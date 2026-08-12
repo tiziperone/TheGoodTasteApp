@@ -1,1 +1,1 @@
-# The Good Taste
+# The Good Taste App
