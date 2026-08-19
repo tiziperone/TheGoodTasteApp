@@ -1,21 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data.SqlClient;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Data.SqlClient;
 
 namespace The_Good_Taste.Datos
 {
-    internal class Conexion
+    internal static class Conexion
     {
-        // Cadena de conexión interna para el servidor local
-        private static string cadenaConexion = "Data Source=.;Initial Catalog=TheGoodTasteDB;Integrated Security=True";
+        // Si tu instancia de SQL Server es SQLEXPRESS, cambia "Data Source=." por "Data Source=.\\SQLEXPRESS"
+        private static readonly string CadenaConexion = "Data Source=.;Initial Catalog=TheGoodTasteDB;Integrated Security=True;TrustServerCertificate=True;";
 
         internal static SqlConnection ObtenerConexion()
         {
-            return new SqlConnection(cadenaConexion);
+            return new SqlConnection(CadenaConexion);
         }
     }
 }
-
