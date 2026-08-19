@@ -1,4 +1,4 @@
 <Solution>
   <Project Path="The Good Taste/The Good Taste.csproj" Id="64bc27b0-82e7-4636-8e0b-a8d533c1f8c7" />
-  <Project Path="TheGoodTaste.UI/TheGoodTaste.UI.vbproj" Id="ff06011e-5e6f-4b6f-8de2-030847010687" />
+  <Project Path="TheGoodTaste.UI/TheGoodTaste.UI.csproj" Id="f530f9b9-3a69-42f1-8b7b-e2a20614d699" />
 </Solution>
