@@ -16,7 +16,8 @@ namespace The_Good_Taste
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new Form1());
+            Application.Run(new The_Good_Taste.Vistas.FormPrincipal());
         }
     }
 }
+//
