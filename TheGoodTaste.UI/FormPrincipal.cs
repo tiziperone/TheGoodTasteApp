@@ -16,5 +16,16 @@ namespace TheGoodTaste.UI
         {
             InitializeComponent();
         }
+
+        private void FormPrincipal_Load(object sender, EventArgs e)
+        {
+
+        }
+
+        private void productosToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            FormProductos frm = new FormProductos();
+            frm.ShowDialog(); // O frm.Show() si quieres que puedan usar la ventana de fondo
+        }
     }
 }
