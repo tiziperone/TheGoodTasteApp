@@ -24,8 +24,8 @@ namespace TheGoodTaste.UI
             var categorias = new Dictionary<int, string>
             {
                 { 1, "Pastas Frescas" },
-                { 2, "Carnes y Elaborados" },
-                { 3, "Bebidas" }
+                { 2, "Bondiolas" },
+                { 3, "Milanesas" }
             };
 
             cboCategoria.DataSource = new BindingSource(categorias, null);
