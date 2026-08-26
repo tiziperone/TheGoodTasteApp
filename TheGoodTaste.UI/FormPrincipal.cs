@@ -25,7 +25,24 @@ namespace TheGoodTaste.UI
         private void productosToolStripMenuItem_Click(object sender, EventArgs e)
         {
             FormProductos frm = new FormProductos();
-            frm.ShowDialog(); // O frm.Show() si quieres que puedan usar la ventana de fondo
+            frm.ShowDialog();
+        }
+
+        private void clientesToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            FormClientes frm = new FormClientes();
+            frm.ShowDialog();
+        }
+
+        private void ventasToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            FormPuntoVenta frm = new FormPuntoVenta();
+            frm.ShowDialog();
+        }
+
+        private void salirToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            this.Close();
         }
     }
 }
