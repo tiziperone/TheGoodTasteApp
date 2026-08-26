@@ -42,7 +42,6 @@
             this.LStock = new System.Windows.Forms.Label();
             this.dgvProductos = new System.Windows.Forms.DataGridView();
             this.btnGuardar = new System.Windows.Forms.Button();
-            this.btnModificar = new System.Windows.Forms.Button();
             this.btnEliminar = new System.Windows.Forms.Button();
             this.btnLimpiar = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.nudStock)).BeginInit();
@@ -96,7 +95,7 @@
             // LCodProd
             // 
             this.LCodProd.AutoSize = true;
-            this.LCodProd.Location = new System.Drawing.Point(51, 48);
+            this.LCodProd.Location = new System.Drawing.Point(47, 48);
             this.LCodProd.Name = "LCodProd";
             this.LCodProd.Size = new System.Drawing.Size(127, 16);
             this.LCodProd.TabIndex = 6;
@@ -105,7 +104,7 @@
             // LNombreProd
             // 
             this.LNombreProd.AutoSize = true;
-            this.LNombreProd.Location = new System.Drawing.Point(51, 93);
+            this.LNombreProd.Location = new System.Drawing.Point(47, 93);
             this.LNombreProd.Name = "LNombreProd";
             this.LNombreProd.Size = new System.Drawing.Size(56, 16);
             this.LNombreProd.TabIndex = 7;
@@ -114,7 +113,7 @@
             // LDescripcion
             // 
             this.LDescripcion.AutoSize = true;
-            this.LDescripcion.Location = new System.Drawing.Point(51, 144);
+            this.LDescripcion.Location = new System.Drawing.Point(47, 144);
             this.LDescripcion.Name = "LDescripcion";
             this.LDescripcion.Size = new System.Drawing.Size(79, 16);
             this.LDescripcion.TabIndex = 8;
@@ -123,7 +122,7 @@
             // LPrecio
             // 
             this.LPrecio.AutoSize = true;
-            this.LPrecio.Location = new System.Drawing.Point(51, 183);
+            this.LPrecio.Location = new System.Drawing.Point(47, 189);
             this.LPrecio.Name = "LPrecio";
             this.LPrecio.Size = new System.Drawing.Size(46, 16);
             this.LPrecio.TabIndex = 9;
@@ -132,16 +131,17 @@
             // LNroCategoria
             // 
             this.LNroCategoria.AutoSize = true;
-            this.LNroCategoria.Location = new System.Drawing.Point(51, 240);
+            this.LNroCategoria.Location = new System.Drawing.Point(47, 241);
             this.LNroCategoria.Name = "LNroCategoria";
-            this.LNroCategoria.Size = new System.Drawing.Size(88, 16);
+            this.LNroCategoria.Size = new System.Drawing.Size(66, 16);
             this.LNroCategoria.TabIndex = 10;
-            this.LNroCategoria.Text = "NroCategoria";
+            this.LNroCategoria.Text = "Categoria";
+            this.LNroCategoria.Click += new System.EventHandler(this.LNroCategoria_Click);
             // 
             // LStock
             // 
             this.LStock.AutoSize = true;
-            this.LStock.Location = new System.Drawing.Point(56, 284);
+            this.LStock.Location = new System.Drawing.Point(52, 284);
             this.LStock.Name = "LStock";
             this.LStock.Size = new System.Drawing.Size(41, 16);
             this.LStock.TabIndex = 11;
@@ -162,7 +162,7 @@
             // 
             // btnGuardar
             // 
-            this.btnGuardar.Location = new System.Drawing.Point(42, 388);
+            this.btnGuardar.Location = new System.Drawing.Point(42, 359);
             this.btnGuardar.Name = "btnGuardar";
             this.btnGuardar.Size = new System.Drawing.Size(75, 23);
             this.btnGuardar.TabIndex = 13;
@@ -170,18 +170,9 @@
             this.btnGuardar.UseVisualStyleBackColor = true;
             this.btnGuardar.Click += new System.EventHandler(this.btnGuardar_Click);
             // 
-            // btnModificar
-            // 
-            this.btnModificar.Location = new System.Drawing.Point(42, 350);
-            this.btnModificar.Name = "btnModificar";
-            this.btnModificar.Size = new System.Drawing.Size(75, 23);
-            this.btnModificar.TabIndex = 14;
-            this.btnModificar.Text = "Modificar";
-            this.btnModificar.UseVisualStyleBackColor = true;
-            // 
             // btnEliminar
             // 
-            this.btnEliminar.Location = new System.Drawing.Point(123, 388);
+            this.btnEliminar.Location = new System.Drawing.Point(123, 359);
             this.btnEliminar.Name = "btnEliminar";
             this.btnEliminar.Size = new System.Drawing.Size(75, 23);
             this.btnEliminar.TabIndex = 15;
@@ -190,7 +181,7 @@
             // 
             // btnLimpiar
             // 
-            this.btnLimpiar.Location = new System.Drawing.Point(123, 350);
+            this.btnLimpiar.Location = new System.Drawing.Point(80, 400);
             this.btnLimpiar.Name = "btnLimpiar";
             this.btnLimpiar.Size = new System.Drawing.Size(75, 23);
             this.btnLimpiar.TabIndex = 16;
@@ -205,7 +196,6 @@
             this.ClientSize = new System.Drawing.Size(800, 450);
             this.Controls.Add(this.btnLimpiar);
             this.Controls.Add(this.btnEliminar);
-            this.Controls.Add(this.btnModificar);
             this.Controls.Add(this.btnGuardar);
             this.Controls.Add(this.dgvProductos);
             this.Controls.Add(this.LStock);
@@ -246,7 +236,6 @@
         private System.Windows.Forms.Label LStock;
         private System.Windows.Forms.DataGridView dgvProductos;
         private System.Windows.Forms.Button btnGuardar;
-        private System.Windows.Forms.Button btnModificar;
         private System.Windows.Forms.Button btnEliminar;
         private System.Windows.Forms.Button btnLimpiar;
     }

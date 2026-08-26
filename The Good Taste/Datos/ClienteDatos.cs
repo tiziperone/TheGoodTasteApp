@@ -30,8 +30,8 @@ namespace The_Good_Taste.Datos
                             Telefono = dr["Telefono"].ToString(),
                             Email = dr["Email"].ToString(),
                             Calle = dr["Calle"].ToString(),
-                            Numero = dr["Numero"].ToString(),
-                            Barrio = dr["Barrio"].ToString()
+                            Numero = dr["Numero"].ToString()
+
                         };
                     }
                 }

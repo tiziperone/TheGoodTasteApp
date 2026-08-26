@@ -23,7 +23,7 @@ namespace TheGoodTaste.UI
         {
             var categorias = new Dictionary<int, string>
             {
-                { 1, "Pastas Frescas" },
+                { 1, "Pastas" },
                 { 2, "Bondiolas" },
                 { 3, "Milanesas" }
             };
@@ -121,6 +121,11 @@ namespace TheGoodTaste.UI
 
         private void label1_Click(object sender, EventArgs e)
         {
+        }
+
+        private void LNroCategoria_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }
