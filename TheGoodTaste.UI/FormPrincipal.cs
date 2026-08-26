@@ -19,7 +19,7 @@ namespace TheGoodTaste.UI
 
         private void FormPrincipal_Load(object sender, EventArgs e)
         {
-
+            TemaVisual.AplicarEstilo(this);
         }
 
         private void productosToolStripMenuItem_Click(object sender, EventArgs e)

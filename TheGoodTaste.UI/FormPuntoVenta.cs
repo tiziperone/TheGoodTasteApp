@@ -19,7 +19,7 @@ namespace TheGoodTaste.UI
 
         private void FormPuntoVenta_Load(object sender, EventArgs e)
         {
-
+            TemaVisual.AplicarEstilo(this);
         }
 
         private void label7_Click(object sender, EventArgs e)

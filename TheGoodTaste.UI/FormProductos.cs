@@ -17,6 +17,7 @@ namespace TheGoodTaste.UI
         {
             CargarCategorias();
             CargarGrillaProductos();
+            TemaVisual.AplicarEstilo(this);
         }
 
         private void CargarCategorias()
@@ -124,6 +125,11 @@ namespace TheGoodTaste.UI
         }
 
         private void LNroCategoria_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnEliminar_Click(object sender, EventArgs e)
         {
 
         }

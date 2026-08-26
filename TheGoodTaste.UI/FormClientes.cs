@@ -24,7 +24,7 @@ namespace TheGoodTaste.UI
 
         private void FormClientes_Load(object sender, EventArgs e)
         {
-
+            TemaVisual.AplicarEstilo(this);
         }
 
         private void label1_Click(object sender, EventArgs e)
