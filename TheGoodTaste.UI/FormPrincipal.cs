@@ -40,6 +40,12 @@ namespace TheGoodTaste.UI
             frm.ShowDialog();
         }
 
+        private void usuariosToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            FormUsuarios frm = new FormUsuarios();
+            frm.ShowDialog();
+        }
+
         private void salirToolStripMenuItem_Click(object sender, EventArgs e)
         {
             this.Close();
