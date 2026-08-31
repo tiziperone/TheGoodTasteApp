@@ -35,7 +35,6 @@
             this.txtTelefono = new System.Windows.Forms.TextBox();
             this.txtCalle = new System.Windows.Forms.TextBox();
             this.txtNumero = new System.Windows.Forms.TextBox();
-            this.txtBarrio = new System.Windows.Forms.TextBox();
             this.dtpFechaNacimiento = new System.Windows.Forms.DateTimePicker();
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
@@ -45,7 +44,6 @@
             this.label6 = new System.Windows.Forms.Label();
             this.label7 = new System.Windows.Forms.Label();
             this.label8 = new System.Windows.Forms.Label();
-            this.label9 = new System.Windows.Forms.Label();
             this.dgvClientes = new System.Windows.Forms.DataGridView();
             this.btnGuardar = new System.Windows.Forms.Button();
             this.btnLimpiar = new System.Windows.Forms.Button();
@@ -106,13 +104,6 @@
             this.txtNumero.Name = "txtNumero";
             this.txtNumero.Size = new System.Drawing.Size(135, 22);
             this.txtNumero.TabIndex = 6;
-            // 
-            // txtBarrio
-            // 
-            this.txtBarrio.Location = new System.Drawing.Point(152, 426);
-            this.txtBarrio.Name = "txtBarrio";
-            this.txtBarrio.Size = new System.Drawing.Size(138, 22);
-            this.txtBarrio.TabIndex = 7;
             // 
             // dtpFechaNacimiento
             // 
@@ -194,19 +185,10 @@
             this.label8.TabIndex = 16;
             this.label8.Text = "Número:";
             // 
-            // label9
-            // 
-            this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(60, 429);
-            this.label9.Name = "label9";
-            this.label9.Size = new System.Drawing.Size(58, 16);
-            this.label9.TabIndex = 17;
-            this.label9.Text = "BARRIO";
-            // 
             // dgvClientes
             // 
             this.dgvClientes.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dgvClientes.Location = new System.Drawing.Point(50, 429);
+            this.dgvClientes.Location = new System.Drawing.Point(62, 437);
             this.dgvClientes.Name = "dgvClientes";
             this.dgvClientes.ReadOnly = true;
             this.dgvClientes.RowHeadersWidth = 51;
@@ -285,7 +267,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 673);
+            this.ClientSize = new System.Drawing.Size(933, 749);
             this.Controls.Add(this.textNroAltura);
             this.Controls.Add(this.textLocalidad);
             this.Controls.Add(this.label12);
@@ -295,7 +277,6 @@
             this.Controls.Add(this.btnLimpiar);
             this.Controls.Add(this.btnGuardar);
             this.Controls.Add(this.dgvClientes);
-            this.Controls.Add(this.label9);
             this.Controls.Add(this.label8);
             this.Controls.Add(this.label7);
             this.Controls.Add(this.label6);
@@ -305,7 +286,6 @@
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.dtpFechaNacimiento);
-            this.Controls.Add(this.txtBarrio);
             this.Controls.Add(this.txtNumero);
             this.Controls.Add(this.txtCalle);
             this.Controls.Add(this.txtTelefono);
@@ -319,6 +299,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.dgvClientes)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
+
         }
 
         #endregion
@@ -330,7 +311,6 @@
         private System.Windows.Forms.TextBox txtTelefono;
         private System.Windows.Forms.TextBox txtCalle;
         private System.Windows.Forms.TextBox txtNumero;
-        private System.Windows.Forms.TextBox txtBarrio;
         private System.Windows.Forms.DateTimePicker dtpFechaNacimiento;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
@@ -340,7 +320,6 @@
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.Label label8;
-        private System.Windows.Forms.Label label9;
         private System.Windows.Forms.DataGridView dgvClientes;
         private System.Windows.Forms.Button btnGuardar;
         private System.Windows.Forms.Button btnLimpiar;
