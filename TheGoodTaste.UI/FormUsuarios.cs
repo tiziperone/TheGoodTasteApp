@@ -21,5 +21,10 @@ namespace TheGoodTaste.UI
         {
 
         }
+
+        private void FormUsuarios_Load(object sender, EventArgs e)
+        {
+            TemaVisual.AplicarEstilo(this);
+        }
     }
 }
