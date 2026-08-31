@@ -136,7 +136,6 @@
             this.LNroCategoria.Size = new System.Drawing.Size(66, 16);
             this.LNroCategoria.TabIndex = 10;
             this.LNroCategoria.Text = "Categoria";
-            this.LNroCategoria.Click += new System.EventHandler(this.LNroCategoria_Click);
             // 
             // LStock
             // 
@@ -146,7 +145,6 @@
             this.LStock.Size = new System.Drawing.Size(41, 16);
             this.LStock.TabIndex = 11;
             this.LStock.Text = "Stock";
-            this.LStock.Click += new System.EventHandler(this.label1_Click);
             // 
             // dgvProductos
             // 
@@ -157,7 +155,7 @@
             this.dgvProductos.RowHeadersWidth = 51;
             this.dgvProductos.RowTemplate.Height = 24;
             this.dgvProductos.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.dgvProductos.Size = new System.Drawing.Size(381, 365);
+            this.dgvProductos.Size = new System.Drawing.Size(534, 365);
             this.dgvProductos.TabIndex = 12;
             // 
             // btnGuardar
@@ -194,7 +192,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 450);
+            this.ClientSize = new System.Drawing.Size(1043, 528);
             this.Controls.Add(this.btnLimpiar);
             this.Controls.Add(this.btnEliminar);
             this.Controls.Add(this.btnGuardar);
