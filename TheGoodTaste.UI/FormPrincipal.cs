@@ -7,19 +7,56 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using The_Good_Taste.Entidades;
 
 namespace TheGoodTaste.UI
 {
     public partial class FormPrincipal : Form
     {
+        private readonly UsuarioSistema _usuarioActual;
+
+        // Constructor por defecto (requerido por el diseñador de Windows Forms)
         public FormPrincipal()
         {
             InitializeComponent();
         }
 
+        // Constructor que recibe la sesión activa desde Program.cs
+        public FormPrincipal(UsuarioSistema usuario) : this()
+        {
+            _usuarioActual = usuario;
+        }
+
         private void FormPrincipal_Load(object sender, EventArgs e)
         {
             TemaVisual.AplicarEstilo(this);
+
+            if (_usuarioActual != null)
+            {
+                this.Text = $"Bienvenido a The Good Taste - Usuario: {_usuarioActual.NombreUsuario} [{_usuarioActual.Rol}]";
+                ConfigurarPermisosPorRol();
+            }
+        }
+
+        private void ConfigurarPermisosPorRol()
+        {
+            switch (_usuarioActual.Rol)
+            {
+                case RolUsuario.Admin:
+                    // Admin ve todo (no se oculta nada)
+                    break;
+
+                case RolUsuario.Gerente:
+                    // Gerente ve catálogo, clientes y ventas, pero no gestiona usuarios
+                    usuariosToolStripMenuItem.Visible = false;
+                    break;
+
+                case RolUsuario.Vendedor:
+                    // Vendedor solo atiende clientes y registra ventas
+                    usuariosToolStripMenuItem.Visible = false;
+                    productosToolStripMenuItem.Visible = false;
+                    break;
+            }
         }
 
         // Método auxiliar para incrustar formularios dentro del panel
@@ -63,6 +100,11 @@ namespace TheGoodTaste.UI
         private void salirToolStripMenuItem_Click(object sender, EventArgs e)
         {
             this.Close();
+        }
+
+        private void panelContenedor_Paint(object sender, PaintEventArgs e)
+        {
+
         }
     }
 }

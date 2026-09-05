@@ -16,7 +16,21 @@ namespace TheGoodTaste.UI
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new FormPrincipal());
+
+            using (var login = new FormLogin())
+            {
+                // Abre el login de forma modal
+                if (login.ShowDialog() == DialogResult.OK)
+                {
+                    // Pasa el usuario autenticado a la ventana principal
+                    Application.Run(new FormPrincipal(login.UsuarioAutenticado));
+                }
+                else
+                {
+                    // Si cierra o cancela la ventana de login, termina la app
+                    Application.Exit();
+                }
+            }
         }
     }
 }

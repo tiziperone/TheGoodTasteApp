@@ -15,6 +15,7 @@ namespace TheGoodTaste.UI
         {
             InitializeComponent();
 
+            
             // Centra la ventana de login en la pantalla
             this.StartPosition = FormStartPosition.CenterScreen;
             this.FormBorderStyle = FormBorderStyle.FixedSingle;
@@ -25,6 +26,7 @@ namespace TheGoodTaste.UI
         {
             // Opcional: Si quieres asegurar que la contraseña se oculte por código
             // txtPassword.UseSystemPasswordChar = true;
+            TemaVisual.AplicarEstilo(this);
         }
 
         // Asocia este evento al botón "Ingresar" / "Iniciar Sesión"
@@ -68,7 +70,7 @@ namespace TheGoodTaste.UI
         }
 
         // Si tienes un botón "Cancelar" o "Salir" en el Login
-        private void btnCancelar_Click(object sender, EventArgs e)
+        private void btnIngresar_Click_1(object sender, EventArgs e)
         {
             this.DialogResult = DialogResult.Cancel;
             this.Close();
