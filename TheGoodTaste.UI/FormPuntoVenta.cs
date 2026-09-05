@@ -8,6 +8,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using The_Good_Taste.Datos;
+using The_Good_Taste.Entidades;
 
 namespace TheGoodTaste.UI
 {
@@ -149,10 +151,56 @@ namespace TheGoodTaste.UI
                 return;
             }
 
-            // Aquí se conecta con la capa de persistencia/base de datos
-            MessageBox.Show("Venta registrada con éxito.", "Venta Exitosa", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            try
+            {
+                // 1. Calcular el total 
+                decimal totalVenta = 0;
+                foreach (DataGridViewRow row in dgvDetalles.Rows)
+                {
+                    if (row.Cells["Subtotal"].Value != null)
+                        totalVenta += Convert.ToDecimal(row.Cells["Subtotal"].Value);
+                }
 
-            LimpiarTodo();
+                // 2. Instanciar la cabecera de la venta
+                Venta nuevaVenta = new Venta
+                {
+                    Fecha = dtpFechaVenta.Value,
+                  
+                    IdCliente = cboCliente.SelectedIndex != -1 ? Convert.ToInt32(cboCliente.SelectedValue) : 1,
+                    MetodoEnvio = "Local",
+                    DireccionEnvio = "Retiro en sucursal",
+                    Total = totalVenta,
+                    Detalles = new List<VentaDetalle>() // Inicializamos la lista de detalles
+                };
+
+                // 3. Llenar los detalles recorriendo las filas del DataGridView
+                foreach (DataGridViewRow row in dgvDetalles.Rows)
+                {
+                    if (row.IsNewRow) continue;
+
+                    VentaDetalle detalle = new VentaDetalle
+                    {
+                        IdProducto = Convert.ToInt32(row.Cells["ID"].Value),
+                        Cantidad = Convert.ToInt32(row.Cells["Cantidad"].Value),
+                        PrecioUnitario = Convert.ToDecimal(row.Cells["Precio"].Value)
+                    };
+
+                    nuevaVenta.Detalles.Add(detalle);
+                }
+
+                // 4. Enviar a la base de datos usando tu clase VentaDatos
+                bool exito = VentaDatos.RegistrarVenta(nuevaVenta);
+
+                if (exito)
+                {
+                    MessageBox.Show("Venta registrada con éxito en la base de datos.", "Venta Exitosa", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    LimpiarTodo(); // Vaciamos la pantalla para la siguiente venta
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Ocurrió un error al registrar la venta: " + ex.Message, "Error de Base de Datos", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private void btnLimpiar_Click(object sender, EventArgs e)
@@ -160,8 +208,7 @@ namespace TheGoodTaste.UI
             LimpiarTodo();
         }
 
-        // =======================
-        // MÉTODOS AUXILIARES
+       
         // =======================
         private void CalcularTotalVenta()
         {
@@ -177,8 +224,7 @@ namespace TheGoodTaste.UI
                 }
             }
 
-            // Si tienes un Label para el total (ej: lblTotal):
-            // lblTotal.Text = total.ToString("N2");
+  
         }
 
         private void LimpiarTodo()

@@ -98,9 +98,6 @@ namespace TheGoodTaste.UI
             if (dgvProductos.Columns["IdProducto"] != null)
                 dgvProductos.Columns["IdProducto"].Visible = false;
 
-            if (dgvProductos.Columns["UrlImagen"] != null)
-                dgvProductos.Columns["UrlImagen"].Visible = false;
-
             if (dgvProductos.Columns["DeletedAt"] != null)
                 dgvProductos.Columns["DeletedAt"].Visible = false;
 
