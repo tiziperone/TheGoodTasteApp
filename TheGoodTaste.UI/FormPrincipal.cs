@@ -36,6 +36,9 @@ namespace TheGoodTaste.UI
                 this.Text = $"Bienvenido a The Good Taste - Usuario: {_usuarioActual.NombreUsuario} [{_usuarioActual.Rol}]";
                 ConfigurarPermisosPorRol();
             }
+
+            // Centra la imagen de bienvenida al cargar el formulario
+            CentrarLogo();
         }
 
         private void ConfigurarPermisosPorRol()
@@ -59,23 +62,53 @@ namespace TheGoodTaste.UI
             }
         }
 
+        // Mantiene el logo centrado si la ventana cambia de tamaño o se maximiza
+        private void CentrarLogo()
+        {
+            if (pbLogoInicio != null && pbLogoInicio.Visible)
+            {
+                pbLogoInicio.Left = (panelContenedor.ClientSize.Width - pbLogoInicio.Width) / 2;
+                pbLogoInicio.Top = (panelContenedor.ClientSize.Height - pbLogoInicio.Height) / 2;
+            }
+        }
+
         // Método auxiliar para incrustar formularios dentro del panel
         private void AbrirFormularioEnPanel(Form formularioHijo)
         {
-            // Cierra y libera recursos del formulario anterior si existe
-            if (this.panelContenedor.Controls.Count > 0)
+            // Oculta la imagen de bienvenida para mostrar el módulo
+            if (pbLogoInicio != null)
             {
-                Control controlActual = this.panelContenedor.Controls[0];
-                this.panelContenedor.Controls.RemoveAt(0);
-                controlActual.Dispose(); // Libera la memoria del form anterior
+                pbLogoInicio.Visible = false;
+            }
+
+            // Cierra y libera memoria del formulario previo sin borrar el PictureBox
+            for (int i = panelContenedor.Controls.Count - 1; i >= 0; i--)
+            {
+                Control control = panelContenedor.Controls[i];
+                if (control is Form formPrevio)
+                {
+                    panelContenedor.Controls.RemoveAt(i);
+                    formPrevio.Dispose();
+                }
             }
 
             formularioHijo.TopLevel = false;
             formularioHijo.FormBorderStyle = FormBorderStyle.None;
             formularioHijo.Dock = DockStyle.Fill;
 
+            // Vuelve a mostrar el logo si el formulario hijo se cierra
+            formularioHijo.FormClosed += (s, args) =>
+            {
+                if (pbLogoInicio != null)
+                {
+                    pbLogoInicio.Visible = true;
+                    CentrarLogo();
+                }
+            };
+
             this.panelContenedor.Controls.Add(formularioHijo);
             this.panelContenedor.Tag = formularioHijo;
+            formularioHijo.BringToFront();
             formularioHijo.Show();
         }
 
@@ -107,6 +140,11 @@ namespace TheGoodTaste.UI
         private void panelContenedor_Paint(object sender, PaintEventArgs e)
         {
 
+        }
+
+        private void panelContenedor_Resize(object sender, EventArgs e)
+        {
+            CentrarLogo();
         }
     }
 }

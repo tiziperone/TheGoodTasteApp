@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormPrincipal));
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.productosToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.clientesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -36,7 +37,10 @@
             this.salirToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.panel1 = new System.Windows.Forms.Panel();
             this.panelContenedor = new System.Windows.Forms.Panel();
+            this.pbLogoInicio = new System.Windows.Forms.PictureBox();
             this.menuStrip1.SuspendLayout();
+            this.panelContenedor.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pbLogoInicio)).BeginInit();
             this.SuspendLayout();
             // 
             // menuStrip1
@@ -98,12 +102,24 @@
             // 
             // panelContenedor
             // 
+            this.panelContenedor.Controls.Add(this.pbLogoInicio);
             this.panelContenedor.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panelContenedor.Location = new System.Drawing.Point(0, 28);
             this.panelContenedor.Name = "panelContenedor";
             this.panelContenedor.Size = new System.Drawing.Size(1046, 545);
             this.panelContenedor.TabIndex = 1;
             this.panelContenedor.Paint += new System.Windows.Forms.PaintEventHandler(this.panelContenedor_Paint);
+            // 
+            // pbLogoInicio
+            // 
+            this.pbLogoInicio.BackColor = System.Drawing.SystemColors.ActiveCaptionText;
+            this.pbLogoInicio.Image = ((System.Drawing.Image)(resources.GetObject("pbLogoInicio.Image")));
+            this.pbLogoInicio.Location = new System.Drawing.Point(78, 44);
+            this.pbLogoInicio.Name = "pbLogoInicio";
+            this.pbLogoInicio.Size = new System.Drawing.Size(885, 454);
+            this.pbLogoInicio.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.pbLogoInicio.TabIndex = 0;
+            this.pbLogoInicio.TabStop = false;
             // 
             // FormPrincipal
             // 
@@ -119,6 +135,8 @@
             this.Load += new System.EventHandler(this.FormPrincipal_Load);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
+            this.panelContenedor.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.pbLogoInicio)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -134,6 +152,7 @@
         private System.Windows.Forms.ToolStripMenuItem usuariosToolStripMenuItem;
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.Panel panelContenedor;
+        private System.Windows.Forms.PictureBox pbLogoInicio;
     }
 }
 
