@@ -7,7 +7,7 @@ using The_Good_Taste.Entidades;
 
 namespace The_Good_Taste.Datos
 {
-    internal class UsuarioDatos
+    public class UsuarioDatos
     {
         public UsuarioSistema Autenticar(string user, string pass)// solo temporalmente hasta conectar con sql
         {
