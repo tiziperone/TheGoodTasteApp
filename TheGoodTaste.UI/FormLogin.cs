@@ -30,7 +30,7 @@ namespace TheGoodTaste.UI
         }
 
         // Asocia este evento al botón "Ingresar" / "Iniciar Sesión"
-        private void btnIngresar_Click(object sender, EventArgs e)
+        private void btnIngresar_Click_1(object sender, EventArgs e)
         {
             string usuario = txtUsuario.Text.Trim();
             string clave = txtPassword.Text.Trim();
@@ -67,13 +67,6 @@ namespace TheGoodTaste.UI
                 txtPassword.Clear();
                 txtPassword.Focus();
             }
-        }
-
-        // Si tienes un botón "Cancelar" o "Salir" en el Login
-        private void btnIngresar_Click_1(object sender, EventArgs e)
-        {
-            this.DialogResult = DialogResult.Cancel;
-            this.Close();
         }
 
     }

@@ -65,7 +65,7 @@
             this.labelUserName.AutoSize = true;
             this.labelUserName.Location = new System.Drawing.Point(173, 132);
             this.labelUserName.Name = "labelUserName";
-            this.labelUserName.Size = new System.Drawing.Size(45, 20);
+            this.labelUserName.Size = new System.Drawing.Size(36, 16);
             this.labelUserName.TabIndex = 3;
             this.labelUserName.Text = "User";
             // 
@@ -74,7 +74,7 @@
             this.labelPassword.AutoSize = true;
             this.labelPassword.Location = new System.Drawing.Point(173, 186);
             this.labelPassword.Name = "labelPassword";
-            this.labelPassword.Size = new System.Drawing.Size(84, 20);
+            this.labelPassword.Size = new System.Drawing.Size(67, 16);
             this.labelPassword.TabIndex = 4;
             this.labelPassword.Text = "Password";
             // 
@@ -89,7 +89,7 @@
             this.Controls.Add(this.txtPassword);
             this.Controls.Add(this.txtUsuario);
             this.Name = "FormLogin";
-            this.Text = "FormLogin";
+            this.Text = "Inicio de Sesión";
             this.Load += new System.EventHandler(this.FormLogin_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
