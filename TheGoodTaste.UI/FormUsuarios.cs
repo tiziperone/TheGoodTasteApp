@@ -2,12 +2,14 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Data.SqlClient;
 using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using The_Good_Taste.Datos;
 
 namespace TheGoodTaste.UI
 {
@@ -16,27 +18,43 @@ namespace TheGoodTaste.UI
         public FormUsuarios()
         {
             InitializeComponent();
-            
         }
 
         private void FormUsuarios_Load(object sender, EventArgs e)
         {
             TemaVisual.AplicarEstilo(this);
+            CargarRoles();
             ConfigurarEventos();
             LimpiarCampos();
+
+            // Carga inicial de la grilla con usuarios activos
+            CargarGrillaUsuarios(true);
+        }
+
+        private void CargarRoles()
+        {
+            var roles = new Dictionary<int, string>
+            {
+                { 1, "Admin" },
+                { 2, "Gerente" },
+                { 3, "Vendedor" }
+            };
+
+            comboBox1.DataSource = new BindingSource(roles, null);
+            comboBox1.DisplayMember = "Value";
+            comboBox1.ValueMember = "Key";
+            comboBox1.SelectedIndex = -1;
         }
 
         private void ConfigurarEventos()
         {
-            // Restricción de caracteres: solo letras
+            // Restricción de caracteres
             textBoxName.KeyPress += SoloLetras_KeyPress;
             textBoxApellido.KeyPress += SoloLetras_KeyPress;
-
-            // Restricción de caracteres: solo números
             textBoxDNI.KeyPress += SoloNumeros_KeyPress;
             textBoxNroTel.KeyPress += SoloNumeros_KeyPress;
 
-            // Detección de cambios para actualizar el estado de los botones
+            // Detección de cambios de texto
             textBoxName.TextChanged += Control_Modificado;
             textBoxApellido.TextChanged += Control_Modificado;
             textBoxUser.TextChanged += Control_Modificado;
@@ -50,17 +68,33 @@ namespace TheGoodTaste.UI
             radioButtonHom.CheckedChanged += Control_Modificado;
             radioButtonMuj.CheckedChanged += Control_Modificado;
 
-            // Eventos de clic
+            // Acciones principales
             buttonSave.Click += buttonSave_Click;
             buttonDel.Click += buttonDel_Click;
+
+            // Eventos de los botones de filtro de la grilla
+            // Si tus botones se llaman distinto en el Diseñador, cambia buttonActivos/buttonInactivos
+            radioButtonAct.Click += (s, e) => CargarGrillaUsuarios(true);
+            radioButtonInac.Click += (s, e) => CargarGrillaUsuarios(false);
         }
 
-        // =======================
-        // FILTRADO DE ENTRADA
-        // =======================
+        private void CargarGrillaUsuarios(bool verActivos)
+        {
+            try
+            {
+                UsuarioDatos repo = new UsuarioDatos();
+                // Si tu DataGridView tiene otro nombre (ej: dgvUsuarios), reemplázalo aquí
+                dataGridView1.DataSource = repo.ObtenerUsuariosPorEstado(verActivos);
+                dataGridView1.ClearSelection();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error al cargar la lista de usuarios: " + ex.Message, "Error BD", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
         private void SoloLetras_KeyPress(object sender, KeyPressEventArgs e)
         {
-            // Permite solo letras, espacio y teclas de control (retroceso/borrar)
             if (!char.IsLetter(e.KeyChar) && !char.IsControl(e.KeyChar) && !char.IsWhiteSpace(e.KeyChar))
             {
                 e.Handled = true;
@@ -69,16 +103,12 @@ namespace TheGoodTaste.UI
 
         private void SoloNumeros_KeyPress(object sender, KeyPressEventArgs e)
         {
-            // Permite solo dígitos numéricos y teclas de control
             if (!char.IsDigit(e.KeyChar) && !char.IsControl(e.KeyChar))
             {
                 e.Handled = true;
             }
         }
 
-        // =======================
-        // ESTADO DE BOTONES
-        // =======================
         private void Control_Modificado(object sender, EventArgs e)
         {
             ActualizarEstadoBotones();
@@ -86,7 +116,6 @@ namespace TheGoodTaste.UI
 
         private void ActualizarEstadoBotones()
         {
-            // Habilita Cancelar (buttonDel) si hay al menos un dato cargado
             bool algunCampoConDato = !string.IsNullOrWhiteSpace(textBoxName.Text) ||
                                      !string.IsNullOrWhiteSpace(textBoxApellido.Text) ||
                                      !string.IsNullOrWhiteSpace(textBoxUser.Text) ||
@@ -99,7 +128,6 @@ namespace TheGoodTaste.UI
                                      radioButtonHom.Checked ||
                                      radioButtonMuj.Checked;
 
-            // Habilita Guardar (buttonSave) si todos los obligatorios están llenos
             bool obligatoriosCompletos = !string.IsNullOrWhiteSpace(textBoxName.Text) &&
                                          !string.IsNullOrWhiteSpace(textBoxApellido.Text) &&
                                          !string.IsNullOrWhiteSpace(textBoxUser.Text) &&
@@ -113,12 +141,8 @@ namespace TheGoodTaste.UI
             buttonSave.Enabled = obligatoriosCompletos;
         }
 
-        // =======================
-        // ACCIONES DE BOTONES
-        // =======================
         private void buttonSave_Click(object sender, EventArgs e)
         {
-            // Validación de formato de email
             string emailPattern = @"^[^@\s]+@[^@\s]+\.[^@\s]+$";
             if (!Regex.IsMatch(textBoxEmail.Text.Trim(), emailPattern))
             {
@@ -128,7 +152,6 @@ namespace TheGoodTaste.UI
                 return;
             }
 
-            // Validación de longitud de DNI (7 u 8 dígitos)
             if (textBoxDNI.Text.Trim().Length < 7 || textBoxDNI.Text.Trim().Length > 8)
             {
                 MessageBox.Show("El DNI debe contener 7 u 8 dígitos.",
@@ -137,10 +160,39 @@ namespace TheGoodTaste.UI
                 return;
             }
 
-            // Lógica de inserción/actualización en base de datos aquí...
-            MessageBox.Show("Usuario registrado correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            try
+            {
+                string username = textBoxUser.Text.Trim();
+                string password = textBoxPass.Text.Trim();
+                string nombreCompleto = $"{textBoxName.Text.Trim()} {textBoxApellido.Text.Trim()}";
+                int idRol = Convert.ToInt32(comboBox1.SelectedValue);
 
-            LimpiarCampos();
+                UsuarioDatos repo = new UsuarioDatos();
+                bool registrado = repo.RegistrarUsuario(username, password, nombreCompleto, idRol);
+
+                if (registrado)
+                {
+                    MessageBox.Show("Usuario registrado correctamente en la base de datos.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    LimpiarCampos();
+                    CargarGrillaUsuarios(true); // Refresca automáticamente los activos
+                }
+            }
+            catch (SqlException ex)
+            {
+                if (ex.Number == 2627 || ex.Number == 2601)
+                {
+                    MessageBox.Show("Ya existe un usuario con ese nombre de usuario. Elija otro.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    textBoxUser.Focus();
+                }
+                else
+                {
+                    MessageBox.Show("Error al guardar en la base de datos: " + ex.Message, "Error BD", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error inesperado: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private void buttonDel_Click(object sender, EventArgs e)
@@ -166,5 +218,15 @@ namespace TheGoodTaste.UI
 
             ActualizarEstadoBotones();
         }
-    }
+    
+    private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            // Método requerido por FormUsuarios.Designer.cs
+        }
+
+        private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+
+        }
+    } 
 }

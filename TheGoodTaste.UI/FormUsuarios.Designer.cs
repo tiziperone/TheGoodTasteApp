@@ -268,12 +268,13 @@
             this.comboBox1.FormattingEnabled = true;
             this.comboBox1.Items.AddRange(new object[] {
             "Administrador",
-            "Cajero",
-            "Gerente"});
+            "Gerente",
+            "Vendedor"});
             this.comboBox1.Location = new System.Drawing.Point(125, 209);
             this.comboBox1.Name = "comboBox1";
             this.comboBox1.Size = new System.Drawing.Size(181, 24);
             this.comboBox1.TabIndex = 25;
+            this.comboBox1.SelectedIndexChanged += new System.EventHandler(this.comboBox1_SelectedIndexChanged);
             // 
             // dataGridView1
             // 
@@ -284,6 +285,7 @@
             this.dataGridView1.RowTemplate.Height = 24;
             this.dataGridView1.Size = new System.Drawing.Size(834, 201);
             this.dataGridView1.TabIndex = 26;
+            this.dataGridView1.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellContentClick);
             // 
             // radioButtonAct
             // 
@@ -313,7 +315,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1019, 590);
+            this.ClientSize = new System.Drawing.Size(1106, 804);
             this.Controls.Add(this.radioButtonInac);
             this.Controls.Add(this.radioButtonAct);
             this.Controls.Add(this.dataGridView1);

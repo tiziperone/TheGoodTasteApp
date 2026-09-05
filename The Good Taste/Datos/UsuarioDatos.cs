@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Configuration;
+using System.Data;
 using System.Data.SqlClient;
 using System.Security.Cryptography;
 using System.Text;
@@ -9,10 +10,8 @@ namespace The_Good_Taste.Datos
 {
     public class UsuarioDatos
     {
-        // Obtiene la cadena de conexión configurada en App.config
         private readonly string _cadenaConexion = ConfigurationManager.ConnectionStrings["CadenaConexion"].ConnectionString;
 
-        // Genera el hash SHA256 de la contraseña ingresada para compararlo con el guardado en la base de datos
         private string GenerarHashSHA256(string texto)
         {
             using (SHA256 sha256 = SHA256.Create())
@@ -31,7 +30,6 @@ namespace The_Good_Taste.Datos
         {
             string hashPassword = GenerarHashSHA256(pass);
 
-            // Consulta parametrizada para evitar inyecciones SQL
             string query = @"
                 SELECT IdUsuario, Username, NombreCompleto, IdRol, Activo
                 FROM Usuarios
@@ -63,7 +61,64 @@ namespace The_Good_Taste.Datos
                 }
             }
 
-            return null; // Credenciales inválidas o usuario inactivo
+            return null;
+        }
+
+        public bool RegistrarUsuario(string username, string password, string nombreCompleto, int idRol)
+        {
+            string hashPassword = GenerarHashSHA256(password);
+
+            string query = @"
+                INSERT INTO Usuarios (Username, PasswordHash, NombreCompleto, IdRol, Activo)
+                VALUES (@user, @pass, @nombre, @rol, 1)";
+
+            using (SqlConnection conexion = new SqlConnection(_cadenaConexion))
+            {
+                using (SqlCommand cmd = new SqlCommand(query, conexion))
+                {
+                    cmd.Parameters.AddWithValue("@user", username);
+                    cmd.Parameters.AddWithValue("@pass", hashPassword);
+                    cmd.Parameters.AddWithValue("@nombre", nombreCompleto);
+                    cmd.Parameters.AddWithValue("@rol", idRol);
+
+                    conexion.Open();
+                    return cmd.ExecuteNonQuery() > 0;
+                }
+            }
+        }
+
+        public DataTable ObtenerUsuariosPorEstado(bool activos)
+        {
+            DataTable dt = new DataTable();
+
+            string query = @"
+        SELECT 
+            IdUsuario AS [ID],
+            Username AS [Usuario],
+            NombreCompleto AS [Nombre Completo],
+            CASE IdRol
+                WHEN 1 THEN 'Admin'
+                WHEN 2 THEN 'Gerente'
+                WHEN 3 THEN 'Vendedor'
+                ELSE 'Desconocido'
+            END AS [Rol],
+            Activo AS [Estado]
+        FROM Usuarios
+        WHERE Activo = @activo";
+
+            using (SqlConnection con = new SqlConnection(_cadenaConexion))
+            {
+                using (SqlCommand cmd = new SqlCommand(query, con))
+                {
+                    cmd.Parameters.AddWithValue("@activo", activos ? 1 : 0);
+                    using (SqlDataAdapter da = new SqlDataAdapter(cmd))
+                    {
+                        da.Fill(dt);
+                    }
+                }
+            }
+
+            return dt;
         }
     }
 }
