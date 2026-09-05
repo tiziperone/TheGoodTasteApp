@@ -62,16 +62,18 @@ namespace TheGoodTaste.UI
         // Método auxiliar para incrustar formularios dentro del panel
         private void AbrirFormularioEnPanel(Form formularioHijo)
         {
-            // Limpia el formulario previo si existe
+            // Cierra y libera recursos del formulario anterior si existe
             if (this.panelContenedor.Controls.Count > 0)
+            {
+                Control controlActual = this.panelContenedor.Controls[0];
                 this.panelContenedor.Controls.RemoveAt(0);
+                controlActual.Dispose(); // Libera la memoria del form anterior
+            }
 
-            // Ajusta las propiedades para incrustarlo
             formularioHijo.TopLevel = false;
             formularioHijo.FormBorderStyle = FormBorderStyle.None;
             formularioHijo.Dock = DockStyle.Fill;
 
-            // Agrega y muestra el formulario en el panel
             this.panelContenedor.Controls.Add(formularioHijo);
             this.panelContenedor.Tag = formularioHijo;
             formularioHijo.Show();

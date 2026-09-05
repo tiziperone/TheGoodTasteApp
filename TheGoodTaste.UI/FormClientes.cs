@@ -16,12 +16,13 @@ namespace TheGoodTaste.UI
         public FormClientes()
         {
             InitializeComponent();
-            ConfigurarEventos();
+            
         }
 
         private void FormClientes_Load(object sender, EventArgs e)
         {
             TemaVisual.AplicarEstilo(this);
+            ConfigurarEventos();
             LimpiarCampos();
         }
 
