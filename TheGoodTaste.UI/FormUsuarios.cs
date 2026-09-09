@@ -68,12 +68,7 @@ namespace TheGoodTaste.UI
             radioButtonHom.CheckedChanged += Control_Modificado;
             radioButtonMuj.CheckedChanged += Control_Modificado;
 
-            // Acciones principales
-            buttonSave.Click += buttonSave_Click;
-            buttonDel.Click += buttonDel_Click;
-
-            // Eventos de los botones de filtro de la grilla
-            // Si tus botones se llaman distinto en el Diseñador, cambia buttonActivos/buttonInactivos
+            // Filtros de grilla
             radioButtonAct.Click += (s, e) => CargarGrillaUsuarios(true);
             radioButtonInac.Click += (s, e) => CargarGrillaUsuarios(false);
         }
@@ -83,7 +78,6 @@ namespace TheGoodTaste.UI
             try
             {
                 UsuarioDatos repo = new UsuarioDatos();
-                // Si tu DataGridView tiene otro nombre (ej: dgvUsuarios), reemplázalo aquí
                 dataGridView1.DataSource = repo.ObtenerUsuariosPorEstado(verActivos);
                 dataGridView1.ClearSelection();
             }
@@ -141,6 +135,7 @@ namespace TheGoodTaste.UI
             buttonSave.Enabled = obligatoriosCompletos;
         }
 
+        // Evento asignado al botón Guardar
         private void buttonSave_Click(object sender, EventArgs e)
         {
             string emailPattern = @"^[^@\s]+@[^@\s]+\.[^@\s]+$";
@@ -174,7 +169,7 @@ namespace TheGoodTaste.UI
                 {
                     MessageBox.Show("Usuario registrado correctamente en la base de datos.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     LimpiarCampos();
-                    CargarGrillaUsuarios(true); // Refresca automáticamente los activos
+                    CargarGrillaUsuarios(true);
                 }
             }
             catch (SqlException ex)
@@ -195,9 +190,22 @@ namespace TheGoodTaste.UI
             }
         }
 
+        // Redirige por si el diseñador quedó enlazado a buttonSave_Click_1
+        private void buttonSave_Click_1(object sender, EventArgs e)
+        {
+            buttonSave_Click(sender, e);
+        }
+
+        // Evento asignado al botón Limpiar/Borrar campos
         private void buttonDel_Click(object sender, EventArgs e)
         {
             LimpiarCampos();
+        }
+
+        // Redirige por si el diseñador quedó enlazado a buttonDel_Click_1
+        private void buttonDel_Click_1(object sender, EventArgs e)
+        {
+            buttonDel_Click(sender, e);
         }
 
         private void LimpiarCampos()
@@ -218,15 +226,13 @@ namespace TheGoodTaste.UI
 
             ActualizarEstadoBotones();
         }
-    
-    private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
+
+        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
-            // Método requerido por FormUsuarios.Designer.cs
         }
 
         private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
-
         }
-    } 
+    }
 }

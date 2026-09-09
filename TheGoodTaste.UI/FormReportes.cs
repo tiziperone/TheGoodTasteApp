@@ -16,5 +16,10 @@ namespace TheGoodTaste.UI
         {
             InitializeComponent();
         }
+
+        private void FormReportes_Load(object sender, EventArgs e)
+        {
+
+        }
     }
 }

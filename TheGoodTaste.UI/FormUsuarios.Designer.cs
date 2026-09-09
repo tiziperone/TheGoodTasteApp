@@ -252,6 +252,7 @@
             this.buttonSave.TabIndex = 23;
             this.buttonSave.Text = "Guardar";
             this.buttonSave.UseVisualStyleBackColor = true;
+            this.buttonSave.Click += new System.EventHandler(this.buttonSave_Click_1);
             // 
             // buttonDel
             // 
@@ -261,6 +262,7 @@
             this.buttonDel.TabIndex = 24;
             this.buttonDel.Text = "Cancelar";
             this.buttonDel.UseVisualStyleBackColor = true;
+            this.buttonDel.Click += new System.EventHandler(this.buttonDel_Click_1);
             // 
             // comboBox1
             // 

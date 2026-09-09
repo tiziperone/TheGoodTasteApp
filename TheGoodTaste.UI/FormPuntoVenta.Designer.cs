@@ -42,15 +42,15 @@
             this.nudCantidad = new System.Windows.Forms.NumericUpDown();
             this.btnAgregar = new System.Windows.Forms.Button();
             this.dgvDetalles = new System.Windows.Forms.DataGridView();
-            this.label7 = new System.Windows.Forms.Label();
-            this.lblTotalMonto = new System.Windows.Forms.Label();
-            this.btnGuardarVenta = new System.Windows.Forms.Button();
-            this.btnLimpiar = new System.Windows.Forms.Button();
             this.colIdProducto = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colNombre = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colPrecio = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colCantidad = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colSubtotal = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.label7 = new System.Windows.Forms.Label();
+            this.lblTotalMonto = new System.Windows.Forms.Label();
+            this.btnGuardarVenta = new System.Windows.Forms.Button();
+            this.btnLimpiar = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.nudCantidad)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dgvDetalles)).BeginInit();
             this.SuspendLayout();
@@ -174,6 +174,7 @@
             this.btnAgregar.TabIndex = 13;
             this.btnAgregar.Text = "Agregar Producto";
             this.btnAgregar.UseVisualStyleBackColor = true;
+            this.btnAgregar.Click += new System.EventHandler(this.btnAgregar_Click_1);
             // 
             // dgvDetalles
             // 
@@ -191,43 +192,6 @@
             this.dgvDetalles.RowTemplate.Height = 24;
             this.dgvDetalles.Size = new System.Drawing.Size(320, 254);
             this.dgvDetalles.TabIndex = 14;
-            // 
-            // label7
-            // 
-            this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(494, 307);
-            this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(64, 16);
-            this.label7.TabIndex = 15;
-            this.label7.Text = "TOTAL: $";
-            // 
-            // lblTotalMonto
-            // 
-            this.lblTotalMonto.AutoSize = true;
-            this.lblTotalMonto.Location = new System.Drawing.Point(605, 307);
-            this.lblTotalMonto.Name = "lblTotalMonto";
-            this.lblTotalMonto.Size = new System.Drawing.Size(31, 16);
-            this.lblTotalMonto.TabIndex = 16;
-            this.lblTotalMonto.Text = "0.00";
-            // 
-            // btnGuardarVenta
-            // 
-            this.btnGuardarVenta.Location = new System.Drawing.Point(429, 342);
-            this.btnGuardarVenta.Name = "btnGuardarVenta";
-            this.btnGuardarVenta.Size = new System.Drawing.Size(114, 46);
-            this.btnGuardarVenta.TabIndex = 17;
-            this.btnGuardarVenta.Text = "Confirmar Venta";
-            this.btnGuardarVenta.TextImageRelation = System.Windows.Forms.TextImageRelation.TextAboveImage;
-            this.btnGuardarVenta.UseVisualStyleBackColor = true;
-            // 
-            // btnLimpiar
-            // 
-            this.btnLimpiar.Location = new System.Drawing.Point(583, 342);
-            this.btnLimpiar.Name = "btnLimpiar";
-            this.btnLimpiar.Size = new System.Drawing.Size(102, 46);
-            this.btnLimpiar.TabIndex = 18;
-            this.btnLimpiar.Text = "Limpiar";
-            this.btnLimpiar.UseVisualStyleBackColor = true;
             // 
             // colIdProducto
             // 
@@ -263,6 +227,45 @@
             this.colSubtotal.MinimumWidth = 6;
             this.colSubtotal.Name = "colSubtotal";
             this.colSubtotal.Width = 125;
+            // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Location = new System.Drawing.Point(494, 307);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(64, 16);
+            this.label7.TabIndex = 15;
+            this.label7.Text = "TOTAL: $";
+            // 
+            // lblTotalMonto
+            // 
+            this.lblTotalMonto.AutoSize = true;
+            this.lblTotalMonto.Location = new System.Drawing.Point(605, 307);
+            this.lblTotalMonto.Name = "lblTotalMonto";
+            this.lblTotalMonto.Size = new System.Drawing.Size(31, 16);
+            this.lblTotalMonto.TabIndex = 16;
+            this.lblTotalMonto.Text = "0.00";
+            // 
+            // btnGuardarVenta
+            // 
+            this.btnGuardarVenta.Location = new System.Drawing.Point(429, 342);
+            this.btnGuardarVenta.Name = "btnGuardarVenta";
+            this.btnGuardarVenta.Size = new System.Drawing.Size(114, 46);
+            this.btnGuardarVenta.TabIndex = 17;
+            this.btnGuardarVenta.Text = "Confirmar Venta";
+            this.btnGuardarVenta.TextImageRelation = System.Windows.Forms.TextImageRelation.TextAboveImage;
+            this.btnGuardarVenta.UseVisualStyleBackColor = true;
+            this.btnGuardarVenta.Click += new System.EventHandler(this.btnGuardarVenta_Click_1);
+            // 
+            // btnLimpiar
+            // 
+            this.btnLimpiar.Location = new System.Drawing.Point(583, 342);
+            this.btnLimpiar.Name = "btnLimpiar";
+            this.btnLimpiar.Size = new System.Drawing.Size(102, 46);
+            this.btnLimpiar.TabIndex = 18;
+            this.btnLimpiar.Text = "Limpiar";
+            this.btnLimpiar.UseVisualStyleBackColor = true;
+            this.btnLimpiar.Click += new System.EventHandler(this.btnLimpiar_Click_1);
             // 
             // FormPuntoVenta
             // 

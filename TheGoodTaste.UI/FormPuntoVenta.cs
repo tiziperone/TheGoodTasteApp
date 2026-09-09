@@ -240,5 +240,20 @@ namespace TheGoodTaste.UI
             CalcularTotalVenta();
             ActualizarEstadoBotones();
         }
+
+        private void btnAgregar_Click_1(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnGuardarVenta_Click_1(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnLimpiar_Click_1(object sender, EventArgs e)
+        {
+
+        }
     }
 }
