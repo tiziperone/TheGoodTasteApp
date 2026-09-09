@@ -87,6 +87,21 @@ namespace The_Good_Taste.Datos
             }
         }
 
+        public bool ExisteDNI(string dni)
+        {
+            // Asegúrate de usar la misma lógica de conexión que ya tienes en tu proyecto
+            using (SqlConnection conexion = Conexion.ObtenerConexion())
+            {
+                conexion.Open();
+                string query = "SELECT COUNT(*) FROM Usuarios WHERE DNI = @DNI";
+                SqlCommand cmd = new SqlCommand(query, conexion);
+                cmd.Parameters.AddWithValue("@DNI", dni);
+
+                int cantidad = (int)cmd.ExecuteScalar();
+                return cantidad > 0; // Si es mayor a 0, devuelve true (el DNI ya existe)
+            }
+        }
+
         public DataTable ObtenerUsuariosPorEstado(bool activos)
         {
             DataTable dt = new DataTable();

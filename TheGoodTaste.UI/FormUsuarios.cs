@@ -163,6 +163,16 @@ namespace TheGoodTaste.UI
                 int idRol = Convert.ToInt32(comboBox1.SelectedValue);
 
                 UsuarioDatos repo = new UsuarioDatos();
+
+                // Validación en código: Verificamos si el DNI ya existe en la base de datos
+                if (repo.ExisteDNI(textBoxDNI.Text.Trim()))
+                {
+                    MessageBox.Show("El DNI ingresado ya está registrado para otro usuario.", "DNI Duplicado", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    textBoxDNI.Focus();
+                    return; // Detiene la ejecución para no guardar duplicados
+                }
+
+                // Si todo está correcto, registramos
                 bool registrado = repo.RegistrarUsuario(username, password, nombreCompleto, idRol);
 
                 if (registrado)
@@ -174,6 +184,7 @@ namespace TheGoodTaste.UI
             }
             catch (SqlException ex)
             {
+                // Mantenemos la captura de errores SQL por si existe una restricción de Username (violación UNIQUE)
                 if (ex.Number == 2627 || ex.Number == 2601)
                 {
                     MessageBox.Show("Ya existe un usuario con ese nombre de usuario. Elija otro.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning);
