@@ -231,5 +231,10 @@ namespace TheGoodTaste.UI
         {
             btnLimpiar_Click(sender, e);
         }
+
+        private void dgvDetalles_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+
+        }
     }
 }

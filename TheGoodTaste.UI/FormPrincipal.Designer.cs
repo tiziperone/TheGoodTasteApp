@@ -120,6 +120,7 @@
             this.pbLogoInicio.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.pbLogoInicio.TabIndex = 0;
             this.pbLogoInicio.TabStop = false;
+            this.pbLogoInicio.Click += new System.EventHandler(this.pbLogoInicio_Click);
             // 
             // FormPrincipal
             // 

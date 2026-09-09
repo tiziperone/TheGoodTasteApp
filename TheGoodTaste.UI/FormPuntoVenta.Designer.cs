@@ -179,6 +179,10 @@
             // dgvDetalles
             // 
             this.dgvDetalles.AllowUserToAddRows = false;
+            this.dgvDetalles.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.dgvDetalles.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
             this.dgvDetalles.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dgvDetalles.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.colIdProducto,
@@ -192,41 +196,37 @@
             this.dgvDetalles.RowTemplate.Height = 24;
             this.dgvDetalles.Size = new System.Drawing.Size(320, 254);
             this.dgvDetalles.TabIndex = 14;
+            this.dgvDetalles.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvDetalles_CellContentClick);
             // 
             // colIdProducto
             // 
             this.colIdProducto.HeaderText = "ID";
             this.colIdProducto.MinimumWidth = 6;
             this.colIdProducto.Name = "colIdProducto";
-            this.colIdProducto.Width = 125;
             // 
             // colNombre
             // 
             this.colNombre.HeaderText = "Producto";
             this.colNombre.MinimumWidth = 6;
             this.colNombre.Name = "colNombre";
-            this.colNombre.Width = 125;
             // 
             // colPrecio
             // 
             this.colPrecio.HeaderText = "Precio Unitario";
             this.colPrecio.MinimumWidth = 6;
             this.colPrecio.Name = "colPrecio";
-            this.colPrecio.Width = 125;
             // 
             // colCantidad
             // 
             this.colCantidad.HeaderText = "Cantidad";
             this.colCantidad.MinimumWidth = 6;
             this.colCantidad.Name = "colCantidad";
-            this.colCantidad.Width = 125;
             // 
             // colSubtotal
             // 
             this.colSubtotal.HeaderText = "Subtotal";
             this.colSubtotal.MinimumWidth = 6;
             this.colSubtotal.Name = "colSubtotal";
-            this.colSubtotal.Width = 125;
             // 
             // label7
             // 

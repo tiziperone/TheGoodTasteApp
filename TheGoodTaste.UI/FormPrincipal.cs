@@ -146,5 +146,10 @@ namespace TheGoodTaste.UI
         {
             CentrarLogo();
         }
+
+        private void pbLogoInicio_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }
