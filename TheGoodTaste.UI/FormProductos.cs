@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Windows.Forms;
 using The_Good_Taste.Entidades;
@@ -60,7 +61,6 @@ namespace TheGoodTaste.UI
 
         private void CargarProductosIniciales()
         {
-            // Solo carga datos de prueba la primera vez que se abre la pantalla
             if (listaProductosEnMemoria.Count == 0)
             {
                 listaProductosEnMemoria.Add(new Producto
@@ -94,7 +94,6 @@ namespace TheGoodTaste.UI
             dgvProductos.DataSource = null;
             dgvProductos.DataSource = listaProductosEnMemoria.ToList();
 
-            // Ocultar columnas internas si existen en la clase Producto
             if (dgvProductos.Columns["IdProducto"] != null)
                 dgvProductos.Columns["IdProducto"].Visible = false;
 
@@ -109,15 +108,21 @@ namespace TheGoodTaste.UI
         // =======================
         private void SoloNumerosYDecimal_KeyPress(object sender, KeyPressEventArgs e)
         {
+            char decSep = CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator[0];
+
             if (!char.IsDigit(e.KeyChar) && !char.IsControl(e.KeyChar) && e.KeyChar != '.' && e.KeyChar != ',')
             {
                 e.Handled = true;
                 return;
             }
 
-            if ((e.KeyChar == '.' || e.KeyChar == ',') && (txtPrecio.Text.Contains(".") || txtPrecio.Text.Contains(",")))
+            if (e.KeyChar == '.' || e.KeyChar == ',')
             {
-                e.Handled = true;
+                e.KeyChar = decSep;
+                if (txtPrecio.Text.Contains(decSep.ToString()))
+                {
+                    e.Handled = true;
+                }
             }
         }
 
@@ -155,7 +160,7 @@ namespace TheGoodTaste.UI
         private void btnGuardar_Click(object sender, EventArgs e)
         {
             string precioTexto = txtPrecio.Text.Trim().Replace(',', '.');
-            if (!decimal.TryParse(precioTexto, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out decimal precio) || precio <= 0)
+            if (!decimal.TryParse(precioTexto, NumberStyles.Any, CultureInfo.InvariantCulture, out decimal precio) || precio <= 0)
             {
                 MessageBox.Show("Ingrese un precio válido mayor a 0.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 txtPrecio.Focus();
@@ -228,6 +233,21 @@ namespace TheGoodTaste.UI
             dgvProductos.ClearSelection();
             ActualizarEstadoBotones();
             txtCodigo.Focus();
+        }
+
+        private void btnGuardar_Click_1(object sender, EventArgs e)
+        {
+            btnGuardar_Click(sender, e);
+        }
+
+        private void btnEliminar_Click_1(object sender, EventArgs e)
+        {
+            btnEliminar_Click(sender, e);
+        }
+
+        private void btnLimpiar_Click_1(object sender, EventArgs e)
+        {
+            btnLimpiar_Click(sender, e);
         }
     }
 }

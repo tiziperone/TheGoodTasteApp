@@ -33,7 +33,7 @@ namespace TheGoodTaste.UI
             // Restricción: el precio solo acepta números y coma/punto decimal
             txtPrecio.KeyPress += SoloDecimales_KeyPress;
 
-            // Detección de cambios para actualizar el estado de los botones
+            
             cboCliente.SelectedIndexChanged += Control_Modificado;
             cboTipoFactura.SelectedIndexChanged += Control_Modificado;
             cboProducto.SelectedIndexChanged += Control_Modificado;
@@ -54,9 +54,7 @@ namespace TheGoodTaste.UI
             }
         }
 
-        // =======================
-        // FILTRADO DE ENTRADA
-        // =======================
+       
         private void SoloDecimales_KeyPress(object sender, KeyPressEventArgs e)
         {
             char decSep = CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator[0];
@@ -77,9 +75,9 @@ namespace TheGoodTaste.UI
             }
         }
 
-        // =======================
-        // ESTADO DE BOTONES
-        // =======================
+        
+        // botones
+        
         private void Control_Modificado(object sender, EventArgs e)
         {
             ActualizarEstadoBotones();
@@ -186,9 +184,7 @@ namespace TheGoodTaste.UI
             LimpiarTodo();
         }
 
-        // =======================
-        // MÉTODOS AUXILIARES
-        // =======================
+        
         private decimal CalcularTotalVenta()
         {
             decimal total = 0;
@@ -218,6 +214,22 @@ namespace TheGoodTaste.UI
 
             CalcularTotalVenta();
             ActualizarEstadoBotones();
+        }
+
+
+        private void btnAgregar_Click_1(object sender, EventArgs e)
+        {
+            btnAgregar_Click(sender, e);
+        }
+
+        private void btnGuardarVenta_Click_1(object sender, EventArgs e)
+        {
+            btnGuardarVenta_Click(sender, e);
+        }
+
+        private void btnLimpiar_Click_1(object sender, EventArgs e)
+        {
+            btnLimpiar_Click(sender, e);
         }
     }
 }
