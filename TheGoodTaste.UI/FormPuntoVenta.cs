@@ -39,11 +39,6 @@ namespace TheGoodTaste.UI
             cboProducto.SelectedIndexChanged += Control_Modificado;
             nudCantidad.ValueChanged += Control_Modificado;
             txtPrecio.TextChanged += Control_Modificado;
-
-            // Eventos de clic
-            btnAgregar.Click += btnAgregar_Click;
-            btnGuardarVenta.Click += btnGuardarVenta_Click;
-            btnLimpiar.Click += btnLimpiar_Click;
         }
 
         private void InicializarTablaDetalles()
@@ -64,7 +59,6 @@ namespace TheGoodTaste.UI
         // =======================
         private void SoloDecimales_KeyPress(object sender, KeyPressEventArgs e)
         {
-            // Permite números, retroceso y separador decimal (. o ,)
             char decSep = CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator[0];
 
             if (!char.IsDigit(e.KeyChar) && !char.IsControl(e.KeyChar) && e.KeyChar != '.' && e.KeyChar != ',')
@@ -73,7 +67,6 @@ namespace TheGoodTaste.UI
                 return;
             }
 
-            // Normaliza punto y coma para que coincida con el separador local
             if (e.KeyChar == '.' || e.KeyChar == ',')
             {
                 e.KeyChar = decSep;
@@ -94,18 +87,15 @@ namespace TheGoodTaste.UI
 
         private void ActualizarEstadoBotones()
         {
-            // Habilitar botón "Agregar Producto" si se seleccionó producto, cantidad > 0 y precio válido
             decimal precio = 0;
             bool precioValido = decimal.TryParse(txtPrecio.Text.Trim(), out precio) && precio > 0;
             bool productoListo = cboProducto.SelectedIndex != -1 && nudCantidad.Value > 0 && precioValido;
             btnAgregar.Enabled = productoListo;
 
-            // Habilitar botón "Confirmar Venta" (btnGuardarVenta) si hay cliente, tipo factura y al menos 1 producto en la grilla
             bool cabeceraLista = cboCliente.SelectedIndex != -1 && cboTipoFactura.SelectedIndex != -1;
             bool tieneItems = dgvDetalles.Rows.Count > 0;
             btnGuardarVenta.Enabled = cabeceraLista && tieneItems;
 
-            // Habilitar botón "Limpiar" si hay cualquier dato cargado
             bool hayDatos = cboCliente.SelectedIndex != -1 ||
                             cboTipoFactura.SelectedIndex != -1 ||
                             cboProducto.SelectedIndex != -1 ||
@@ -129,12 +119,10 @@ namespace TheGoodTaste.UI
             int cantidad = (int)nudCantidad.Value;
             decimal subtotal = precio * cantidad;
             string nombreProducto = cboProducto.Text;
-            string idProducto = (cboProducto.SelectedIndex + 1).ToString(); // O el ID real según tu DataSource
+            string idProducto = (cboProducto.SelectedIndex + 1).ToString();
 
-            // Agregar fila al DataGridView
             dgvDetalles.Rows.Add(idProducto, nombreProducto, precio.ToString("N2"), cantidad, subtotal.ToString("N2"));
 
-            // Limpiar controles de carga de producto
             cboProducto.SelectedIndex = -1;
             nudCantidad.Value = 1;
             txtPrecio.Clear();
@@ -153,27 +141,18 @@ namespace TheGoodTaste.UI
 
             try
             {
-                // 1. Calcular el total 
-                decimal totalVenta = 0;
-                foreach (DataGridViewRow row in dgvDetalles.Rows)
-                {
-                    if (row.Cells["Subtotal"].Value != null)
-                        totalVenta += Convert.ToDecimal(row.Cells["Subtotal"].Value);
-                }
+                decimal totalVenta = CalcularTotalVenta();
 
-                // 2. Instanciar la cabecera de la venta
                 Venta nuevaVenta = new Venta
                 {
                     Fecha = dtpFechaVenta.Value,
-                  
                     IdCliente = cboCliente.SelectedIndex != -1 ? Convert.ToInt32(cboCliente.SelectedValue) : 1,
                     MetodoEnvio = "Local",
                     DireccionEnvio = "Retiro en sucursal",
                     Total = totalVenta,
-                    Detalles = new List<VentaDetalle>() // Inicializamos la lista de detalles
+                    Detalles = new List<VentaDetalle>()
                 };
 
-                // 3. Llenar los detalles recorriendo las filas del DataGridView
                 foreach (DataGridViewRow row in dgvDetalles.Rows)
                 {
                     if (row.IsNewRow) continue;
@@ -188,13 +167,12 @@ namespace TheGoodTaste.UI
                     nuevaVenta.Detalles.Add(detalle);
                 }
 
-                // 4. Enviar a la base de datos usando tu clase VentaDatos
                 bool exito = VentaDatos.RegistrarVenta(nuevaVenta);
 
                 if (exito)
                 {
                     MessageBox.Show("Venta registrada con éxito en la base de datos.", "Venta Exitosa", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    LimpiarTodo(); // Vaciamos la pantalla para la siguiente venta
+                    LimpiarTodo();
                 }
             }
             catch (Exception ex)
@@ -208,9 +186,10 @@ namespace TheGoodTaste.UI
             LimpiarTodo();
         }
 
-       
         // =======================
-        private void CalcularTotalVenta()
+        // MÉTODOS AUXILIARES
+        // =======================
+        private decimal CalcularTotalVenta()
         {
             decimal total = 0;
             foreach (DataGridViewRow row in dgvDetalles.Rows)
@@ -224,7 +203,7 @@ namespace TheGoodTaste.UI
                 }
             }
 
-  
+            return total;
         }
 
         private void LimpiarTodo()
@@ -239,21 +218,6 @@ namespace TheGoodTaste.UI
 
             CalcularTotalVenta();
             ActualizarEstadoBotones();
-        }
-
-        private void btnAgregar_Click_1(object sender, EventArgs e)
-        {
-
-        }
-
-        private void btnGuardarVenta_Click_1(object sender, EventArgs e)
-        {
-
-        }
-
-        private void btnLimpiar_Click_1(object sender, EventArgs e)
-        {
-
         }
     }
 }
