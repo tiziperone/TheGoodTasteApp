@@ -29,70 +29,19 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormPrincipal));
-            this.menuStrip1 = new System.Windows.Forms.MenuStrip();
-            this.productosToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.clientesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.ventasToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.usuariosToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.salirToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.panel1 = new System.Windows.Forms.Panel();
             this.panelContenedor = new System.Windows.Forms.Panel();
             this.pbLogoInicio = new System.Windows.Forms.PictureBox();
-            this.menuStrip1.SuspendLayout();
+            this.panelSuperior = new System.Windows.Forms.Panel();
+            this.btnProductos = new System.Windows.Forms.Button();
+            this.btnClientes = new System.Windows.Forms.Button();
+            this.btnVentas = new System.Windows.Forms.Button();
+            this.btnUsuarios = new System.Windows.Forms.Button();
+            this.btnSalir = new System.Windows.Forms.Button();
             this.panelContenedor.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pbLogoInicio)).BeginInit();
+            this.panelSuperior.SuspendLayout();
             this.SuspendLayout();
-            // 
-            // menuStrip1
-            // 
-            this.menuStrip1.ImageScalingSize = new System.Drawing.Size(20, 20);
-            this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.productosToolStripMenuItem,
-            this.clientesToolStripMenuItem,
-            this.ventasToolStripMenuItem,
-            this.usuariosToolStripMenuItem,
-            this.salirToolStripMenuItem});
-            this.menuStrip1.Location = new System.Drawing.Point(0, 0);
-            this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(1046, 28);
-            this.menuStrip1.TabIndex = 0;
-            this.menuStrip1.Text = "menuStrip1";
-            this.menuStrip1.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.menuStrip1_ItemClicked);
-            // 
-            // productosToolStripMenuItem
-            // 
-            this.productosToolStripMenuItem.Name = "productosToolStripMenuItem";
-            this.productosToolStripMenuItem.Size = new System.Drawing.Size(89, 24);
-            this.productosToolStripMenuItem.Text = "Productos";
-            this.productosToolStripMenuItem.Click += new System.EventHandler(this.productosToolStripMenuItem_Click);
-            // 
-            // clientesToolStripMenuItem
-            // 
-            this.clientesToolStripMenuItem.Name = "clientesToolStripMenuItem";
-            this.clientesToolStripMenuItem.Size = new System.Drawing.Size(75, 24);
-            this.clientesToolStripMenuItem.Text = "Clientes";
-            this.clientesToolStripMenuItem.Click += new System.EventHandler(this.clientesToolStripMenuItem_Click);
-            // 
-            // ventasToolStripMenuItem
-            // 
-            this.ventasToolStripMenuItem.Name = "ventasToolStripMenuItem";
-            this.ventasToolStripMenuItem.Size = new System.Drawing.Size(66, 24);
-            this.ventasToolStripMenuItem.Text = "Ventas";
-            this.ventasToolStripMenuItem.Click += new System.EventHandler(this.ventasToolStripMenuItem_Click);
-            // 
-            // usuariosToolStripMenuItem
-            // 
-            this.usuariosToolStripMenuItem.Name = "usuariosToolStripMenuItem";
-            this.usuariosToolStripMenuItem.Size = new System.Drawing.Size(79, 24);
-            this.usuariosToolStripMenuItem.Text = "Usuarios";
-            this.usuariosToolStripMenuItem.Click += new System.EventHandler(this.usuariosToolStripMenuItem_Click);
-            // 
-            // salirToolStripMenuItem
-            // 
-            this.salirToolStripMenuItem.Name = "salirToolStripMenuItem";
-            this.salirToolStripMenuItem.Size = new System.Drawing.Size(52, 24);
-            this.salirToolStripMenuItem.Text = "Salir";
-            this.salirToolStripMenuItem.Click += new System.EventHandler(this.salirToolStripMenuItem_Click);
             // 
             // panel1
             // 
@@ -103,25 +52,128 @@
             // 
             // panelContenedor
             // 
+            this.panelContenedor.Controls.Add(this.panelSuperior);
             this.panelContenedor.Controls.Add(this.pbLogoInicio);
             this.panelContenedor.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panelContenedor.Location = new System.Drawing.Point(0, 28);
+            this.panelContenedor.Location = new System.Drawing.Point(0, 0);
             this.panelContenedor.Name = "panelContenedor";
-            this.panelContenedor.Size = new System.Drawing.Size(1046, 545);
+            this.panelContenedor.Size = new System.Drawing.Size(1046, 573);
             this.panelContenedor.TabIndex = 1;
             this.panelContenedor.Paint += new System.Windows.Forms.PaintEventHandler(this.panelContenedor_Paint);
             // 
             // pbLogoInicio
             // 
             this.pbLogoInicio.BackColor = System.Drawing.SystemColors.ActiveCaptionText;
+            this.pbLogoInicio.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.pbLogoInicio.Image = ((System.Drawing.Image)(resources.GetObject("pbLogoInicio.Image")));
-            this.pbLogoInicio.Location = new System.Drawing.Point(78, 44);
+            this.pbLogoInicio.Location = new System.Drawing.Point(0, 119);
             this.pbLogoInicio.Name = "pbLogoInicio";
-            this.pbLogoInicio.Size = new System.Drawing.Size(885, 454);
+            this.pbLogoInicio.Size = new System.Drawing.Size(1046, 454);
             this.pbLogoInicio.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.pbLogoInicio.TabIndex = 0;
             this.pbLogoInicio.TabStop = false;
             this.pbLogoInicio.Click += new System.EventHandler(this.pbLogoInicio_Click);
+            // 
+            // panelSuperior
+            // 
+            this.panelSuperior.BackColor = System.Drawing.Color.Goldenrod;
+            this.panelSuperior.Controls.Add(this.btnSalir);
+            this.panelSuperior.Controls.Add(this.btnUsuarios);
+            this.panelSuperior.Controls.Add(this.btnVentas);
+            this.panelSuperior.Controls.Add(this.btnClientes);
+            this.panelSuperior.Controls.Add(this.btnProductos);
+            this.panelSuperior.Dock = System.Windows.Forms.DockStyle.Top;
+            this.panelSuperior.Location = new System.Drawing.Point(0, 0);
+            this.panelSuperior.Name = "panelSuperior";
+            this.panelSuperior.Size = new System.Drawing.Size(1046, 113);
+            this.panelSuperior.TabIndex = 1;
+            // 
+            // btnProductos
+            // 
+            this.btnProductos.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.btnProductos.BackColor = System.Drawing.Color.DarkGoldenrod;
+            this.btnProductos.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("btnProductos.BackgroundImage")));
+            this.btnProductos.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.btnProductos.FlatAppearance.BorderSize = 0;
+            this.btnProductos.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnProductos.Location = new System.Drawing.Point(152, 12);
+            this.btnProductos.Name = "btnProductos";
+            this.btnProductos.Size = new System.Drawing.Size(128, 86);
+            this.btnProductos.TabIndex = 0;
+            this.btnProductos.Text = "[F1] Productos";
+            this.btnProductos.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+            this.btnProductos.UseVisualStyleBackColor = false;
+            this.btnProductos.Click += new System.EventHandler(this.btnProductos_Click);
+            // 
+            // btnClientes
+            // 
+            this.btnClientes.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.btnClientes.BackColor = System.Drawing.Color.DarkGoldenrod;
+            this.btnClientes.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("btnClientes.BackgroundImage")));
+            this.btnClientes.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.btnClientes.FlatAppearance.BorderSize = 0;
+            this.btnClientes.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnClientes.Location = new System.Drawing.Point(297, 12);
+            this.btnClientes.Name = "btnClientes";
+            this.btnClientes.Size = new System.Drawing.Size(128, 86);
+            this.btnClientes.TabIndex = 0;
+            this.btnClientes.Text = "[F2] Clientes";
+            this.btnClientes.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+            this.btnClientes.UseVisualStyleBackColor = false;
+            this.btnClientes.Click += new System.EventHandler(this.btnClientes_Click);
+            // 
+            // btnVentas
+            // 
+            this.btnVentas.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.btnVentas.BackColor = System.Drawing.Color.DarkGoldenrod;
+            this.btnVentas.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("btnVentas.BackgroundImage")));
+            this.btnVentas.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.btnVentas.FlatAppearance.BorderSize = 0;
+            this.btnVentas.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnVentas.Location = new System.Drawing.Point(443, 12);
+            this.btnVentas.Name = "btnVentas";
+            this.btnVentas.Size = new System.Drawing.Size(128, 86);
+            this.btnVentas.TabIndex = 0;
+            this.btnVentas.Text = "[F3] Ventas";
+            this.btnVentas.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+            this.btnVentas.UseVisualStyleBackColor = false;
+            this.btnVentas.Click += new System.EventHandler(this.btnVentas_Click);
+            // 
+            // btnUsuarios
+            // 
+            this.btnUsuarios.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.btnUsuarios.BackColor = System.Drawing.Color.DarkGoldenrod;
+            this.btnUsuarios.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("btnUsuarios.BackgroundImage")));
+            this.btnUsuarios.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.btnUsuarios.FlatAppearance.BorderSize = 0;
+            this.btnUsuarios.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnUsuarios.Location = new System.Drawing.Point(590, 12);
+            this.btnUsuarios.Name = "btnUsuarios";
+            this.btnUsuarios.RightToLeft = System.Windows.Forms.RightToLeft.No;
+            this.btnUsuarios.Size = new System.Drawing.Size(128, 86);
+            this.btnUsuarios.TabIndex = 0;
+            this.btnUsuarios.Text = "[F4] Usuarios";
+            this.btnUsuarios.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+            this.btnUsuarios.UseVisualStyleBackColor = false;
+            this.btnUsuarios.Click += new System.EventHandler(this.btnUsuarios_Click);
+            // 
+            // btnSalir
+            // 
+            this.btnSalir.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnSalir.BackColor = System.Drawing.Color.DarkGoldenrod;
+            this.btnSalir.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("btnSalir.BackgroundImage")));
+            this.btnSalir.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.btnSalir.FlatAppearance.BorderSize = 0;
+            this.btnSalir.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnSalir.Location = new System.Drawing.Point(735, 12);
+            this.btnSalir.Name = "btnSalir";
+            this.btnSalir.Size = new System.Drawing.Size(128, 86);
+            this.btnSalir.TabIndex = 0;
+            this.btnSalir.TabStop = false;
+            this.btnSalir.Text = "Salir [ESC]";
+            this.btnSalir.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+            this.btnSalir.UseVisualStyleBackColor = false;
+            this.btnSalir.Click += new System.EventHandler(this.btnSalir_Click);
             // 
             // FormPrincipal
             // 
@@ -130,31 +182,26 @@
             this.ClientSize = new System.Drawing.Size(1046, 573);
             this.Controls.Add(this.panelContenedor);
             this.Controls.Add(this.panel1);
-            this.Controls.Add(this.menuStrip1);
-            this.MainMenuStrip = this.menuStrip1;
             this.Name = "FormPrincipal";
             this.Text = "Bienvenido a The Good Taste";
             this.Load += new System.EventHandler(this.FormPrincipal_Load);
-            this.menuStrip1.ResumeLayout(false);
-            this.menuStrip1.PerformLayout();
             this.panelContenedor.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.pbLogoInicio)).EndInit();
+            this.panelSuperior.ResumeLayout(false);
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
 
         #endregion
-
-        private System.Windows.Forms.MenuStrip menuStrip1;
-        private System.Windows.Forms.ToolStripMenuItem productosToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem clientesToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem ventasToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem salirToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem usuariosToolStripMenuItem;
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.Panel panelContenedor;
         private System.Windows.Forms.PictureBox pbLogoInicio;
+        private System.Windows.Forms.Panel panelSuperior;
+        private System.Windows.Forms.Button btnProductos;
+        private System.Windows.Forms.Button btnUsuarios;
+        private System.Windows.Forms.Button btnVentas;
+        private System.Windows.Forms.Button btnClientes;
+        private System.Windows.Forms.Button btnSalir;
     }
 }
 
