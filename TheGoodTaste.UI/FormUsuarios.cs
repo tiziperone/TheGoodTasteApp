@@ -12,7 +12,7 @@ namespace TheGoodTaste.UI
 {
     public partial class FormUsuarios : Form
     {
-        private int? _idUsuarioSeleccionado = null; // null = Nuevo Usuario, int = Modo Edición
+        private int? _idUsuarioSeleccionado = null;
 
         public FormUsuarios()
         {
@@ -25,6 +25,11 @@ namespace TheGoodTaste.UI
             CargarRoles();
             ConfigurarEventos();
             LimpiarCampos();
+
+            // Configuración dinámica de la grilla
+            dataGridView1.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            dataGridView1.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+
             CargarGrillaUsuarios(true);
         }
 
@@ -45,34 +50,34 @@ namespace TheGoodTaste.UI
 
         private void ConfigurarEventos()
         {
-            // Restricciones de entrada
             textBoxName.KeyPress += SoloLetras_KeyPress;
             textBoxApellido.KeyPress += SoloLetras_KeyPress;
             textBoxDNI.KeyPress += SoloNumeros_KeyPress;
             textBoxNroTel.KeyPress += SoloNumeros_KeyPress;
 
-            // Detección de cambios para evaluar REGLA DE NEGOCIO (Habilitar/Deshabilitar botones)
+            // Validación en tiempo real para habilitar botones
             textBoxName.TextChanged += Control_Modificado;
             textBoxApellido.TextChanged += Control_Modificado;
             textBoxUser.TextChanged += Control_Modificado;
-            textBoxPass.TextChanged += Control_Modificado;
             textBoxEmail.TextChanged += Control_Modificado;
             textBoxDNI.TextChanged += Control_Modificado;
-            textBoxDir.TextChanged += Control_Modificado;
-            textBoxNroTel.TextChanged += Control_Modificado;
-
             comboBox1.SelectedIndexChanged += Control_Modificado;
             radioButtonHom.CheckedChanged += Control_Modificado;
             radioButtonMuj.CheckedChanged += Control_Modificado;
 
-            // Autogeneración inteligente para agilizar
+            // Generación de usuario sugerido
             textBoxName.TextChanged += GenerarUsuarioSugerido;
             textBoxApellido.TextChanged += GenerarUsuarioSugerido;
 
-            // Selección en DataGridView para editar
+            // Al escribir el DNI, se asigna como contraseña por defecto automáticamente
+            textBoxDNI.TextChanged += (s, e) => {
+                if (!_idUsuarioSeleccionado.HasValue)
+                    textBoxPass.Text = textBoxDNI.Text.Trim();
+            };
+
             dataGridView1.CellDoubleClick += DataGridView1_CellDoubleClick;
 
-            // Navegación fluida con la tecla ENTER entre inputs
+            // Navegación rápida con ENTER
             foreach (Control c in this.Controls)
             {
                 if (c is TextBox)
@@ -95,29 +100,20 @@ namespace TheGoodTaste.UI
             bool algunCampoConDato = !string.IsNullOrWhiteSpace(textBoxName.Text) ||
                                      !string.IsNullOrWhiteSpace(textBoxApellido.Text) ||
                                      !string.IsNullOrWhiteSpace(textBoxUser.Text) ||
-                                     !string.IsNullOrWhiteSpace(textBoxPass.Text) ||
                                      !string.IsNullOrWhiteSpace(textBoxEmail.Text) ||
                                      !string.IsNullOrWhiteSpace(textBoxDNI.Text) ||
-                                     !string.IsNullOrWhiteSpace(textBoxDir.Text) ||
-                                     !string.IsNullOrWhiteSpace(textBoxNroTel.Text) ||
-                                     comboBox1.SelectedIndex != -1 ||
-                                     radioButtonHom.Checked ||
-                                     radioButtonMuj.Checked;
-
-            // Si estamos en modo edición, la contraseña puede quedar vacía para no cambiarla
-            bool esPasswordValido = _idUsuarioSeleccionado.HasValue ? true : !string.IsNullOrWhiteSpace(textBoxPass.Text);
+                                     comboBox1.SelectedIndex != -1;
 
             bool obligatoriosCompletos = !string.IsNullOrWhiteSpace(textBoxName.Text) &&
                                          !string.IsNullOrWhiteSpace(textBoxApellido.Text) &&
                                          !string.IsNullOrWhiteSpace(textBoxUser.Text) &&
-                                         esPasswordValido &&
                                          !string.IsNullOrWhiteSpace(textBoxEmail.Text) &&
                                          !string.IsNullOrWhiteSpace(textBoxDNI.Text) &&
                                          comboBox1.SelectedIndex != -1 &&
                                          (radioButtonHom.Checked || radioButtonMuj.Checked);
 
             buttonDel.Enabled = algunCampoConDato || _idUsuarioSeleccionado.HasValue;
-            buttonSave.Enabled = obligatoriosCompletos; // Mantiene bloqueado el botón hasta cumplir la regla
+            buttonSave.Enabled = obligatoriosCompletos;
         }
 
         private void GenerarUsuarioSugerido(object sender, EventArgs e)
@@ -136,18 +132,17 @@ namespace TheGoodTaste.UI
 
         private void buttonSave_Click(object sender, EventArgs e)
         {
-            // Validaciones de formato antes de tocar BD
             string emailPattern = @"^[^@\s]+@[^@\s]+\.[^@\s]+$";
             if (!Regex.IsMatch(textBoxEmail.Text.Trim(), emailPattern))
             {
-                MessageBox.Show("El correo electrónico no tiene un formato válido (ejemplo: usuario@correo.com).", "Formato Inválido", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("El correo electrónico no tiene un formato válido.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 textBoxEmail.Focus();
                 return;
             }
 
             if (textBoxDNI.Text.Trim().Length < 7 || textBoxDNI.Text.Trim().Length > 8)
             {
-                MessageBox.Show("El DNI debe contener 7 u 8 dígitos.", "Formato Inválido", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("El DNI debe contener 7 u 8 dígitos.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 textBoxDNI.Focus();
                 return;
             }
@@ -155,7 +150,8 @@ namespace TheGoodTaste.UI
             try
             {
                 string username = textBoxUser.Text.Trim();
-                string password = textBoxPass.Text.Trim();
+                // La contraseña predeterminada es el DNI
+                string password = string.IsNullOrWhiteSpace(textBoxPass.Text) ? textBoxDNI.Text.Trim() : textBoxPass.Text.Trim();
                 string nombreCompleto = $"{textBoxName.Text.Trim()} {textBoxApellido.Text.Trim()}";
                 int idRol = Convert.ToInt32(comboBox1.SelectedValue);
 
@@ -163,7 +159,6 @@ namespace TheGoodTaste.UI
 
                 if (!_idUsuarioSeleccionado.HasValue)
                 {
-                    // Crear nuevo usuario
                     if (repo.ExisteDNI(textBoxDNI.Text.Trim()))
                     {
                         MessageBox.Show("El DNI ingresado ya está registrado.", "DNI Duplicado", MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -173,34 +168,21 @@ namespace TheGoodTaste.UI
 
                     if (repo.RegistrarUsuario(username, password, nombreCompleto, idRol))
                     {
-                        MessageBox.Show("Usuario registrado correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        MessageBox.Show("Usuario registrado con éxito.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
                 }
                 else
                 {
-                    // Actualizar usuario existente
-                    // repo.ActualizarUsuario(_idUsuarioSeleccionado.Value, ...);
-                    MessageBox.Show("Usuario actualizado correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    // Lógica para actualizar usuario
+                    MessageBox.Show("Usuario actualizado con éxito.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
 
                 LimpiarCampos();
                 CargarGrillaUsuarios(true);
             }
-            catch (SqlException ex)
-            {
-                if (ex.Number == 2627 || ex.Number == 2601)
-                {
-                    MessageBox.Show("Ya existe un usuario con ese nombre de usuario. Elija otro.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    textBoxUser.Focus();
-                }
-                else
-                {
-                    MessageBox.Show("Error al guardar en la base de datos: " + ex.Message, "Error BD", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-            }
             catch (Exception ex)
             {
-                MessageBox.Show("Error inesperado: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Error al guardar: " + ex.Message, "Error BD", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -213,9 +195,23 @@ namespace TheGoodTaste.UI
                 _idUsuarioSeleccionado = Convert.ToInt32(fila.Cells["ID"].Value);
                 textBoxUser.Text = fila.Cells["Usuario"].Value?.ToString();
 
-                string[] nombres = fila.Cells["Nombre Completo"].Value?.ToString().Split(' ');
-                textBoxName.Text = nombres.Length > 0 ? nombres[0] : "";
-                textBoxApellido.Text = nombres.Length > 1 ? string.Join(" ", nombres.Skip(1)) : "";
+                // Separación inteligente de Nombre y Apellido
+                string nombreCompleto = fila.Cells["Nombre Completo"].Value?.ToString().Trim() ?? "";
+                int ultimoEspacio = nombreCompleto.LastIndexOf(' ');
+
+                if (ultimoEspacio > 0)
+                {
+                    textBoxName.Text = nombreCompleto.Substring(0, ultimoEspacio);
+                    textBoxApellido.Text = nombreCompleto.Substring(ultimoEspacio + 1);
+                }
+                else
+                {
+                    textBoxName.Text = nombreCompleto;
+                    textBoxApellido.Text = "";
+                }
+
+                // Mantiene la contraseña actual para no sobreescribirla
+                textBoxPass.Text = "********";
 
                 buttonSave.Text = "Actualizar";
                 buttonDel.Text = "Cancelar";
@@ -279,12 +275,10 @@ namespace TheGoodTaste.UI
             }
         }
 
-        // Métodos de enlace para compatibilidad con el Diseñador
+        // Enlaces de compatibilidad con el diseñador
         private void buttonSave_Click_1(object sender, EventArgs e) => buttonSave_Click(sender, e);
         private void buttonDel_Click_1(object sender, EventArgs e) => buttonDel_Click(sender, e);
         private void comboBox1_SelectedIndexChanged(object sender, EventArgs e) { }
         private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e) { }
     }
-
-
 }
