@@ -151,5 +151,10 @@ namespace TheGoodTaste.UI
         {
 
         }
+
+        private void menuStrip1_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
+        {
+
+        }
     }
 }
