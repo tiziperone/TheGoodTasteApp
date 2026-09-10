@@ -5,76 +5,105 @@ namespace TheGoodTaste.UI
 {
     public static class TemaVisual
     {
-        // Paleta de colores moderna
-        public static readonly Color FondoForm = Color.FromArgb(245, 246, 250);
-        public static readonly Color Primario = Color.FromArgb(41, 128, 185);     // Azul moderno
-        public static readonly Color Exito = Color.FromArgb(39, 174, 96);        // Verde confirmación
-        public static readonly Color Peligro = Color.FromArgb(192, 57, 43);       // Rojo cancelar/limpiar
-        public static readonly Color TextoOscuro = Color.FromArgb(44, 62, 80);
-        public static readonly Font FuenteGeneral = new Font("Segoe UI", 9.5f, FontStyle.Regular);
-        public static readonly Font FuenteTitulos = new Font("Segoe UI Semibold", 10.5f);
+        // Paleta "The Good Taste" - Ajustada para contraste y botones vivos
+        public static Color ColorFondoGeneral = Color.FromArgb(52, 38, 30);     // Marrón café cálido
+        public static Color ColorFondoGrilla = Color.FromArgb(40, 28, 22);     // Fondo oscuro para delimitar la tabla vacía
+        public static Color ColorFilasTabla = Color.FromArgb(68, 50, 40);     // Marrón medio para filas cargadas
+        public static Color ColorFilaAltTabla = Color.FromArgb(60, 44, 35);     // Tono alternativo
+        public static Color ColorTextoClaro = Color.FromArgb(245, 240, 230);  // Crema suave
+        public static Color ColorDoradoMarca = Color.FromArgb(195, 140, 45);   // Dorado encabezados
 
-        public static void AplicarEstilo(Form form)
+        // Botones con tonos más vivos y brillantes
+        public static Color ColorVerdeVivo = Color.FromArgb(46, 160, 80);    // Verde brillante
+        public static Color ColorRojoVivo = Color.FromArgb(190, 50, 50);    // Rojo brillante
+        public static Color ColorBotonComun = Color.FromArgb(85, 62, 48);     // Marrón claro para botones comunes (Agregar)
+
+        public static void AplicarEstilo(Control control)
         {
-            form.BackColor = FondoForm;
-            form.Font = FuenteGeneral;
-            form.StartPosition = FormStartPosition.CenterScreen;
-
-            AplicarAControles(form.Controls);
-        }
-
-        private static void AplicarAControles(Control.ControlCollection controles)
-        {
-            foreach (Control c in controles)
+            if (control is Form form)
             {
-                if (c is Label lbl)
+                form.BackColor = ColorFondoGeneral;
+                form.ForeColor = ColorTextoClaro;
+            }
+
+            foreach (Control subControl in control.Controls)
+            {
+                // Paneles / GroupBox
+                if (subControl is Panel || subControl is GroupBox)
                 {
-                    lbl.ForeColor = TextoOscuro;
-                    lbl.Font = lbl.Font.Bold ? FuenteTitulos : FuenteGeneral;
+                    subControl.BackColor = ColorFondoGeneral;
+                    subControl.ForeColor = ColorTextoClaro;
                 }
-                else if (c is Button btn)
+                // Etiquetas
+                else if (subControl is Label lbl)
+                {
+                    lbl.ForeColor = ColorTextoClaro;
+                    lbl.BackColor = Color.Transparent;
+                }
+                // Radios / Checkbox
+                else if (subControl is RadioButton || subControl is CheckBox)
+                {
+                    subControl.ForeColor = ColorTextoClaro;
+                    subControl.BackColor = Color.Transparent;
+                }
+                // Cajas de texto y combos
+                else if (subControl is TextBox || subControl is ComboBox || subControl is DateTimePicker || subControl is NumericUpDown)
+                {
+                    subControl.BackColor = Color.White;
+                    subControl.ForeColor = Color.Black;
+                }
+                // Todos los Botones
+                else if (subControl is Button btn)
                 {
                     btn.FlatStyle = FlatStyle.Flat;
                     btn.FlatAppearance.BorderSize = 0;
-                    btn.Font = FuenteTitulos;
                     btn.ForeColor = Color.White;
-                    btn.Cursor = Cursors.Hand;
 
-                    // Asigna color según el texto o nombre del botón
-                    string txt = btn.Text.ToLower();
-                    if (txt.Contains("guardar") || txt.Contains("confirmar") || txt.Contains("agregar"))
-                        btn.BackColor = Exito;
-                    else if (txt.Contains("eliminar") || txt.Contains("cancelar") || txt.Contains("limpiar") || txt.Contains("salir"))
-                        btn.BackColor = Peligro;
+                    string nombre = btn.Name.ToLower();
+                    string texto = btn.Text.ToLower();
+
+                    // Identificación por nombre de variable o texto del botón
+                    if (nombre.Contains("save") || nombre.Contains("guardar") || nombre.Contains("confirmar") || texto.Contains("confirmar"))
+                    {
+                        btn.BackColor = ColorVerdeVivo;
+                    }
+                    else if (nombre.Contains("del") || nombre.Contains("limpiar") || nombre.Contains("eliminar") || texto.Contains("limpiar"))
+                    {
+                        btn.BackColor = ColorRojoVivo;
+                    }
                     else
-                        btn.BackColor = Primario;
+                    {
+                        // Para "Agregar Producto" y otros botones de acción
+                        btn.BackColor = ColorBotonComun;
+                    }
                 }
-                else if (c is TextBox txt)
+                // Tabla DataGridView
+                else if (subControl is DataGridView dgv)
                 {
-                    txt.BorderStyle = BorderStyle.FixedSingle;
-                    txt.Font = FuenteGeneral;
-                }
-                else if (c is ComboBox cbo)
-                {
-                    cbo.FlatStyle = FlatStyle.Flat;
-                    cbo.Font = FuenteGeneral;
-                }
-                else if (c is DataGridView dgv)
-                {
-                    dgv.BackgroundColor = Color.White;
-                    dgv.BorderStyle = BorderStyle.None;
+                    // Un fondo más oscuro para la tabla delimita el área visible aunque no haya filas
+                    dgv.BackgroundColor = ColorFondoGrilla;
+                    dgv.BorderStyle = BorderStyle.FixedSingle;
                     dgv.EnableHeadersVisualStyles = false;
-                    dgv.ColumnHeadersDefaultCellStyle.BackColor = Primario;
-                    dgv.ColumnHeadersDefaultCellStyle.ForeColor = Color.White;
-                    dgv.ColumnHeadersDefaultCellStyle.Font = FuenteTitulos;
                     dgv.RowHeadersVisible = false;
-                    dgv.AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(240, 243, 244);
+
+                    // Encabezados Dorados
+                    dgv.ColumnHeadersDefaultCellStyle.BackColor = ColorDoradoMarca;
+                    dgv.ColumnHeadersDefaultCellStyle.ForeColor = Color.Black;
+                    dgv.ColumnHeadersDefaultCellStyle.Font = new Font(dgv.Font, FontStyle.Bold);
+
+                    // Filas de la grilla
+                    dgv.DefaultCellStyle.BackColor = ColorFilasTabla;
+                    dgv.DefaultCellStyle.ForeColor = ColorTextoClaro;
+                    dgv.DefaultCellStyle.SelectionBackColor = Color.FromArgb(120, 90, 65);
+                    dgv.DefaultCellStyle.SelectionForeColor = ColorTextoClaro;
+
+                    dgv.AlternatingRowsDefaultCellStyle.BackColor = ColorFilaAltTabla;
                 }
 
-                // Si el control contiene otros controles (como un Panel o GroupBox), aplica recursivamente
-                if (c.HasChildren)
+                // Recursión
+                if (subControl.HasChildren)
                 {
-                    AplicarAControles(c.Controls);
+                    AplicarEstilo(subControl);
                 }
             }
         }
