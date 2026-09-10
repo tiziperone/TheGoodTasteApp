@@ -56,6 +56,7 @@
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
             this.radioButtonAct = new System.Windows.Forms.RadioButton();
             this.radioButtonInac = new System.Windows.Forms.RadioButton();
+            this.chkVerPassUsuario = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -185,6 +186,7 @@
             this.textBoxPass.Name = "textBoxPass";
             this.textBoxPass.Size = new System.Drawing.Size(181, 22);
             this.textBoxPass.TabIndex = 14;
+            this.textBoxPass.UseSystemPasswordChar = true;
             // 
             // textBoxEmail
             // 
@@ -317,11 +319,25 @@
             this.radioButtonInac.Text = "Inactivos";
             this.radioButtonInac.UseVisualStyleBackColor = true;
             // 
+            // chkVerPassUsuario
+            // 
+            this.chkVerPassUsuario.Appearance = System.Windows.Forms.Appearance.Button;
+            this.chkVerPassUsuario.AutoSize = true;
+            this.chkVerPassUsuario.Location = new System.Drawing.Point(277, 141);
+            this.chkVerPassUsuario.Name = "chkVerPassUsuario";
+            this.chkVerPassUsuario.Size = new System.Drawing.Size(29, 26);
+            this.chkVerPassUsuario.TabIndex = 29;
+            this.chkVerPassUsuario.Text = "👁️";
+            this.chkVerPassUsuario.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
+            this.chkVerPassUsuario.UseVisualStyleBackColor = true;
+            this.chkVerPassUsuario.CheckedChanged += new System.EventHandler(this.btnMostrarPassword_CheckedChanged);
+            // 
             // FormUsuarios
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1106, 804);
+            this.Controls.Add(this.chkVerPassUsuario);
             this.Controls.Add(this.radioButtonInac);
             this.Controls.Add(this.radioButtonAct);
             this.Controls.Add(this.dataGridView1);
@@ -389,5 +405,6 @@
         private System.Windows.Forms.DataGridView dataGridView1;
         private System.Windows.Forms.RadioButton radioButtonAct;
         private System.Windows.Forms.RadioButton radioButtonInac;
+        private System.Windows.Forms.CheckBox chkVerPassUsuario;
     }
 }

@@ -15,7 +15,6 @@ namespace TheGoodTaste.UI
         {
             InitializeComponent();
 
-            
             // Centra la ventana de login en la pantalla
             this.StartPosition = FormStartPosition.CenterScreen;
             this.FormBorderStyle = FormBorderStyle.FixedSingle;
@@ -24,9 +23,23 @@ namespace TheGoodTaste.UI
 
         private void FormLogin_Load(object sender, EventArgs e)
         {
-            // Opcional: Si quieres asegurar que la contraseña se oculte por código
-            // txtPassword.UseSystemPasswordChar = true;
             TemaVisual.AplicarEstilo(this);
+
+            // Asegura que la contraseña inicie oculta con los caracteres nativos del sistema
+            txtPassword.UseSystemPasswordChar = true;
+        }
+
+        // Evento para el botón/icono de "Ver / Ocultar Contraseña"
+        private void btnVerPassword_Click(object sender, EventArgs e)
+        {
+            // Alterna la visibilidad del texto
+            txtPassword.UseSystemPasswordChar = !txtPassword.UseSystemPasswordChar;
+
+            // Opcional: cambia el texto/emoji del botón según el estado
+            if (sender is Button btn)
+            {
+                btn.Text = txtPassword.UseSystemPasswordChar ? "👁️" : "🙈";
+            }
         }
 
         // Asocia este evento al botón "Ingresar" / "Iniciar Sesión"
@@ -69,5 +82,14 @@ namespace TheGoodTaste.UI
             }
         }
 
+        // Método oficial con el último nombre
+        private void chkVerPassLogin_CheckedChanged(object sender, EventArgs e)
+        {
+            txtPassword.UseSystemPasswordChar = !chkVerPassLogin.Checked;
+            chkVerPassLogin.Text = chkVerPassLogin.Checked ? "🙈" : "👁️";
+        }
+
+        // Parche para eliminar el error del Diseñador si quedó el evento viejo enlazado
+        private void btnVerPassword_CheckedChanged(object sender, EventArgs e) => chkVerPassLogin_CheckedChanged(sender, e);
     }
 }

@@ -231,6 +231,10 @@ namespace TheGoodTaste.UI
             textBoxDNI.Clear();
             textBoxDir.Clear();
             textBoxNroTel.Clear();
+            textBoxPass.Clear();
+            textBoxPass.UseSystemPasswordChar = true;
+            chkVerPassUsuario.Checked = false;
+            chkVerPassUsuario.Text = "👁️";
 
             comboBox1.SelectedIndex = -1;
             radioButtonHom.Checked = false;
@@ -280,5 +284,24 @@ namespace TheGoodTaste.UI
         private void buttonDel_Click_1(object sender, EventArgs e) => buttonDel_Click(sender, e);
         private void comboBox1_SelectedIndexChanged(object sender, EventArgs e) { }
         private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e) { }
+
+        private void btnMostrarPassword_Click(object sender, EventArgs e)
+        {
+            // Invierte el estado actual de ocultación
+            textBoxPass.UseSystemPasswordChar = !textBoxPass.UseSystemPasswordChar;
+
+            // Cambia el texto del botón según el estado
+            chkVerPassUsuario.Text = textBoxPass.UseSystemPasswordChar ? "👁️" : "🙈";
+        }
+
+        // Método oficial con el último nombre
+        private void chkVerPassUsuario_CheckedChanged(object sender, EventArgs e)
+        {
+            textBoxPass.UseSystemPasswordChar = !chkVerPassUsuario.Checked;
+            chkVerPassUsuario.Text = chkVerPassUsuario.Checked ? "🙈" : "👁️";
+        }
+
+        // Parche para eliminar el error del Diseñador si quedó el evento viejo enlazado
+        private void btnMostrarPassword_CheckedChanged(object sender, EventArgs e) => chkVerPassUsuario_CheckedChanged(sender, e);
     }
 }

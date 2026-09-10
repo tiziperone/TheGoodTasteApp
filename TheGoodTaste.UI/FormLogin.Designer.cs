@@ -33,6 +33,8 @@
             this.btnIngresar = new System.Windows.Forms.Button();
             this.labelUserName = new System.Windows.Forms.Label();
             this.labelPassword = new System.Windows.Forms.Label();
+            this.btnVerPassword = new System.Windows.Forms.CheckBox();
+            this.chkVerPassLogin = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // txtUsuario
@@ -78,11 +80,44 @@
             this.labelPassword.TabIndex = 4;
             this.labelPassword.Text = "Password";
             // 
+            // btnVerPassword
+            // 
+            this.btnVerPassword.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnVerPassword.Appearance = System.Windows.Forms.Appearance.Button;
+            this.btnVerPassword.AutoSize = true;
+            this.btnVerPassword.Location = new System.Drawing.Point(377, 181);
+            this.btnVerPassword.Name = "btnVerPassword";
+            this.btnVerPassword.Size = new System.Drawing.Size(29, 26);
+            this.btnVerPassword.TabIndex = 5;
+            this.btnVerPassword.Text = "👁️";
+            this.btnVerPassword.UseVisualStyleBackColor = true;
+            this.btnVerPassword.CheckedChanged += new System.EventHandler(this.btnVerPassword_CheckedChanged);
+            // 
+            // chkVerPassLogin
+            // 
+            this.chkVerPassLogin.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.chkVerPassLogin.Appearance = System.Windows.Forms.Appearance.Button;
+            this.chkVerPassLogin.AutoSize = true;
+            this.chkVerPassLogin.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.chkVerPassLogin.Location = new System.Drawing.Point(377, 180);
+            this.chkVerPassLogin.Name = "chkVerPassLogin";
+            this.chkVerPassLogin.Size = new System.Drawing.Size(29, 26);
+            this.chkVerPassLogin.TabIndex = 5;
+            this.chkVerPassLogin.Text = "👁️";
+            this.chkVerPassLogin.UseVisualStyleBackColor = true;
+            this.chkVerPassLogin.CheckedChanged += new System.EventHandler(this.btnVerPassword_CheckedChanged);
+            // 
             // FormLogin
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.chkVerPassLogin);
+            this.Controls.Add(this.btnVerPassword);
             this.Controls.Add(this.labelPassword);
             this.Controls.Add(this.labelUserName);
             this.Controls.Add(this.btnIngresar);
@@ -103,5 +138,7 @@
         private System.Windows.Forms.Button btnIngresar;
         private System.Windows.Forms.Label labelUserName;
         private System.Windows.Forms.Label labelPassword;
+        private System.Windows.Forms.CheckBox btnVerPassword;
+        private System.Windows.Forms.CheckBox chkVerPassLogin;
     }
 }
