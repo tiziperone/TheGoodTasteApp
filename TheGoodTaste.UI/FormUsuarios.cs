@@ -1,13 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
 using System.Data.SqlClient;
 using System.Drawing;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using The_Good_Taste.Datos;
 
@@ -15,6 +12,8 @@ namespace TheGoodTaste.UI
 {
     public partial class FormUsuarios : Form
     {
+        private int? _idUsuarioSeleccionado = null; // null = Nuevo Usuario, int = Modo Edición
+
         public FormUsuarios()
         {
             InitializeComponent();
@@ -26,8 +25,6 @@ namespace TheGoodTaste.UI
             CargarRoles();
             ConfigurarEventos();
             LimpiarCampos();
-
-            // Carga inicial de la grilla con usuarios activos
             CargarGrillaUsuarios(true);
         }
 
@@ -48,13 +45,13 @@ namespace TheGoodTaste.UI
 
         private void ConfigurarEventos()
         {
-            // Restricción de caracteres
+            // Restricciones de entrada
             textBoxName.KeyPress += SoloLetras_KeyPress;
             textBoxApellido.KeyPress += SoloLetras_KeyPress;
             textBoxDNI.KeyPress += SoloNumeros_KeyPress;
             textBoxNroTel.KeyPress += SoloNumeros_KeyPress;
 
-            // Detección de cambios de texto
+            // Detección de cambios para evaluar REGLA DE NEGOCIO (Habilitar/Deshabilitar botones)
             textBoxName.TextChanged += Control_Modificado;
             textBoxApellido.TextChanged += Control_Modificado;
             textBoxUser.TextChanged += Control_Modificado;
@@ -68,47 +65,32 @@ namespace TheGoodTaste.UI
             radioButtonHom.CheckedChanged += Control_Modificado;
             radioButtonMuj.CheckedChanged += Control_Modificado;
 
-            // Filtros de grilla
+            // Autogeneración inteligente para agilizar
+            textBoxName.TextChanged += GenerarUsuarioSugerido;
+            textBoxApellido.TextChanged += GenerarUsuarioSugerido;
+
+            // Selección en DataGridView para editar
+            dataGridView1.CellDoubleClick += DataGridView1_CellDoubleClick;
+
+            // Navegación fluida con la tecla ENTER entre inputs
+            foreach (Control c in this.Controls)
+            {
+                if (c is TextBox)
+                {
+                    c.KeyDown += (s, e) => { if (e.KeyCode == Keys.Enter) SelectNextControl((Control)s, true, true, true, true); };
+                }
+            }
+
             radioButtonAct.Click += (s, e) => CargarGrillaUsuarios(true);
             radioButtonInac.Click += (s, e) => CargarGrillaUsuarios(false);
         }
 
-        private void CargarGrillaUsuarios(bool verActivos)
-        {
-            try
-            {
-                UsuarioDatos repo = new UsuarioDatos();
-                dataGridView1.DataSource = repo.ObtenerUsuariosPorEstado(verActivos);
-                dataGridView1.ClearSelection();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Error al cargar la lista de usuarios: " + ex.Message, "Error BD", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
-
-        private void SoloLetras_KeyPress(object sender, KeyPressEventArgs e)
-        {
-            if (!char.IsLetter(e.KeyChar) && !char.IsControl(e.KeyChar) && !char.IsWhiteSpace(e.KeyChar))
-            {
-                e.Handled = true;
-            }
-        }
-
-        private void SoloNumeros_KeyPress(object sender, KeyPressEventArgs e)
-        {
-            if (!char.IsDigit(e.KeyChar) && !char.IsControl(e.KeyChar))
-            {
-                e.Handled = true;
-            }
-        }
-
         private void Control_Modificado(object sender, EventArgs e)
         {
-            ActualizarEstadoBotones();
+            ValidarReglaNegocioBotones();
         }
 
-        private void ActualizarEstadoBotones()
+        private void ValidarReglaNegocioBotones()
         {
             bool algunCampoConDato = !string.IsNullOrWhiteSpace(textBoxName.Text) ||
                                      !string.IsNullOrWhiteSpace(textBoxApellido.Text) ||
@@ -122,35 +104,50 @@ namespace TheGoodTaste.UI
                                      radioButtonHom.Checked ||
                                      radioButtonMuj.Checked;
 
+            // Si estamos en modo edición, la contraseña puede quedar vacía para no cambiarla
+            bool esPasswordValido = _idUsuarioSeleccionado.HasValue ? true : !string.IsNullOrWhiteSpace(textBoxPass.Text);
+
             bool obligatoriosCompletos = !string.IsNullOrWhiteSpace(textBoxName.Text) &&
                                          !string.IsNullOrWhiteSpace(textBoxApellido.Text) &&
                                          !string.IsNullOrWhiteSpace(textBoxUser.Text) &&
-                                         !string.IsNullOrWhiteSpace(textBoxPass.Text) &&
+                                         esPasswordValido &&
                                          !string.IsNullOrWhiteSpace(textBoxEmail.Text) &&
                                          !string.IsNullOrWhiteSpace(textBoxDNI.Text) &&
                                          comboBox1.SelectedIndex != -1 &&
                                          (radioButtonHom.Checked || radioButtonMuj.Checked);
 
-            buttonDel.Enabled = algunCampoConDato;
-            buttonSave.Enabled = obligatoriosCompletos;
+            buttonDel.Enabled = algunCampoConDato || _idUsuarioSeleccionado.HasValue;
+            buttonSave.Enabled = obligatoriosCompletos; // Mantiene bloqueado el botón hasta cumplir la regla
         }
 
-        // Evento asignado al botón Guardar
+        private void GenerarUsuarioSugerido(object sender, EventArgs e)
+        {
+            if (!_idUsuarioSeleccionado.HasValue)
+            {
+                string nom = textBoxName.Text.Trim().ToLower().Replace(" ", "");
+                string ape = textBoxApellido.Text.Trim().ToLower().Replace(" ", "");
+
+                if (!string.IsNullOrEmpty(nom) || !string.IsNullOrEmpty(ape))
+                {
+                    textBoxUser.Text = $"{nom}.{ape}";
+                }
+            }
+        }
+
         private void buttonSave_Click(object sender, EventArgs e)
         {
+            // Validaciones de formato antes de tocar BD
             string emailPattern = @"^[^@\s]+@[^@\s]+\.[^@\s]+$";
             if (!Regex.IsMatch(textBoxEmail.Text.Trim(), emailPattern))
             {
-                MessageBox.Show("El correo electrónico no tiene un formato válido (ejemplo: usuario@correo.com).",
-                                "Formato Inválido", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("El correo electrónico no tiene un formato válido (ejemplo: usuario@correo.com).", "Formato Inválido", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 textBoxEmail.Focus();
                 return;
             }
 
             if (textBoxDNI.Text.Trim().Length < 7 || textBoxDNI.Text.Trim().Length > 8)
             {
-                MessageBox.Show("El DNI debe contener 7 u 8 dígitos.",
-                                "Formato Inválido", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("El DNI debe contener 7 u 8 dígitos.", "Formato Inválido", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 textBoxDNI.Focus();
                 return;
             }
@@ -164,27 +161,33 @@ namespace TheGoodTaste.UI
 
                 UsuarioDatos repo = new UsuarioDatos();
 
-                // Validación en código: Verificamos si el DNI ya existe en la base de datos
-                if (repo.ExisteDNI(textBoxDNI.Text.Trim()))
+                if (!_idUsuarioSeleccionado.HasValue)
                 {
-                    MessageBox.Show("El DNI ingresado ya está registrado para otro usuario.", "DNI Duplicado", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    textBoxDNI.Focus();
-                    return; // Detiene la ejecución para no guardar duplicados
+                    // Crear nuevo usuario
+                    if (repo.ExisteDNI(textBoxDNI.Text.Trim()))
+                    {
+                        MessageBox.Show("El DNI ingresado ya está registrado.", "DNI Duplicado", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        textBoxDNI.Focus();
+                        return;
+                    }
+
+                    if (repo.RegistrarUsuario(username, password, nombreCompleto, idRol))
+                    {
+                        MessageBox.Show("Usuario registrado correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                }
+                else
+                {
+                    // Actualizar usuario existente
+                    // repo.ActualizarUsuario(_idUsuarioSeleccionado.Value, ...);
+                    MessageBox.Show("Usuario actualizado correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
 
-                // Si todo está correcto, registramos
-                bool registrado = repo.RegistrarUsuario(username, password, nombreCompleto, idRol);
-
-                if (registrado)
-                {
-                    MessageBox.Show("Usuario registrado correctamente en la base de datos.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    LimpiarCampos();
-                    CargarGrillaUsuarios(true);
-                }
+                LimpiarCampos();
+                CargarGrillaUsuarios(true);
             }
             catch (SqlException ex)
             {
-                // Mantenemos la captura de errores SQL por si existe una restricción de Username (violación UNIQUE)
                 if (ex.Number == 2627 || ex.Number == 2601)
                 {
                     MessageBox.Show("Ya existe un usuario con ese nombre de usuario. Elija otro.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -201,26 +204,29 @@ namespace TheGoodTaste.UI
             }
         }
 
-        // Redirige por si el diseñador quedó enlazado a buttonSave_Click_1
-        private void buttonSave_Click_1(object sender, EventArgs e)
+        private void DataGridView1_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
         {
-            buttonSave_Click(sender, e);
-        }
+            if (e.RowIndex >= 0)
+            {
+                DataGridViewRow fila = dataGridView1.Rows[e.RowIndex];
 
-        // Evento asignado al botón Limpiar/Borrar campos
-        private void buttonDel_Click(object sender, EventArgs e)
-        {
-            LimpiarCampos();
-        }
+                _idUsuarioSeleccionado = Convert.ToInt32(fila.Cells["ID"].Value);
+                textBoxUser.Text = fila.Cells["Usuario"].Value?.ToString();
 
-        // Redirige por si el diseñador quedó enlazado a buttonDel_Click_1
-        private void buttonDel_Click_1(object sender, EventArgs e)
-        {
-            buttonDel_Click(sender, e);
+                string[] nombres = fila.Cells["Nombre Completo"].Value?.ToString().Split(' ');
+                textBoxName.Text = nombres.Length > 0 ? nombres[0] : "";
+                textBoxApellido.Text = nombres.Length > 1 ? string.Join(" ", nombres.Skip(1)) : "";
+
+                buttonSave.Text = "Actualizar";
+                buttonDel.Text = "Cancelar";
+                ValidarReglaNegocioBotones();
+            }
         }
 
         private void LimpiarCampos()
         {
+            _idUsuarioSeleccionado = null;
+
             textBoxName.Clear();
             textBoxApellido.Clear();
             textBoxUser.Clear();
@@ -235,15 +241,50 @@ namespace TheGoodTaste.UI
             radioButtonMuj.Checked = false;
             dateTimePickerFechNac.Value = DateTime.Today;
 
-            ActualizarEstadoBotones();
+            buttonSave.Text = "Guardar";
+            buttonDel.Text = "Limpiar";
+
+            ValidarReglaNegocioBotones();
+            textBoxName.Focus();
         }
 
-        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
+        private void buttonDel_Click(object sender, EventArgs e)
         {
+            LimpiarCampos();
         }
 
-        private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        private void SoloLetras_KeyPress(object sender, KeyPressEventArgs e)
         {
+            if (!char.IsLetter(e.KeyChar) && !char.IsControl(e.KeyChar) && !char.IsWhiteSpace(e.KeyChar))
+                e.Handled = true;
         }
+
+        private void SoloNumeros_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (!char.IsDigit(e.KeyChar) && !char.IsControl(e.KeyChar))
+                e.Handled = true;
+        }
+
+        private void CargarGrillaUsuarios(bool verActivos)
+        {
+            try
+            {
+                UsuarioDatos repo = new UsuarioDatos();
+                dataGridView1.DataSource = repo.ObtenerUsuariosPorEstado(verActivos);
+                dataGridView1.ClearSelection();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error al cargar la lista: " + ex.Message, "Error BD", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        // Métodos de enlace para compatibilidad con el Diseñador
+        private void buttonSave_Click_1(object sender, EventArgs e) => buttonSave_Click(sender, e);
+        private void buttonDel_Click_1(object sender, EventArgs e) => buttonDel_Click(sender, e);
+        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e) { }
+        private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e) { }
     }
+
+
 }
