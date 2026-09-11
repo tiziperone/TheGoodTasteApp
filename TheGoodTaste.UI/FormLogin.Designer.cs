@@ -39,14 +39,17 @@
             // 
             // txtUsuario
             // 
-            this.txtUsuario.Location = new System.Drawing.Point(264, 129);
+            this.txtUsuario.Location = new System.Drawing.Point(324, 144);
             this.txtUsuario.Name = "txtUsuario";
             this.txtUsuario.Size = new System.Drawing.Size(142, 22);
             this.txtUsuario.TabIndex = 0;
             // 
             // txtPassword
             // 
-            this.txtPassword.Location = new System.Drawing.Point(264, 180);
+            this.txtPassword.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.txtPassword.Location = new System.Drawing.Point(324, 195);
             this.txtPassword.Name = "txtPassword";
             this.txtPassword.Size = new System.Drawing.Size(142, 22);
             this.txtPassword.TabIndex = 1;
@@ -54,9 +57,9 @@
             // 
             // btnIngresar
             // 
-            this.btnIngresar.Location = new System.Drawing.Point(264, 255);
+            this.btnIngresar.Location = new System.Drawing.Point(310, 259);
             this.btnIngresar.Name = "btnIngresar";
-            this.btnIngresar.Size = new System.Drawing.Size(142, 30);
+            this.btnIngresar.Size = new System.Drawing.Size(169, 39);
             this.btnIngresar.TabIndex = 2;
             this.btnIngresar.Text = "Ingresar";
             this.btnIngresar.UseVisualStyleBackColor = true;
@@ -64,8 +67,11 @@
             // 
             // labelUserName
             // 
+            this.labelUserName.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.labelUserName.AutoSize = true;
-            this.labelUserName.Location = new System.Drawing.Point(173, 132);
+            this.labelUserName.Location = new System.Drawing.Point(233, 150);
             this.labelUserName.Name = "labelUserName";
             this.labelUserName.Size = new System.Drawing.Size(36, 16);
             this.labelUserName.TabIndex = 3;
@@ -73,8 +79,11 @@
             // 
             // labelPassword
             // 
+            this.labelPassword.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.labelPassword.AutoSize = true;
-            this.labelPassword.Location = new System.Drawing.Point(173, 186);
+            this.labelPassword.Location = new System.Drawing.Point(233, 201);
             this.labelPassword.Name = "labelPassword";
             this.labelPassword.Size = new System.Drawing.Size(67, 16);
             this.labelPassword.TabIndex = 4;
@@ -82,12 +91,9 @@
             // 
             // btnVerPassword
             // 
-            this.btnVerPassword.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
             this.btnVerPassword.Appearance = System.Windows.Forms.Appearance.Button;
             this.btnVerPassword.AutoSize = true;
-            this.btnVerPassword.Location = new System.Drawing.Point(377, 181);
+            this.btnVerPassword.Location = new System.Drawing.Point(437, 196);
             this.btnVerPassword.Name = "btnVerPassword";
             this.btnVerPassword.Size = new System.Drawing.Size(29, 26);
             this.btnVerPassword.TabIndex = 5;
@@ -103,7 +109,7 @@
             this.chkVerPassLogin.Appearance = System.Windows.Forms.Appearance.Button;
             this.chkVerPassLogin.AutoSize = true;
             this.chkVerPassLogin.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.chkVerPassLogin.Location = new System.Drawing.Point(377, 180);
+            this.chkVerPassLogin.Location = new System.Drawing.Point(437, 193);
             this.chkVerPassLogin.Name = "chkVerPassLogin";
             this.chkVerPassLogin.Size = new System.Drawing.Size(29, 26);
             this.chkVerPassLogin.TabIndex = 5;
