@@ -135,5 +135,24 @@ namespace The_Good_Taste.Datos
 
             return dt;
         }
+
+        public bool CambiarEstadoUsuario(int idUsuario, bool nuevoEstado)
+        {
+            using (SqlConnection conexion = Conexion.ObtenerConexion()) // Usa la clase de conexión que tengas definida
+            {
+                string query = "UPDATE Usuarios SET Activo = @Activo WHERE IdUsuario = @IdUsuario";
+
+                using (SqlCommand cmd = new SqlCommand(query, conexion))
+                {
+                    cmd.Parameters.AddWithValue("@Activo", nuevoEstado);
+                    cmd.Parameters.AddWithValue("@IdUsuario", idUsuario);
+
+                    conexion.Open();
+                    int filasAfectadas = cmd.ExecuteNonQuery();
+
+                    return filasAfectadas > 0;
+                }
+            }
+        }
     }
 }

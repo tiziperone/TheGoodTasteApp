@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Drawing;
-using System.Globalization; // Requerido para el formateo de texto
+using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
@@ -27,9 +27,7 @@ namespace TheGoodTaste.UI
             ConfigurarAutocompletadoDireccion();
             LimpiarCampos();
 
-            // Deshabilitar la creación de nuevas filas manuales en el DataGridView
             dataGridView1.AllowUserToAddRows = false;
-
             dataGridView1.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
             dataGridView1.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
 
@@ -55,9 +53,7 @@ namespace TheGoodTaste.UI
         {
             try
             {
-                // Lista de calles para sugerir mientras se escribe en textBoxDir
                 AutoCompleteStringCollection callesSugeridas = new AutoCompleteStringCollection();
-
                 string[] listaCalles = new string[]
                 {
                     "Av. 3 de Abril", "Av. Pedro Ferré", "Av. Gobernador Ruiz", "Av. Armenia",
@@ -72,17 +68,12 @@ namespace TheGoodTaste.UI
                 textBoxDir.AutoCompleteSource = AutoCompleteSource.CustomSource;
                 textBoxDir.AutoCompleteCustomSource = callesSugeridas;
             }
-            catch (Exception)
-            {
-                // Control silencioso si falla la carga
-            }
+            catch (Exception) { }
         }
 
-        // Método para formatear la dirección (Primera letra Mayúscula, resto minúscula)
         private string FormatearDireccion(string texto)
         {
             if (string.IsNullOrWhiteSpace(texto)) return string.Empty;
-
             TextInfo textInfo = CultureInfo.CurrentCulture.TextInfo;
             return textInfo.ToTitleCase(texto.Trim().ToLower());
         }
@@ -113,6 +104,10 @@ namespace TheGoodTaste.UI
 
             dataGridView1.CellDoubleClick += DataGridView1_CellDoubleClick;
 
+            // Eventos para la baja directa al hacer clic en el recuadro (Checkbox)
+            dataGridView1.CellContentClick += DataGridView1_CellContentClick;
+            dataGridView1.CurrentCellDirtyStateChanged += DataGridView1_CurrentCellDirtyStateChanged;
+
             foreach (Control c in this.Controls)
             {
                 if (c is TextBox)
@@ -123,6 +118,65 @@ namespace TheGoodTaste.UI
 
             radioButtonAct.Click += (s, e) => CargarGrillaUsuarios(true);
             radioButtonInac.Click += (s, e) => CargarGrillaUsuarios(false);
+        }
+
+        // Detecta el clic en el checkbox de la columna Estado
+        private void DataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex >= 0 && dataGridView1.Columns[e.ColumnIndex].Name == "Estado")
+            {
+                DataGridViewRow fila = dataGridView1.Rows[e.RowIndex];
+
+                if (fila.Cells["ID"].Value != DBNull.Value && fila.Cells["ID"].Value != null)
+                {
+                    int idUsuario = Convert.ToInt32(fila.Cells["ID"].Value);
+                    bool nuevoEstado = Convert.ToBoolean(fila.Cells["Estado"].Value);
+                    string usuarioNombre = fila.Cells["Usuario"].Value?.ToString() ?? "este usuario";
+
+                    string accion = nuevoEstado ? "reactivar" : "dar de baja";
+
+                    DialogResult result = MessageBox.Show(
+                        $"¿Está seguro de que desea {accion} al usuario '{usuarioNombre}'?",
+                        "Confirmación de Estado",
+                        MessageBoxButtons.YesNo,
+                        MessageBoxIcon.Question
+                    );
+
+                    if (result == DialogResult.Yes)
+                    {
+                        try
+                        {
+                            UsuarioDatos repo = new UsuarioDatos();
+                            if (repo.CambiarEstadoUsuario(idUsuario, nuevoEstado))
+                            {
+                                MessageBox.Show($"Usuario {(nuevoEstado ? "reactivado" : "dado de baja")} correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                                CargarGrillaUsuarios(radioButtonAct.Checked);
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show("Error al cambiar el estado en la base de datos: " + ex.Message, "Error BD", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            // Revertir el valor en la grilla si falla
+                            fila.Cells["Estado"].Value = !nuevoEstado;
+                        }
+                    }
+                    else
+                    {
+                        // Si cancela la operación, cancela la marca del checkbox
+                        dataGridView1.CancelEdit();
+                        CargarGrillaUsuarios(radioButtonAct.Checked);
+                    }
+                }
+            }
+        }
+
+        // Fuerza a que la celda envíe el valor inmediatamente sin esperar a perder el foco
+        private void DataGridView1_CurrentCellDirtyStateChanged(object sender, EventArgs e)
+        {
+            if (dataGridView1.IsCurrentCellDirty && dataGridView1.CurrentCell is DataGridViewCheckBoxCell)
+            {
+                dataGridView1.CommitEdit(DataGridViewDataErrorContexts.Commit);
+            }
         }
 
         private void Control_Modificado(object sender, EventArgs e)
@@ -189,9 +243,6 @@ namespace TheGoodTaste.UI
                 string nombreCompleto = $"{textBoxName.Text.Trim()} {textBoxApellido.Text.Trim()}";
                 int idRol = Convert.ToInt32(comboBox1.SelectedValue);
 
-                // Aplicación del formato Title Case a la dirección ingresada
-                string direccionFormateada = FormatearDireccion(textBoxDir.Text);
-
                 UsuarioDatos repo = new UsuarioDatos();
 
                 if (!_idUsuarioSeleccionado.HasValue)
@@ -224,12 +275,10 @@ namespace TheGoodTaste.UI
 
         private void DataGridView1_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
         {
-            // 1. Validar que la fila sea válida y que no sea la fila de agregación nueva (isNewRow)
             if (e.RowIndex >= 0 && !dataGridView1.Rows[e.RowIndex].IsNewRow)
             {
                 DataGridViewRow fila = dataGridView1.Rows[e.RowIndex];
 
-                // 2. Validar que la celda ID contenga un valor válido antes de convertir
                 if (fila.Cells["ID"].Value != DBNull.Value && fila.Cells["ID"].Value != null)
                 {
                     _idUsuarioSeleccionado = Convert.ToInt32(fila.Cells["ID"].Value);
@@ -252,7 +301,7 @@ namespace TheGoodTaste.UI
                     textBoxPass.Text = "********";
 
                     buttonSave.Text = "Actualizar";
-                    buttonDel.Text = "Cancelar";
+                    buttonDel.Text = "Limpiar / Cancelar";
                     ValidarReglaNegocioBotones();
                 }
             }
@@ -320,7 +369,6 @@ namespace TheGoodTaste.UI
         private void buttonSave_Click_1(object sender, EventArgs e) => buttonSave_Click(sender, e);
         private void buttonDel_Click_1(object sender, EventArgs e) => buttonDel_Click(sender, e);
         private void comboBox1_SelectedIndexChanged(object sender, EventArgs e) { }
-        private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e) { }
 
         private void btnMostrarPassword_Click(object sender, EventArgs e)
         {
