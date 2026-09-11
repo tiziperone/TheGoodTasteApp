@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.SqlClient;
 using System.Drawing;
+using System.Globalization; // Requerido para el formateo de texto
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
@@ -24,9 +24,12 @@ namespace TheGoodTaste.UI
             TemaVisual.AplicarEstilo(this);
             CargarRoles();
             ConfigurarEventos();
+            ConfigurarAutocompletadoDireccion();
             LimpiarCampos();
 
-            // Configuración dinámica de la grilla
+            // Deshabilitar la creación de nuevas filas manuales en el DataGridView
+            dataGridView1.AllowUserToAddRows = false;
+
             dataGridView1.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
             dataGridView1.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
 
@@ -48,6 +51,42 @@ namespace TheGoodTaste.UI
             comboBox1.SelectedIndex = -1;
         }
 
+        private void ConfigurarAutocompletadoDireccion()
+        {
+            try
+            {
+                // Lista de calles para sugerir mientras se escribe en textBoxDir
+                AutoCompleteStringCollection callesSugeridas = new AutoCompleteStringCollection();
+
+                string[] listaCalles = new string[]
+                {
+                    "Av. 3 de Abril", "Av. Pedro Ferré", "Av. Gobernador Ruiz", "Av. Armenia",
+                    "Av. Independencia", "Av. Maipú", "Av. Centenario", "Junín",
+                    "Pellegrini", "9 de Julio", "San Martín", "Córdoba", "Mendoza",
+                    "Salta", "Tucumán", "Buenos Aires", "Belgrano", "Bolívar", "Sarmiento"
+                };
+
+                callesSugeridas.AddRange(listaCalles);
+
+                textBoxDir.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
+                textBoxDir.AutoCompleteSource = AutoCompleteSource.CustomSource;
+                textBoxDir.AutoCompleteCustomSource = callesSugeridas;
+            }
+            catch (Exception)
+            {
+                // Control silencioso si falla la carga
+            }
+        }
+
+        // Método para formatear la dirección (Primera letra Mayúscula, resto minúscula)
+        private string FormatearDireccion(string texto)
+        {
+            if (string.IsNullOrWhiteSpace(texto)) return string.Empty;
+
+            TextInfo textInfo = CultureInfo.CurrentCulture.TextInfo;
+            return textInfo.ToTitleCase(texto.Trim().ToLower());
+        }
+
         private void ConfigurarEventos()
         {
             textBoxName.KeyPress += SoloLetras_KeyPress;
@@ -55,7 +94,6 @@ namespace TheGoodTaste.UI
             textBoxDNI.KeyPress += SoloNumeros_KeyPress;
             textBoxNroTel.KeyPress += SoloNumeros_KeyPress;
 
-            // Validación en tiempo real para habilitar botones
             textBoxName.TextChanged += Control_Modificado;
             textBoxApellido.TextChanged += Control_Modificado;
             textBoxUser.TextChanged += Control_Modificado;
@@ -65,11 +103,9 @@ namespace TheGoodTaste.UI
             radioButtonHom.CheckedChanged += Control_Modificado;
             radioButtonMuj.CheckedChanged += Control_Modificado;
 
-            // Generación de usuario sugerido
             textBoxName.TextChanged += GenerarUsuarioSugerido;
             textBoxApellido.TextChanged += GenerarUsuarioSugerido;
 
-            // Al escribir el DNI, se asigna como contraseña por defecto automáticamente
             textBoxDNI.TextChanged += (s, e) => {
                 if (!_idUsuarioSeleccionado.HasValue)
                     textBoxPass.Text = textBoxDNI.Text.Trim();
@@ -77,7 +113,6 @@ namespace TheGoodTaste.UI
 
             dataGridView1.CellDoubleClick += DataGridView1_CellDoubleClick;
 
-            // Navegación rápida con ENTER
             foreach (Control c in this.Controls)
             {
                 if (c is TextBox)
@@ -150,10 +185,12 @@ namespace TheGoodTaste.UI
             try
             {
                 string username = textBoxUser.Text.Trim();
-                // La contraseña predeterminada es el DNI
                 string password = string.IsNullOrWhiteSpace(textBoxPass.Text) ? textBoxDNI.Text.Trim() : textBoxPass.Text.Trim();
                 string nombreCompleto = $"{textBoxName.Text.Trim()} {textBoxApellido.Text.Trim()}";
                 int idRol = Convert.ToInt32(comboBox1.SelectedValue);
+
+                // Aplicación del formato Title Case a la dirección ingresada
+                string direccionFormateada = FormatearDireccion(textBoxDir.Text);
 
                 UsuarioDatos repo = new UsuarioDatos();
 
@@ -173,7 +210,6 @@ namespace TheGoodTaste.UI
                 }
                 else
                 {
-                    // Lógica para actualizar usuario
                     MessageBox.Show("Usuario actualizado con éxito.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
 
@@ -188,34 +224,37 @@ namespace TheGoodTaste.UI
 
         private void DataGridView1_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
         {
-            if (e.RowIndex >= 0)
+            // 1. Validar que la fila sea válida y que no sea la fila de agregación nueva (isNewRow)
+            if (e.RowIndex >= 0 && !dataGridView1.Rows[e.RowIndex].IsNewRow)
             {
                 DataGridViewRow fila = dataGridView1.Rows[e.RowIndex];
 
-                _idUsuarioSeleccionado = Convert.ToInt32(fila.Cells["ID"].Value);
-                textBoxUser.Text = fila.Cells["Usuario"].Value?.ToString();
-
-                // Separación inteligente de Nombre y Apellido
-                string nombreCompleto = fila.Cells["Nombre Completo"].Value?.ToString().Trim() ?? "";
-                int ultimoEspacio = nombreCompleto.LastIndexOf(' ');
-
-                if (ultimoEspacio > 0)
+                // 2. Validar que la celda ID contenga un valor válido antes de convertir
+                if (fila.Cells["ID"].Value != DBNull.Value && fila.Cells["ID"].Value != null)
                 {
-                    textBoxName.Text = nombreCompleto.Substring(0, ultimoEspacio);
-                    textBoxApellido.Text = nombreCompleto.Substring(ultimoEspacio + 1);
-                }
-                else
-                {
-                    textBoxName.Text = nombreCompleto;
-                    textBoxApellido.Text = "";
-                }
+                    _idUsuarioSeleccionado = Convert.ToInt32(fila.Cells["ID"].Value);
+                    textBoxUser.Text = fila.Cells["Usuario"].Value?.ToString();
 
-                // Mantiene la contraseña actual para no sobreescribirla
-                textBoxPass.Text = "********";
+                    string nombreCompleto = fila.Cells["Nombre Completo"].Value?.ToString().Trim() ?? "";
+                    int ultimoEspacio = nombreCompleto.LastIndexOf(' ');
 
-                buttonSave.Text = "Actualizar";
-                buttonDel.Text = "Cancelar";
-                ValidarReglaNegocioBotones();
+                    if (ultimoEspacio > 0)
+                    {
+                        textBoxName.Text = nombreCompleto.Substring(0, ultimoEspacio);
+                        textBoxApellido.Text = nombreCompleto.Substring(ultimoEspacio + 1);
+                    }
+                    else
+                    {
+                        textBoxName.Text = nombreCompleto;
+                        textBoxApellido.Text = "";
+                    }
+
+                    textBoxPass.Text = "********";
+
+                    buttonSave.Text = "Actualizar";
+                    buttonDel.Text = "Cancelar";
+                    ValidarReglaNegocioBotones();
+                }
             }
         }
 
@@ -231,7 +270,6 @@ namespace TheGoodTaste.UI
             textBoxDNI.Clear();
             textBoxDir.Clear();
             textBoxNroTel.Clear();
-            textBoxPass.Clear();
             textBoxPass.UseSystemPasswordChar = true;
             chkVerPassUsuario.Checked = false;
             chkVerPassUsuario.Text = "👁️";
@@ -279,7 +317,6 @@ namespace TheGoodTaste.UI
             }
         }
 
-        // Enlaces de compatibilidad con el diseñador
         private void buttonSave_Click_1(object sender, EventArgs e) => buttonSave_Click(sender, e);
         private void buttonDel_Click_1(object sender, EventArgs e) => buttonDel_Click(sender, e);
         private void comboBox1_SelectedIndexChanged(object sender, EventArgs e) { }
@@ -287,21 +324,16 @@ namespace TheGoodTaste.UI
 
         private void btnMostrarPassword_Click(object sender, EventArgs e)
         {
-            // Invierte el estado actual de ocultación
             textBoxPass.UseSystemPasswordChar = !textBoxPass.UseSystemPasswordChar;
-
-            // Cambia el texto del botón según el estado
             chkVerPassUsuario.Text = textBoxPass.UseSystemPasswordChar ? "👁️" : "🙈";
         }
 
-        // Método oficial con el último nombre
         private void chkVerPassUsuario_CheckedChanged(object sender, EventArgs e)
         {
             textBoxPass.UseSystemPasswordChar = !chkVerPassUsuario.Checked;
             chkVerPassUsuario.Text = chkVerPassUsuario.Checked ? "🙈" : "👁️";
         }
 
-        // Parche para eliminar el error del Diseñador si quedó el evento viejo enlazado
         private void btnMostrarPassword_CheckedChanged(object sender, EventArgs e) => chkVerPassUsuario_CheckedChanged(sender, e);
     }
 }
