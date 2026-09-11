@@ -19,14 +19,34 @@ namespace TheGoodTaste.UI
             this.StartPosition = FormStartPosition.CenterScreen;
             this.FormBorderStyle = FormBorderStyle.FixedSingle;
             this.MaximizeBox = false;
+
+            // Habilita la captura previa de teclas en el formulario
+            this.KeyPreview = true;
+            this.KeyDown += FormLogin_KeyDown;
         }
 
         private void FormLogin_Load(object sender, EventArgs e)
         {
             TemaVisual.AplicarEstilo(this);
 
+            // Asigna el botón por defecto para ejecutar la acción con ENTER
+            this.AcceptButton = btnIngresar;
+
             // Asegura que la contraseña inicie oculta con los caracteres nativos del sistema
             txtPassword.UseSystemPasswordChar = true;
+
+            // Foco inicial en el usuario
+            txtUsuario.Focus();
+        }
+
+        // Manejo global de teclas (Atajo para cerrar con ESC)
+        private void FormLogin_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Escape)
+            {
+                this.DialogResult = DialogResult.Cancel;
+                this.Close();
+            }
         }
 
         // Evento para el botón/icono de "Ver / Ocultar Contraseña"
@@ -35,14 +55,14 @@ namespace TheGoodTaste.UI
             // Alterna la visibilidad del texto
             txtPassword.UseSystemPasswordChar = !txtPassword.UseSystemPasswordChar;
 
-            // Opcional: cambia el texto/emoji del botón según el estado
+            // Cambia el texto/emoji del botón según el estado
             if (sender is Button btn)
             {
                 btn.Text = txtPassword.UseSystemPasswordChar ? "👁️" : "🙈";
             }
         }
 
-        // Asocia este evento al botón "Ingresar" / "Iniciar Sesión"
+        // Evento del botón "Ingresar" / "Iniciar Sesión"
         private void btnIngresar_Click_1(object sender, EventArgs e)
         {
             string usuario = txtUsuario.Text.Trim();
@@ -82,7 +102,7 @@ namespace TheGoodTaste.UI
             }
         }
 
-        // Método oficial con el último nombre
+        // Método oficial para CheckBox de Ver Contraseña
         private void chkVerPassLogin_CheckedChanged(object sender, EventArgs e)
         {
             txtPassword.UseSystemPasswordChar = !chkVerPassLogin.Checked;
