@@ -16,7 +16,7 @@ namespace The_Good_Taste.Entidades
         public string Email { get; set; }
         public string PasswordHash { get; set; }
         public RolUsuario Rol { get; set; } // "admin" o "vendedor"
-        public bool Activo { get; set; }
+        public bool Activo { get; set; }// "asas"
         public DateTime? LastSeenAt { get; set; }
     }
 }
