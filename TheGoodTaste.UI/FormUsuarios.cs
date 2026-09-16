@@ -162,7 +162,7 @@ namespace TheGoodTaste.UI
                     }
                     else
                     {
-                        // Si cancela la operación, cancela la marca del checkbox
+                   
                         dataGridView1.CancelEdit();
                         CargarGrillaUsuarios(radioButtonAct.Checked);
                     }
@@ -170,7 +170,7 @@ namespace TheGoodTaste.UI
             }
         }
 
-        // Fuerza a que la celda envíe el valor inmediatamente sin esperar a perder el foco
+       
         private void DataGridView1_CurrentCellDirtyStateChanged(object sender, EventArgs e)
         {
             if (dataGridView1.IsCurrentCellDirty && dataGridView1.CurrentCell is DataGridViewCheckBoxCell)
@@ -238,10 +238,21 @@ namespace TheGoodTaste.UI
 
             try
             {
+                // Captura de datos básicos
                 string username = textBoxUser.Text.Trim();
                 string password = string.IsNullOrWhiteSpace(textBoxPass.Text) ? textBoxDNI.Text.Trim() : textBoxPass.Text.Trim();
-                string nombreCompleto = $"{textBoxName.Text.Trim()} {textBoxApellido.Text.Trim()}";
+                string nombre = textBoxName.Text.Trim();
+                string apellido = textBoxApellido.Text.Trim();
+                string nombreCompleto = $"{nombre} {apellido}";
                 int idRol = Convert.ToInt32(comboBox1.SelectedValue);
+
+                // Captura de los nuevos datos del formulario
+                int dni = Convert.ToInt32(textBoxDNI.Text.Trim());
+                string direccion = textBoxDir.Text.Trim();
+                DateTime fechaNacimiento = dateTimePickerFechNac.Value;
+                string telefono = textBoxNroTel.Text.Trim();
+                string email = textBoxEmail.Text.Trim();
+                string sexo = radioButtonHom.Checked ? "M" : (radioButtonMuj.Checked ? "F" : "Otro");
 
                 UsuarioDatos repo = new UsuarioDatos();
 
@@ -254,13 +265,15 @@ namespace TheGoodTaste.UI
                         return;
                     }
 
-                    if (repo.RegistrarUsuario(username, password, nombreCompleto, idRol))
+                    // Se llama a RegistrarUsuario con todos los parámetros
+                    if (repo.RegistrarUsuario(username, password, nombreCompleto, idRol, nombre, apellido, dni, direccion, fechaNacimiento, telefono, email, sexo))
                     {
                         MessageBox.Show("Usuario registrado con éxito.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
                 }
                 else
                 {
+                    // Lógica para actualizar (requerirá un método ActualizarUsuario en UsuarioDatos)
                     MessageBox.Show("Usuario actualizado con éxito.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
 

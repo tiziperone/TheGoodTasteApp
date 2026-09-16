@@ -64,22 +64,37 @@ namespace The_Good_Taste.Datos
             return null;
         }
 
-        public bool RegistrarUsuario(string username, string password, string nombreCompleto, int idRol)
+        public bool RegistrarUsuario(string username, string password, string nombreCompleto, int idRol,
+                             string nombre, string apellido, int dni, string direccion,
+                             DateTime fechaNacimiento, string telefono, string email, string sexo)
         {
             string hashPassword = GenerarHashSHA256(password);
 
             string query = @"
-                INSERT INTO Usuarios (Username, PasswordHash, NombreCompleto, IdRol, Activo)
-                VALUES (@user, @pass, @nombre, @rol, 1)";
+        INSERT INTO Usuarios (Username, PasswordHash, NombreCompleto, IdRol, Activo, 
+                              Nombre, Apellido, DNI, Direccion, FechaNacimiento, Telefono, Email, Sexo)
+        VALUES (@user, @pass, @nombreCompleto, @rol, 1, 
+                @nombre, @apellido, @dni, @direccion, @fechaNacimiento, @telefono, @email, @sexo)";
 
             using (SqlConnection conexion = new SqlConnection(_cadenaConexion))
             {
                 using (SqlCommand cmd = new SqlCommand(query, conexion))
                 {
+                    // Parámetros originales
                     cmd.Parameters.AddWithValue("@user", username);
                     cmd.Parameters.AddWithValue("@pass", hashPassword);
-                    cmd.Parameters.AddWithValue("@nombre", nombreCompleto);
+                    cmd.Parameters.AddWithValue("@nombreCompleto", nombreCompleto);
                     cmd.Parameters.AddWithValue("@rol", idRol);
+
+                    // Nuevos parámetros mapeados
+                    cmd.Parameters.AddWithValue("@nombre", nombre);
+                    cmd.Parameters.AddWithValue("@apellido", apellido);
+                    cmd.Parameters.AddWithValue("@dni", dni);
+                    cmd.Parameters.AddWithValue("@direccion", string.IsNullOrWhiteSpace(direccion) ? (object)DBNull.Value : direccion);
+                    cmd.Parameters.AddWithValue("@fechaNacimiento", fechaNacimiento);
+                    cmd.Parameters.AddWithValue("@telefono", string.IsNullOrWhiteSpace(telefono) ? (object)DBNull.Value : telefono);
+                    cmd.Parameters.AddWithValue("@email", email);
+                    cmd.Parameters.AddWithValue("@sexo", string.IsNullOrWhiteSpace(sexo) ? (object)DBNull.Value : sexo);
 
                     conexion.Open();
                     return cmd.ExecuteNonQuery() > 0;
