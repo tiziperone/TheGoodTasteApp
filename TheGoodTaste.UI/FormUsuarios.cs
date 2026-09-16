@@ -28,6 +28,9 @@ namespace TheGoodTaste.UI
             ConfigurarAutocompletadoDireccion();
             LimpiarCampos();
 
+            // Restringe el DateTimePicker para que no permita seleccionar fechas menores a 18 años atrás
+            dateTimePickerFechNac.MaxDate = DateTime.Today.AddYears(-18);
+
             dataGridView1.AllowUserToAddRows = false;
             dataGridView1.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
             dataGridView1.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
@@ -294,6 +297,23 @@ namespace TheGoodTaste.UI
                 return;
             }
 
+            // 3. VALIDACIÓN DE EDAD MÍNIMA (AQUÍ AGREGAS LA NUEVA)
+            DateTime fechaNacimientoSeleccionada = dateTimePickerFechNac.Value.Date;
+            DateTime fechaHoy = DateTime.Today;
+            int edad = fechaHoy.Year - fechaNacimientoSeleccionada.Year;
+
+            if (fechaNacimientoSeleccionada.Date > fechaHoy.AddYears(-edad))
+            {
+                edad--;
+            }
+
+            if (edad < 18)
+            {
+                MessageBox.Show("El usuario debe ser mayor de edad (mínimo 18 años).", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                dateTimePickerFechNac.Focus();
+                return;
+            }
+
             try
             {
                 int dni = Convert.ToInt32(textBoxDNI.Text.Trim());
@@ -397,7 +417,7 @@ namespace TheGoodTaste.UI
 
             radioButtonHom.Checked = false;
             radioButtonMuj.Checked = false;
-            dateTimePickerFechNac.Value = DateTime.Today;
+            dateTimePickerFechNac.Value = DateTime.Today.AddYears(-18);
 
             buttonSave.Text = "Guardar";
             buttonDel.Text = "Limpiar";
