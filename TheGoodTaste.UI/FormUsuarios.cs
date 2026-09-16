@@ -197,7 +197,8 @@ namespace TheGoodTaste.UI
                             $"¿Está seguro de que desea {accion} al usuario '{usuarioNombre}'?",
                             "Confirmación de Estado",
                             MessageBoxButtons.YesNo,
-                            MessageBoxIcon.Question
+                            MessageBoxIcon.Question,
+                            MessageBoxDefaultButton.Button2
                         );
 
                         if (result == DialogResult.Yes)
@@ -354,7 +355,7 @@ namespace TheGoodTaste.UI
                     }
 
                     string mensaje = "¿Está seguro de aplicar los siguientes cambios?\n\n" + string.Join("\n", cambios);
-                    DialogResult confirmacion = MessageBox.Show(mensaje, "Confirmar Modificación", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                    DialogResult confirmacion = MessageBox.Show(mensaje, "Confirmar Modificación", MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2);
 
                     if (confirmacion == DialogResult.Yes)
                     {
