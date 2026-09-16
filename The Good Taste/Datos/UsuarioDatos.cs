@@ -10,7 +10,7 @@ namespace The_Good_Taste.Datos
     {
         private readonly string _cadenaConexion = ConfigurationManager.ConnectionStrings["CadenaConexion"].ConnectionString;
 
-        // 1. LOGIN (Usa DNI, quita NombreCompleto y valida contraseña en texto plano)
+        // 1. LOGIN
         public UsuarioSistema Autenticar(string user, string pass)
         {
             string query = @"
@@ -35,7 +35,7 @@ namespace The_Good_Taste.Datos
                         {
                             return new UsuarioSistema
                             {
-                                IdUsuario = Convert.ToInt32(reader["DNI"]), // DNI ahora es el identificador principal
+                                IdUsuario = Convert.ToInt32(reader["DNI"]),
                                 NombreUsuario = reader["Username"].ToString(),
                                 Rol = (RolUsuario)Convert.ToInt32(reader["IdRol"])
                             };
@@ -46,7 +46,7 @@ namespace The_Good_Taste.Datos
             return null;
         }
 
-        // 2. INSERT (Agregado IdLocalidad, DNI en la consulta y sin NombreCompleto)
+        // 2. INSERTAR NUEVO USUARIO
         public bool RegistrarUsuario(int dni, string username, string password, int idRol,
                                      string nombre, string apellido, string direccion, int idLocalidad,
                                      DateTime fechaNacimiento, string telefono, string email, string sexo)
@@ -80,22 +80,87 @@ namespace The_Good_Taste.Datos
             }
         }
 
-        // 3. EXISTE DNI (Validamos el DNI directamente como entero)
+        // 3. ACTUALIZAR USUARIO EXISTENTE
+        public bool ActualizarUsuario(int dni, string username, string password, int idRol,
+                             string nombre, string apellido, string direccion, int idLocalidad,
+                             DateTime fechaNacimiento, string telefono, string email, string sexo)
+        {
+            // Solo actualizamos la contraseña si escribieron algo distinto a los asteriscos
+            bool actualizaPass = password != "********" && !string.IsNullOrWhiteSpace(password);
+
+            string query = @"
+                UPDATE Usuarios 
+                SET Username = @user, " +
+                    (actualizaPass ? "PasswordHash = @pass, " : "") + @"
+                    IdRol = @rol,
+                    Nombre = @nombre,
+                    Apellido = @apellido,
+                    Direccion = @direccion,
+                    IdLocalidad = @idLocalidad,
+                    FechaNacimiento = @fechaNacimiento,
+                    Telefono = @telefono,
+                    Email = @email,
+                    Sexo = @sexo
+                WHERE DNI = @dni";
+
+            using (SqlConnection conexion = new SqlConnection(_cadenaConexion))
+            {
+                using (SqlCommand cmd = new SqlCommand(query, conexion))
+                {
+                    cmd.Parameters.AddWithValue("@dni", dni);
+                    cmd.Parameters.AddWithValue("@user", username);
+                    if (actualizaPass) cmd.Parameters.AddWithValue("@pass", password);
+                    cmd.Parameters.AddWithValue("@rol", idRol);
+                    cmd.Parameters.AddWithValue("@nombre", nombre);
+                    cmd.Parameters.AddWithValue("@apellido", apellido);
+                    cmd.Parameters.AddWithValue("@direccion", string.IsNullOrWhiteSpace(direccion) ? (object)DBNull.Value : direccion);
+                    cmd.Parameters.AddWithValue("@idLocalidad", idLocalidad);
+                    cmd.Parameters.AddWithValue("@fechaNacimiento", fechaNacimiento);
+                    cmd.Parameters.AddWithValue("@telefono", string.IsNullOrWhiteSpace(telefono) ? (object)DBNull.Value : telefono);
+                    cmd.Parameters.AddWithValue("@email", email);
+                    cmd.Parameters.AddWithValue("@sexo", string.IsNullOrWhiteSpace(sexo) ? (object)DBNull.Value : sexo);
+
+                    conexion.Open();
+                    return cmd.ExecuteNonQuery() > 0;
+                }
+            }
+        }
+
+        // 4. EXISTE DNI
         public bool ExisteDNI(int dni)
         {
-            using (SqlConnection conexion = new SqlConnection(_cadenaConexion)) // Actualizado a _cadenaConexion para evitar errores con Conexion.cs
+            using (SqlConnection conexion = new SqlConnection(_cadenaConexion))
             {
                 conexion.Open();
                 string query = "SELECT COUNT(*) FROM Usuarios WHERE DNI = @DNI";
                 SqlCommand cmd = new SqlCommand(query, conexion);
                 cmd.Parameters.AddWithValue("@DNI", dni);
 
-                int cantidad = (int)cmd.ExecuteScalar();
-                return cantidad > 0;
+                return (int)cmd.ExecuteScalar() > 0;
             }
         }
 
-        // 4. GRILLA (DNI as ID, JOIN con Roles y concatenar Nombre/Apellido)
+        // 5. OBTENER FILA COMPLETA POR DNI (Para el doble clic)
+        public DataRow ObtenerUsuarioPorDNI(int dni)
+        {
+            DataTable dt = new DataTable();
+            string query = "SELECT * FROM Usuarios WHERE DNI = @DNI";
+
+            using (SqlConnection con = new SqlConnection(_cadenaConexion))
+            {
+                using (SqlCommand cmd = new SqlCommand(query, con))
+                {
+                    cmd.Parameters.AddWithValue("@DNI", dni);
+                    using (SqlDataAdapter da = new SqlDataAdapter(cmd))
+                    {
+                        da.Fill(dt);
+                    }
+                }
+            }
+            return dt.Rows.Count > 0 ? dt.Rows[0] : null;
+        }
+
+        // 6. GRILLA
         public DataTable ObtenerUsuariosPorEstado(bool activos)
         {
             DataTable dt = new DataTable();
@@ -122,31 +187,26 @@ namespace The_Good_Taste.Datos
                     }
                 }
             }
-
             return dt;
         }
 
-        // 5. BAJA/ALTA DE USUARIO (El filtro ahora es por DNI)
+        // 7. CAMBIAR ESTADO
         public bool CambiarEstadoUsuario(int dni, bool nuevoEstado)
         {
             using (SqlConnection conexion = new SqlConnection(_cadenaConexion))
             {
                 string query = "UPDATE Usuarios SET Activo = @Activo WHERE DNI = @DNI";
-
                 using (SqlCommand cmd = new SqlCommand(query, conexion))
                 {
                     cmd.Parameters.AddWithValue("@Activo", nuevoEstado ? 1 : 0);
                     cmd.Parameters.AddWithValue("@DNI", dni);
-
                     conexion.Open();
-                    int filasAfectadas = cmd.ExecuteNonQuery();
-
-                    return filasAfectadas > 0;
+                    return cmd.ExecuteNonQuery() > 0;
                 }
             }
         }
 
-        // 6. OBTENER LOCALIDADES (Para el combo del formulario)
+        // 8. OBTENER LOCALIDADES
         public DataTable ObtenerLocalidades()
         {
             DataTable dt = new DataTable();

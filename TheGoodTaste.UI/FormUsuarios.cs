@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Drawing;
 using System.Globalization;
-using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using The_Good_Taste.Datos;
@@ -12,7 +10,8 @@ namespace TheGoodTaste.UI
 {
     public partial class FormUsuarios : Form
     {
-        private int? _idUsuarioSeleccionado = null; // Ahora guarda el DNI del seleccionado
+        private int? _idUsuarioSeleccionado = null;
+        private DataRow _datosOriginales = null; // Para guardar los datos al hacer doble clic
 
         public FormUsuarios()
         {
@@ -23,7 +22,7 @@ namespace TheGoodTaste.UI
         {
             TemaVisual.AplicarEstilo(this);
             CargarRoles();
-            CargarLocalidades(); // Cargamos el combo de localidades
+            CargarLocalidades();
             ConfigurarEventos();
             ConfigurarAutocompletadoDireccion();
             LimpiarCampos();
@@ -101,9 +100,7 @@ namespace TheGoodTaste.UI
             textBoxEmail.TextChanged += Control_Modificado;
             textBoxDNI.TextChanged += Control_Modificado;
             comboBox1.SelectedIndexChanged += Control_Modificado;
-
-            // Si tenés el combo de localidad, descomentá esto:
-            // comboBoxLocalidad.SelectedIndexChanged += Control_Modificado; 
+            comboBoxLocalidad.SelectedIndexChanged += Control_Modificado;
 
             radioButtonHom.CheckedChanged += Control_Modificado;
             radioButtonMuj.CheckedChanged += Control_Modificado;
@@ -140,7 +137,7 @@ namespace TheGoodTaste.UI
 
                 if (fila.Cells["ID"].Value != DBNull.Value && fila.Cells["ID"].Value != null)
                 {
-                    int dni = Convert.ToInt32(fila.Cells["ID"].Value); // Ahora es DNI
+                    int dni = Convert.ToInt32(fila.Cells["ID"].Value);
                     bool nuevoEstado = Convert.ToBoolean(fila.Cells["Estado"].Value);
                     string usuarioNombre = fila.Cells["Usuario"].Value?.ToString() ?? "este usuario";
 
@@ -207,7 +204,7 @@ namespace TheGoodTaste.UI
                                          !string.IsNullOrWhiteSpace(textBoxEmail.Text) &&
                                          !string.IsNullOrWhiteSpace(textBoxDNI.Text) &&
                                          comboBox1.SelectedIndex != -1 &&
-                                         // comboBoxLocalidad.SelectedIndex != -1 && // Descomentar cuando agregues el combo Localidad
+                                         comboBoxLocalidad.SelectedIndex != -1 &&
                                          (radioButtonHom.Checked || radioButtonMuj.Checked);
 
             buttonDel.Enabled = algunCampoConDato || _idUsuarioSeleccionado.HasValue;
@@ -253,13 +250,8 @@ namespace TheGoodTaste.UI
                 string nombre = textBoxName.Text.Trim();
                 string apellido = textBoxApellido.Text.Trim();
                 int idRol = Convert.ToInt32(comboBox1.SelectedValue);
-
                 string direccion = textBoxDir.Text.Trim();
-
-                // Si aún no dibujaste el comboBoxLocalidad, lo forzamos a 1 (Corrientes) temporalmente.
-                // Si ya lo tenés en diseño, cambiá el "1" por: Convert.ToInt32(comboBoxLocalidad.SelectedValue)
                 int idLocalidad = comboBoxLocalidad.SelectedValue != null ? Convert.ToInt32(comboBoxLocalidad.SelectedValue) : 1;
-
                 DateTime fechaNacimiento = dateTimePickerFechNac.Value;
                 string telefono = textBoxNroTel.Text.Trim();
                 string email = textBoxEmail.Text.Trim();
@@ -267,7 +259,7 @@ namespace TheGoodTaste.UI
 
                 UsuarioDatos repo = new UsuarioDatos();
 
-                if (!_idUsuarioSeleccionado.HasValue) // Alta
+                if (!_idUsuarioSeleccionado.HasValue) // ALTA
                 {
                     if (repo.ExisteDNI(dni))
                     {
@@ -279,19 +271,55 @@ namespace TheGoodTaste.UI
                     if (repo.RegistrarUsuario(dni, username, password, idRol, nombre, apellido, direccion, idLocalidad, fechaNacimiento, telefono, email, sexo))
                     {
                         MessageBox.Show("Usuario registrado con éxito.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        LimpiarCampos();
+                        CargarGrillaUsuarios(true);
                     }
                 }
-                else // Actualización
+                else // MODIFICACIÓN
                 {
-                    MessageBox.Show("Usuario actualizado con éxito.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                }
+                    // Detectamos los cambios para el cuadro de confirmación
+                    List<string> cambios = new List<string>();
 
-                LimpiarCampos();
-                CargarGrillaUsuarios(true);
+                    if (_datosOriginales["Nombre"].ToString() != nombre) cambios.Add($"• Nombre: '{_datosOriginales["Nombre"]}' -> '{nombre}'");
+                    if (_datosOriginales["Apellido"].ToString() != apellido) cambios.Add($"• Apellido: '{_datosOriginales["Apellido"]}' -> '{apellido}'");
+                    if (_datosOriginales["Username"].ToString() != username) cambios.Add($"• Usuario: '{_datosOriginales["Username"]}' -> '{username}'");
+                    if (password != "********") cambios.Add("• Contraseña: Se ingresó una nueva contraseña");
+                    if (Convert.ToInt32(_datosOriginales["IdRol"]) != idRol) cambios.Add($"• Rol modificado");
+                    if (Convert.ToInt32(_datosOriginales["IdLocalidad"] == DBNull.Value ? 0 : _datosOriginales["IdLocalidad"]) != idLocalidad) cambios.Add($"• Localidad modificada");
+                    if (_datosOriginales["Email"].ToString() != email) cambios.Add($"• Email: '{_datosOriginales["Email"]}' -> '{email}'");
+
+                    string dirOriginal = _datosOriginales["Direccion"] != DBNull.Value ? _datosOriginales["Direccion"].ToString() : "";
+                    if (dirOriginal != direccion) cambios.Add($"• Dirección: '{dirOriginal}' -> '{direccion}'");
+
+                    string telOriginal = _datosOriginales["Telefono"] != DBNull.Value ? _datosOriginales["Telefono"].ToString() : "";
+                    if (telOriginal != telefono) cambios.Add($"• Teléfono: '{telOriginal}' -> '{telefono}'");
+
+                    string sexoOriginal = _datosOriginales["Sexo"]?.ToString() ?? "";
+                    if (sexoOriginal != sexo) cambios.Add($"• Sexo: '{sexoOriginal}' -> '{sexo}'");
+
+                    if (cambios.Count == 0)
+                    {
+                        MessageBox.Show("No se detectaron modificaciones para guardar.", "Sin cambios", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        return;
+                    }
+
+                    string mensaje = "¿Está seguro de aplicar los siguientes cambios?\n\n" + string.Join("\n", cambios);
+                    DialogResult confirmacion = MessageBox.Show(mensaje, "Confirmar Modificación", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+
+                    if (confirmacion == DialogResult.Yes)
+                    {
+                        if (repo.ActualizarUsuario(dni, username, password, idRol, nombre, apellido, direccion, idLocalidad, fechaNacimiento, telefono, email, sexo))
+                        {
+                            MessageBox.Show("Usuario actualizado con éxito en la base de datos.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                            LimpiarCampos();
+                            CargarGrillaUsuarios(true);
+                        }
+                    }
+                }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error al guardar: " + ex.Message, "Error BD", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Error al guardar/modificar: " + ex.Message, "Error BD", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -303,28 +331,43 @@ namespace TheGoodTaste.UI
 
                 if (fila.Cells["ID"].Value != DBNull.Value && fila.Cells["ID"].Value != null)
                 {
-                    _idUsuarioSeleccionado = Convert.ToInt32(fila.Cells["ID"].Value); // DNI
-                    textBoxUser.Text = fila.Cells["Usuario"].Value?.ToString();
+                    int dni = Convert.ToInt32(fila.Cells["ID"].Value);
 
-                    string nombreCompleto = fila.Cells["Nombre Completo"].Value?.ToString().Trim() ?? "";
-                    int ultimoEspacio = nombreCompleto.LastIndexOf(' ');
+                    UsuarioDatos repo = new UsuarioDatos();
+                    _datosOriginales = repo.ObtenerUsuarioPorDNI(dni); // Traemos la fila entera desde SQL
 
-                    if (ultimoEspacio > 0)
+                    if (_datosOriginales != null)
                     {
-                        textBoxName.Text = nombreCompleto.Substring(0, ultimoEspacio);
-                        textBoxApellido.Text = nombreCompleto.Substring(ultimoEspacio + 1);
-                    }
-                    else
-                    {
-                        textBoxName.Text = nombreCompleto;
-                        textBoxApellido.Text = "";
-                    }
+                        _idUsuarioSeleccionado = dni;
 
-                    textBoxPass.Text = "********";
+                        // Cargamos los campos
+                        textBoxDNI.Text = _datosOriginales["DNI"].ToString();
+                        textBoxDNI.ReadOnly = true; // Bloqueamos el DNI para que no lo cambien por error
 
-                    buttonSave.Text = "Actualizar";
-                    buttonDel.Text = "Limpiar / Cancelar";
-                    ValidarReglaNegocioBotones();
+                        textBoxName.Text = _datosOriginales["Nombre"].ToString();
+                        textBoxApellido.Text = _datosOriginales["Apellido"].ToString();
+                        textBoxUser.Text = _datosOriginales["Username"].ToString();
+                        textBoxPass.Text = "********";
+                        textBoxEmail.Text = _datosOriginales["Email"].ToString();
+                        textBoxDir.Text = _datosOriginales["Direccion"] != DBNull.Value ? _datosOriginales["Direccion"].ToString() : "";
+                        textBoxNroTel.Text = _datosOriginales["Telefono"] != DBNull.Value ? _datosOriginales["Telefono"].ToString() : "";
+
+                        if (_datosOriginales["FechaNacimiento"] != DBNull.Value)
+                            dateTimePickerFechNac.Value = Convert.ToDateTime(_datosOriginales["FechaNacimiento"]);
+
+                        comboBox1.SelectedValue = Convert.ToInt32(_datosOriginales["IdRol"]);
+
+                        if (_datosOriginales["IdLocalidad"] != DBNull.Value)
+                            comboBoxLocalidad.SelectedValue = Convert.ToInt32(_datosOriginales["IdLocalidad"]);
+
+                        string sexo = _datosOriginales["Sexo"]?.ToString() ?? "";
+                        radioButtonHom.Checked = (sexo == "M");
+                        radioButtonMuj.Checked = (sexo == "F");
+
+                        buttonSave.Text = "Modificar";
+                        buttonDel.Text = "Cancelar";
+                        ValidarReglaNegocioBotones();
+                    }
                 }
             }
         }
@@ -332,6 +375,7 @@ namespace TheGoodTaste.UI
         private void LimpiarCampos()
         {
             _idUsuarioSeleccionado = null;
+            _datosOriginales = null; // Reiniciamos los datos de memoria
 
             textBoxName.Clear();
             textBoxApellido.Clear();
@@ -339,6 +383,7 @@ namespace TheGoodTaste.UI
             textBoxPass.Clear();
             textBoxEmail.Clear();
             textBoxDNI.Clear();
+            textBoxDNI.ReadOnly = false; // Desbloqueamos el DNI para altas nuevas
             textBoxDir.Clear();
             textBoxNroTel.Clear();
             textBoxPass.UseSystemPasswordChar = true;
@@ -397,7 +442,6 @@ namespace TheGoodTaste.UI
 
         private void label8_Click(object sender, EventArgs e)
         {
-
         }
     }
 }
