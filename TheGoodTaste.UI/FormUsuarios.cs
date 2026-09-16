@@ -414,6 +414,20 @@ namespace TheGoodTaste.UI
             {
                 UsuarioDatos repo = new UsuarioDatos();
                 dataGridView1.DataSource = repo.ObtenerUsuariosPorEstado(verActivos);
+
+                // 1. Bloquear la edición de todas las columnas de texto
+                foreach (DataGridViewColumn columna in dataGridView1.Columns)
+                {
+                    // Dejamos libre solo la columna "Estado" para que el CheckBox siga funcionando
+                    if (columna.Name != "Estado")
+                    {
+                        columna.ReadOnly = true;
+                    }
+                }
+
+                // 2. Seleccionar la fila completa al hacer clic (mejora la experiencia de usuario)
+                dataGridView1.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+
                 dataGridView1.ClearSelection();
             }
             catch (Exception ex)
