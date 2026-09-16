@@ -12,7 +12,7 @@ namespace TheGoodTaste.UI
 {
     public partial class FormUsuarios : Form
     {
-        private int? _idUsuarioSeleccionado = null;
+        private int? _idUsuarioSeleccionado = null; // Ahora guarda el DNI del seleccionado
 
         public FormUsuarios()
         {
@@ -23,6 +23,7 @@ namespace TheGoodTaste.UI
         {
             TemaVisual.AplicarEstilo(this);
             CargarRoles();
+            CargarLocalidades(); // Cargamos el combo de localidades
             ConfigurarEventos();
             ConfigurarAutocompletadoDireccion();
             LimpiarCampos();
@@ -49,6 +50,22 @@ namespace TheGoodTaste.UI
             comboBox1.SelectedIndex = -1;
         }
 
+        private void CargarLocalidades()
+        {
+            try
+            {
+                UsuarioDatos repo = new UsuarioDatos();
+                comboBoxLocalidad.DataSource = repo.ObtenerLocalidades();
+                comboBoxLocalidad.DisplayMember = "Descripcion";
+                comboBoxLocalidad.ValueMember = "IdLocalidad";
+                comboBoxLocalidad.SelectedIndex = -1;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error al cargar localidades: " + ex.Message, "Error BD", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+        }
+
         private void ConfigurarAutocompletadoDireccion()
         {
             try
@@ -71,13 +88,6 @@ namespace TheGoodTaste.UI
             catch (Exception) { }
         }
 
-        private string FormatearDireccion(string texto)
-        {
-            if (string.IsNullOrWhiteSpace(texto)) return string.Empty;
-            TextInfo textInfo = CultureInfo.CurrentCulture.TextInfo;
-            return textInfo.ToTitleCase(texto.Trim().ToLower());
-        }
-
         private void ConfigurarEventos()
         {
             textBoxName.KeyPress += SoloLetras_KeyPress;
@@ -91,6 +101,10 @@ namespace TheGoodTaste.UI
             textBoxEmail.TextChanged += Control_Modificado;
             textBoxDNI.TextChanged += Control_Modificado;
             comboBox1.SelectedIndexChanged += Control_Modificado;
+
+            // Si tenés el combo de localidad, descomentá esto:
+            // comboBoxLocalidad.SelectedIndexChanged += Control_Modificado; 
+
             radioButtonHom.CheckedChanged += Control_Modificado;
             radioButtonMuj.CheckedChanged += Control_Modificado;
 
@@ -103,8 +117,6 @@ namespace TheGoodTaste.UI
             };
 
             dataGridView1.CellDoubleClick += DataGridView1_CellDoubleClick;
-
-            // Eventos para la baja directa al hacer clic en el recuadro (Checkbox)
             dataGridView1.CellContentClick += DataGridView1_CellContentClick;
             dataGridView1.CurrentCellDirtyStateChanged += DataGridView1_CurrentCellDirtyStateChanged;
 
@@ -120,7 +132,6 @@ namespace TheGoodTaste.UI
             radioButtonInac.Click += (s, e) => CargarGrillaUsuarios(false);
         }
 
-        // Detecta el clic en el checkbox de la columna Estado
         private void DataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
             if (e.RowIndex >= 0 && dataGridView1.Columns[e.ColumnIndex].Name == "Estado")
@@ -129,7 +140,7 @@ namespace TheGoodTaste.UI
 
                 if (fila.Cells["ID"].Value != DBNull.Value && fila.Cells["ID"].Value != null)
                 {
-                    int idUsuario = Convert.ToInt32(fila.Cells["ID"].Value);
+                    int dni = Convert.ToInt32(fila.Cells["ID"].Value); // Ahora es DNI
                     bool nuevoEstado = Convert.ToBoolean(fila.Cells["Estado"].Value);
                     string usuarioNombre = fila.Cells["Usuario"].Value?.ToString() ?? "este usuario";
 
@@ -147,7 +158,7 @@ namespace TheGoodTaste.UI
                         try
                         {
                             UsuarioDatos repo = new UsuarioDatos();
-                            if (repo.CambiarEstadoUsuario(idUsuario, nuevoEstado))
+                            if (repo.CambiarEstadoUsuario(dni, nuevoEstado))
                             {
                                 MessageBox.Show($"Usuario {(nuevoEstado ? "reactivado" : "dado de baja")} correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
                                 CargarGrillaUsuarios(radioButtonAct.Checked);
@@ -155,14 +166,12 @@ namespace TheGoodTaste.UI
                         }
                         catch (Exception ex)
                         {
-                            MessageBox.Show("Error al cambiar el estado en la base de datos: " + ex.Message, "Error BD", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                            // Revertir el valor en la grilla si falla
+                            MessageBox.Show("Error al cambiar el estado: " + ex.Message, "Error BD", MessageBoxButtons.OK, MessageBoxIcon.Error);
                             fila.Cells["Estado"].Value = !nuevoEstado;
                         }
                     }
                     else
                     {
-                   
                         dataGridView1.CancelEdit();
                         CargarGrillaUsuarios(radioButtonAct.Checked);
                     }
@@ -170,7 +179,6 @@ namespace TheGoodTaste.UI
             }
         }
 
-       
         private void DataGridView1_CurrentCellDirtyStateChanged(object sender, EventArgs e)
         {
             if (dataGridView1.IsCurrentCellDirty && dataGridView1.CurrentCell is DataGridViewCheckBoxCell)
@@ -199,6 +207,7 @@ namespace TheGoodTaste.UI
                                          !string.IsNullOrWhiteSpace(textBoxEmail.Text) &&
                                          !string.IsNullOrWhiteSpace(textBoxDNI.Text) &&
                                          comboBox1.SelectedIndex != -1 &&
+                                         // comboBoxLocalidad.SelectedIndex != -1 && // Descomentar cuando agregues el combo Localidad
                                          (radioButtonHom.Checked || radioButtonMuj.Checked);
 
             buttonDel.Enabled = algunCampoConDato || _idUsuarioSeleccionado.HasValue;
@@ -238,17 +247,19 @@ namespace TheGoodTaste.UI
 
             try
             {
-                // Captura de datos básicos
+                int dni = Convert.ToInt32(textBoxDNI.Text.Trim());
                 string username = textBoxUser.Text.Trim();
                 string password = string.IsNullOrWhiteSpace(textBoxPass.Text) ? textBoxDNI.Text.Trim() : textBoxPass.Text.Trim();
                 string nombre = textBoxName.Text.Trim();
                 string apellido = textBoxApellido.Text.Trim();
-                string nombreCompleto = $"{nombre} {apellido}";
                 int idRol = Convert.ToInt32(comboBox1.SelectedValue);
 
-                // Captura de los nuevos datos del formulario
-                int dni = Convert.ToInt32(textBoxDNI.Text.Trim());
                 string direccion = textBoxDir.Text.Trim();
+
+                // Si aún no dibujaste el comboBoxLocalidad, lo forzamos a 1 (Corrientes) temporalmente.
+                // Si ya lo tenés en diseño, cambiá el "1" por: Convert.ToInt32(comboBoxLocalidad.SelectedValue)
+                int idLocalidad = comboBoxLocalidad.SelectedValue != null ? Convert.ToInt32(comboBoxLocalidad.SelectedValue) : 1;
+
                 DateTime fechaNacimiento = dateTimePickerFechNac.Value;
                 string telefono = textBoxNroTel.Text.Trim();
                 string email = textBoxEmail.Text.Trim();
@@ -256,24 +267,22 @@ namespace TheGoodTaste.UI
 
                 UsuarioDatos repo = new UsuarioDatos();
 
-                if (!_idUsuarioSeleccionado.HasValue)
+                if (!_idUsuarioSeleccionado.HasValue) // Alta
                 {
-                    if (repo.ExisteDNI(textBoxDNI.Text.Trim()))
+                    if (repo.ExisteDNI(dni))
                     {
                         MessageBox.Show("El DNI ingresado ya está registrado.", "DNI Duplicado", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                         textBoxDNI.Focus();
                         return;
                     }
 
-                    // Se llama a RegistrarUsuario con todos los parámetros
-                    if (repo.RegistrarUsuario(username, password, nombreCompleto, idRol, nombre, apellido, dni, direccion, fechaNacimiento, telefono, email, sexo))
+                    if (repo.RegistrarUsuario(dni, username, password, idRol, nombre, apellido, direccion, idLocalidad, fechaNacimiento, telefono, email, sexo))
                     {
                         MessageBox.Show("Usuario registrado con éxito.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
                 }
-                else
+                else // Actualización
                 {
-                    // Lógica para actualizar (requerirá un método ActualizarUsuario en UsuarioDatos)
                     MessageBox.Show("Usuario actualizado con éxito.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
 
@@ -294,7 +303,7 @@ namespace TheGoodTaste.UI
 
                 if (fila.Cells["ID"].Value != DBNull.Value && fila.Cells["ID"].Value != null)
                 {
-                    _idUsuarioSeleccionado = Convert.ToInt32(fila.Cells["ID"].Value);
+                    _idUsuarioSeleccionado = Convert.ToInt32(fila.Cells["ID"].Value); // DNI
                     textBoxUser.Text = fila.Cells["Usuario"].Value?.ToString();
 
                     string nombreCompleto = fila.Cells["Nombre Completo"].Value?.ToString().Trim() ?? "";
@@ -337,6 +346,8 @@ namespace TheGoodTaste.UI
             chkVerPassUsuario.Text = "👁️";
 
             comboBox1.SelectedIndex = -1;
+            if (comboBoxLocalidad != null) comboBoxLocalidad.SelectedIndex = -1;
+
             radioButtonHom.Checked = false;
             radioButtonMuj.Checked = false;
             dateTimePickerFechNac.Value = DateTime.Today;
@@ -348,22 +359,9 @@ namespace TheGoodTaste.UI
             textBoxName.Focus();
         }
 
-        private void buttonDel_Click(object sender, EventArgs e)
-        {
-            LimpiarCampos();
-        }
-
-        private void SoloLetras_KeyPress(object sender, KeyPressEventArgs e)
-        {
-            if (!char.IsLetter(e.KeyChar) && !char.IsControl(e.KeyChar) && !char.IsWhiteSpace(e.KeyChar))
-                e.Handled = true;
-        }
-
-        private void SoloNumeros_KeyPress(object sender, KeyPressEventArgs e)
-        {
-            if (!char.IsDigit(e.KeyChar) && !char.IsControl(e.KeyChar))
-                e.Handled = true;
-        }
+        private void buttonDel_Click(object sender, EventArgs e) => LimpiarCampos();
+        private void SoloLetras_KeyPress(object sender, KeyPressEventArgs e) { if (!char.IsLetter(e.KeyChar) && !char.IsControl(e.KeyChar) && !char.IsWhiteSpace(e.KeyChar)) e.Handled = true; }
+        private void SoloNumeros_KeyPress(object sender, KeyPressEventArgs e) { if (!char.IsDigit(e.KeyChar) && !char.IsControl(e.KeyChar)) e.Handled = true; }
 
         private void CargarGrillaUsuarios(bool verActivos)
         {
@@ -396,5 +394,10 @@ namespace TheGoodTaste.UI
         }
 
         private void btnMostrarPassword_CheckedChanged(object sender, EventArgs e) => chkVerPassUsuario_CheckedChanged(sender, e);
+
+        private void label8_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }

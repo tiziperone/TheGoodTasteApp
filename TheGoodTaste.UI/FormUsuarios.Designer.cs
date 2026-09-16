@@ -45,7 +45,6 @@
             this.textBoxPass = new System.Windows.Forms.TextBox();
             this.textBoxEmail = new System.Windows.Forms.TextBox();
             this.textBoxDNI = new System.Windows.Forms.TextBox();
-            this.textBoxDir = new System.Windows.Forms.TextBox();
             this.dateTimePickerFechNac = new System.Windows.Forms.DateTimePicker();
             this.textBoxNroTel = new System.Windows.Forms.TextBox();
             this.radioButtonHom = new System.Windows.Forms.RadioButton();
@@ -57,6 +56,9 @@
             this.radioButtonAct = new System.Windows.Forms.RadioButton();
             this.radioButtonInac = new System.Windows.Forms.RadioButton();
             this.chkVerPassUsuario = new System.Windows.Forms.CheckBox();
+            this.textBoxDir = new System.Windows.Forms.TextBox();
+            this.comboBoxLocalidad = new System.Windows.Forms.ComboBox();
+            this.label12 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -126,16 +128,17 @@
             // label8
             // 
             this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(386, 41);
+            this.label8.Location = new System.Drawing.Point(386, 93);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(64, 16);
             this.label8.TabIndex = 7;
             this.label8.Text = "Dirección";
+            this.label8.Click += new System.EventHandler(this.label8_Click);
             // 
             // label9
             // 
             this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(386, 76);
+            this.label9.Location = new System.Drawing.Point(386, 124);
             this.label9.Name = "label9";
             this.label9.Size = new System.Drawing.Size(116, 16);
             this.label9.TabIndex = 8;
@@ -144,7 +147,7 @@
             // label10
             // 
             this.label10.AutoSize = true;
-            this.label10.Location = new System.Drawing.Point(386, 108);
+            this.label10.Location = new System.Drawing.Point(386, 157);
             this.label10.Name = "label10";
             this.label10.Size = new System.Drawing.Size(61, 16);
             this.label10.TabIndex = 9;
@@ -153,7 +156,7 @@
             // label11
             // 
             this.label11.AutoSize = true;
-            this.label11.Location = new System.Drawing.Point(386, 141);
+            this.label11.Location = new System.Drawing.Point(386, 185);
             this.label11.Name = "label11";
             this.label11.Size = new System.Drawing.Size(38, 16);
             this.label11.TabIndex = 10;
@@ -202,24 +205,17 @@
             this.textBoxDNI.Size = new System.Drawing.Size(181, 22);
             this.textBoxDNI.TabIndex = 17;
             // 
-            // textBoxDir
-            // 
-            this.textBoxDir.Location = new System.Drawing.Point(510, 38);
-            this.textBoxDir.Name = "textBoxDir";
-            this.textBoxDir.Size = new System.Drawing.Size(153, 22);
-            this.textBoxDir.TabIndex = 18;
-            // 
             // dateTimePickerFechNac
             // 
             this.dateTimePickerFechNac.Format = System.Windows.Forms.DateTimePickerFormat.Short;
-            this.dateTimePickerFechNac.Location = new System.Drawing.Point(510, 70);
+            this.dateTimePickerFechNac.Location = new System.Drawing.Point(510, 119);
             this.dateTimePickerFechNac.Name = "dateTimePickerFechNac";
             this.dateTimePickerFechNac.Size = new System.Drawing.Size(153, 22);
             this.dateTimePickerFechNac.TabIndex = 19;
             // 
             // textBoxNroTel
             // 
-            this.textBoxNroTel.Location = new System.Drawing.Point(510, 105);
+            this.textBoxNroTel.Location = new System.Drawing.Point(510, 154);
             this.textBoxNroTel.Name = "textBoxNroTel";
             this.textBoxNroTel.Size = new System.Drawing.Size(153, 22);
             this.textBoxNroTel.TabIndex = 20;
@@ -227,7 +223,7 @@
             // radioButtonHom
             // 
             this.radioButtonHom.AutoSize = true;
-            this.radioButtonHom.Location = new System.Drawing.Point(510, 137);
+            this.radioButtonHom.Location = new System.Drawing.Point(510, 185);
             this.radioButtonHom.Name = "radioButtonHom";
             this.radioButtonHom.Size = new System.Drawing.Size(77, 20);
             this.radioButtonHom.TabIndex = 21;
@@ -238,7 +234,7 @@
             // radioButtonMuj
             // 
             this.radioButtonMuj.AutoSize = true;
-            this.radioButtonMuj.Location = new System.Drawing.Point(593, 137);
+            this.radioButtonMuj.Location = new System.Drawing.Point(602, 182);
             this.radioButtonMuj.Name = "radioButtonMuj";
             this.radioButtonMuj.Size = new System.Drawing.Size(61, 20);
             this.radioButtonMuj.TabIndex = 22;
@@ -291,7 +287,7 @@
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.RowHeadersWidth = 51;
             this.dataGridView1.RowTemplate.Height = 24;
-            this.dataGridView1.Size = new System.Drawing.Size(1037, 288);
+            this.dataGridView1.Size = new System.Drawing.Size(1037, 195);
             this.dataGridView1.TabIndex = 26;
             // 
             // radioButtonAct
@@ -331,11 +327,38 @@
             this.chkVerPassUsuario.UseVisualStyleBackColor = true;
             this.chkVerPassUsuario.CheckedChanged += new System.EventHandler(this.btnMostrarPassword_CheckedChanged);
             // 
+            // textBoxDir
+            // 
+            this.textBoxDir.Location = new System.Drawing.Point(510, 87);
+            this.textBoxDir.Name = "textBoxDir";
+            this.textBoxDir.Size = new System.Drawing.Size(153, 22);
+            this.textBoxDir.TabIndex = 30;
+            // 
+            // comboBoxLocalidad
+            // 
+            this.comboBoxLocalidad.FormattingEnabled = true;
+            this.comboBoxLocalidad.Location = new System.Drawing.Point(510, 48);
+            this.comboBoxLocalidad.Name = "comboBoxLocalidad";
+            this.comboBoxLocalidad.Size = new System.Drawing.Size(153, 24);
+            this.comboBoxLocalidad.TabIndex = 31;
+            // 
+            // label12
+            // 
+            this.label12.AutoSize = true;
+            this.label12.Location = new System.Drawing.Point(386, 52);
+            this.label12.Name = "label12";
+            this.label12.Size = new System.Drawing.Size(67, 16);
+            this.label12.TabIndex = 32;
+            this.label12.Text = "Localidad";
+            // 
             // FormUsuarios
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1106, 804);
+            this.ClientSize = new System.Drawing.Size(1106, 711);
+            this.Controls.Add(this.label12);
+            this.Controls.Add(this.comboBoxLocalidad);
+            this.Controls.Add(this.textBoxDir);
             this.Controls.Add(this.chkVerPassUsuario);
             this.Controls.Add(this.radioButtonInac);
             this.Controls.Add(this.radioButtonAct);
@@ -347,7 +370,6 @@
             this.Controls.Add(this.radioButtonHom);
             this.Controls.Add(this.textBoxNroTel);
             this.Controls.Add(this.dateTimePickerFechNac);
-            this.Controls.Add(this.textBoxDir);
             this.Controls.Add(this.textBoxDNI);
             this.Controls.Add(this.textBoxEmail);
             this.Controls.Add(this.textBoxPass);
@@ -393,7 +415,6 @@
         private System.Windows.Forms.TextBox textBoxPass;
         private System.Windows.Forms.TextBox textBoxEmail;
         private System.Windows.Forms.TextBox textBoxDNI;
-        private System.Windows.Forms.TextBox textBoxDir;
         private System.Windows.Forms.DateTimePicker dateTimePickerFechNac;
         private System.Windows.Forms.TextBox textBoxNroTel;
         private System.Windows.Forms.RadioButton radioButtonHom;
@@ -405,5 +426,8 @@
         private System.Windows.Forms.RadioButton radioButtonAct;
         private System.Windows.Forms.RadioButton radioButtonInac;
         private System.Windows.Forms.CheckBox chkVerPassUsuario;
+        private System.Windows.Forms.TextBox textBoxDir;
+        private System.Windows.Forms.ComboBox comboBoxLocalidad;
+        private System.Windows.Forms.Label label12;
     }
 }
