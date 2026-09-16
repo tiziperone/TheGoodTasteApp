@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Drawing;
 using System.Globalization;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
@@ -11,7 +12,7 @@ namespace TheGoodTaste.UI
     public partial class FormUsuarios : Form
     {
         private int? _idUsuarioSeleccionado = null;
-        private DataRow _datosOriginales = null; // Para guardar los datos al hacer doble clic
+        private DataRow _datosOriginales = null; // Para guardar los datos al hacer clic en modificar
 
         public FormUsuarios()
         {
@@ -113,7 +114,6 @@ namespace TheGoodTaste.UI
                     textBoxPass.Text = textBoxDNI.Text.Trim();
             };
 
-            dataGridView1.CellDoubleClick += DataGridView1_CellDoubleClick;
             dataGridView1.CellContentClick += DataGridView1_CellContentClick;
             dataGridView1.CurrentCellDirtyStateChanged += DataGridView1_CurrentCellDirtyStateChanged;
 
@@ -129,48 +129,99 @@ namespace TheGoodTaste.UI
             radioButtonInac.Click += (s, e) => CargarGrillaUsuarios(false);
         }
 
+        // Este evento ahora maneja tanto el clic en el botón "Modificar" como en el checkbox de "Estado"
         private void DataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
-            if (e.RowIndex >= 0 && dataGridView1.Columns[e.ColumnIndex].Name == "Estado")
+            if (e.RowIndex >= 0)
             {
                 DataGridViewRow fila = dataGridView1.Rows[e.RowIndex];
 
-                if (fila.Cells["ID"].Value != DBNull.Value && fila.Cells["ID"].Value != null)
+                // 1. Lógica para el botón "Modificar"
+                if (dataGridView1.Columns[e.ColumnIndex].Name == "Modificar")
                 {
-                    int dni = Convert.ToInt32(fila.Cells["ID"].Value);
-                    bool nuevoEstado = Convert.ToBoolean(fila.Cells["Estado"].Value);
-                    string usuarioNombre = fila.Cells["Usuario"].Value?.ToString() ?? "este usuario";
-
-                    string accion = nuevoEstado ? "reactivar" : "dar de baja";
-
-                    DialogResult result = MessageBox.Show(
-                        $"¿Está seguro de que desea {accion} al usuario '{usuarioNombre}'?",
-                        "Confirmación de Estado",
-                        MessageBoxButtons.YesNo,
-                        MessageBoxIcon.Question
-                    );
-
-                    if (result == DialogResult.Yes)
+                    if (fila.Cells["ID"].Value != DBNull.Value && fila.Cells["ID"].Value != null)
                     {
-                        try
+                        int dni = Convert.ToInt32(fila.Cells["ID"].Value);
+
+                        UsuarioDatos repo = new UsuarioDatos();
+                        _datosOriginales = repo.ObtenerUsuarioPorDNI(dni); // Traemos la fila entera desde SQL
+
+                        if (_datosOriginales != null)
                         {
-                            UsuarioDatos repo = new UsuarioDatos();
-                            if (repo.CambiarEstadoUsuario(dni, nuevoEstado))
-                            {
-                                MessageBox.Show($"Usuario {(nuevoEstado ? "reactivado" : "dado de baja")} correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                                CargarGrillaUsuarios(radioButtonAct.Checked);
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            MessageBox.Show("Error al cambiar el estado: " + ex.Message, "Error BD", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                            fila.Cells["Estado"].Value = !nuevoEstado;
+                            _idUsuarioSeleccionado = dni;
+
+                            // Cargamos los campos en el formulario
+                            textBoxDNI.Text = _datosOriginales["DNI"].ToString();
+                            textBoxDNI.ReadOnly = true; // Bloqueamos el DNI para que no lo cambien por error
+
+                            textBoxName.Text = _datosOriginales["Nombre"].ToString();
+                            textBoxApellido.Text = _datosOriginales["Apellido"].ToString();
+                            textBoxUser.Text = _datosOriginales["Username"].ToString();
+                            textBoxPass.Text = "********";
+                            textBoxEmail.Text = _datosOriginales["Email"].ToString();
+                            textBoxDir.Text = _datosOriginales["Direccion"] != DBNull.Value ? _datosOriginales["Direccion"].ToString() : "";
+                            textBoxNroTel.Text = _datosOriginales["Telefono"] != DBNull.Value ? _datosOriginales["Telefono"].ToString() : "";
+
+                            if (_datosOriginales["FechaNacimiento"] != DBNull.Value)
+                                dateTimePickerFechNac.Value = Convert.ToDateTime(_datosOriginales["FechaNacimiento"]);
+
+                            comboBox1.SelectedValue = Convert.ToInt32(_datosOriginales["IdRol"]);
+
+                            if (_datosOriginales["IdLocalidad"] != DBNull.Value)
+                                comboBoxLocalidad.SelectedValue = Convert.ToInt32(_datosOriginales["IdLocalidad"]);
+
+                            string sexo = _datosOriginales["Sexo"]?.ToString() ?? "";
+                            radioButtonHom.Checked = (sexo == "M");
+                            radioButtonMuj.Checked = (sexo == "F");
+
+                            buttonSave.Text = "Modificar";
+                            buttonDel.Text = "Cancelar";
+                            ValidarReglaNegocioBotones();
                         }
                     }
-                    else
+                    return; // Salimos para no evaluar el checkbox
+                }
+
+                // 2. Lógica para el CheckBox "Estado" (Dar de baja / reactivar)
+                if (dataGridView1.Columns[e.ColumnIndex].Name == "Estado")
+                {
+                    if (fila.Cells["ID"].Value != DBNull.Value && fila.Cells["ID"].Value != null)
                     {
-                        dataGridView1.CancelEdit();
-                        CargarGrillaUsuarios(radioButtonAct.Checked);
+                        int dni = Convert.ToInt32(fila.Cells["ID"].Value);
+                        bool nuevoEstado = Convert.ToBoolean(fila.Cells["Estado"].Value);
+                        string usuarioNombre = fila.Cells["Usuario"].Value?.ToString() ?? "este usuario";
+
+                        string accion = nuevoEstado ? "reactivar" : "dar de baja";
+
+                        DialogResult result = MessageBox.Show(
+                            $"¿Está seguro de que desea {accion} al usuario '{usuarioNombre}'?",
+                            "Confirmación de Estado",
+                            MessageBoxButtons.YesNo,
+                            MessageBoxIcon.Question
+                        );
+
+                        if (result == DialogResult.Yes)
+                        {
+                            try
+                            {
+                                UsuarioDatos repo = new UsuarioDatos();
+                                if (repo.CambiarEstadoUsuario(dni, nuevoEstado))
+                                {
+                                    MessageBox.Show($"Usuario {(nuevoEstado ? "reactivado" : "dado de baja")} correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                                    CargarGrillaUsuarios(radioButtonAct.Checked);
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                MessageBox.Show("Error al cambiar el estado: " + ex.Message, "Error BD", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                fila.Cells["Estado"].Value = !nuevoEstado;
+                            }
+                        }
+                        else
+                        {
+                            dataGridView1.CancelEdit();
+                            CargarGrillaUsuarios(radioButtonAct.Checked);
+                        }
                     }
                 }
             }
@@ -277,7 +328,6 @@ namespace TheGoodTaste.UI
                 }
                 else // MODIFICACIÓN
                 {
-                    // Detectamos los cambios para el cuadro de confirmación
                     List<string> cambios = new List<string>();
 
                     if (_datosOriginales["Nombre"].ToString() != nombre) cambios.Add($"• Nombre: '{_datosOriginales["Nombre"]}' -> '{nombre}'");
@@ -323,59 +373,10 @@ namespace TheGoodTaste.UI
             }
         }
 
-        private void DataGridView1_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
-        {
-            if (e.RowIndex >= 0 && !dataGridView1.Rows[e.RowIndex].IsNewRow)
-            {
-                DataGridViewRow fila = dataGridView1.Rows[e.RowIndex];
-
-                if (fila.Cells["ID"].Value != DBNull.Value && fila.Cells["ID"].Value != null)
-                {
-                    int dni = Convert.ToInt32(fila.Cells["ID"].Value);
-
-                    UsuarioDatos repo = new UsuarioDatos();
-                    _datosOriginales = repo.ObtenerUsuarioPorDNI(dni); // Traemos la fila entera desde SQL
-
-                    if (_datosOriginales != null)
-                    {
-                        _idUsuarioSeleccionado = dni;
-
-                        // Cargamos los campos
-                        textBoxDNI.Text = _datosOriginales["DNI"].ToString();
-                        textBoxDNI.ReadOnly = true; // Bloqueamos el DNI para que no lo cambien por error
-
-                        textBoxName.Text = _datosOriginales["Nombre"].ToString();
-                        textBoxApellido.Text = _datosOriginales["Apellido"].ToString();
-                        textBoxUser.Text = _datosOriginales["Username"].ToString();
-                        textBoxPass.Text = "********";
-                        textBoxEmail.Text = _datosOriginales["Email"].ToString();
-                        textBoxDir.Text = _datosOriginales["Direccion"] != DBNull.Value ? _datosOriginales["Direccion"].ToString() : "";
-                        textBoxNroTel.Text = _datosOriginales["Telefono"] != DBNull.Value ? _datosOriginales["Telefono"].ToString() : "";
-
-                        if (_datosOriginales["FechaNacimiento"] != DBNull.Value)
-                            dateTimePickerFechNac.Value = Convert.ToDateTime(_datosOriginales["FechaNacimiento"]);
-
-                        comboBox1.SelectedValue = Convert.ToInt32(_datosOriginales["IdRol"]);
-
-                        if (_datosOriginales["IdLocalidad"] != DBNull.Value)
-                            comboBoxLocalidad.SelectedValue = Convert.ToInt32(_datosOriginales["IdLocalidad"]);
-
-                        string sexo = _datosOriginales["Sexo"]?.ToString() ?? "";
-                        radioButtonHom.Checked = (sexo == "M");
-                        radioButtonMuj.Checked = (sexo == "F");
-
-                        buttonSave.Text = "Modificar";
-                        buttonDel.Text = "Cancelar";
-                        ValidarReglaNegocioBotones();
-                    }
-                }
-            }
-        }
-
         private void LimpiarCampos()
         {
             _idUsuarioSeleccionado = null;
-            _datosOriginales = null; // Reiniciamos los datos de memoria
+            _datosOriginales = null;
 
             textBoxName.Clear();
             textBoxApellido.Clear();
@@ -383,7 +384,7 @@ namespace TheGoodTaste.UI
             textBoxPass.Clear();
             textBoxEmail.Clear();
             textBoxDNI.Clear();
-            textBoxDNI.ReadOnly = false; // Desbloqueamos el DNI para altas nuevas
+            textBoxDNI.ReadOnly = false;
             textBoxDir.Clear();
             textBoxNroTel.Clear();
             textBoxPass.UseSystemPasswordChar = true;
@@ -415,19 +416,29 @@ namespace TheGoodTaste.UI
                 UsuarioDatos repo = new UsuarioDatos();
                 dataGridView1.DataSource = repo.ObtenerUsuariosPorEstado(verActivos);
 
-                // 1. Bloquear la edición de todas las columnas de texto
+                // Agregamos la columna de botón si no existe
+                if (!dataGridView1.Columns.Contains("Modificar"))
+                {
+                    DataGridViewButtonColumn btnModificar = new DataGridViewButtonColumn();
+                    btnModificar.Name = "Modificar";
+                    btnModificar.HeaderText = "Acción";
+                    btnModificar.Text = "Modificar";
+                    btnModificar.UseColumnTextForButtonValue = true;
+                    // La agregamos al principio de todo
+                    dataGridView1.Columns.Insert(0, btnModificar);
+                }
+
+                // Bloquear la edición de todas las columnas de texto
                 foreach (DataGridViewColumn columna in dataGridView1.Columns)
                 {
-                    // Dejamos libre solo la columna "Estado" para que el CheckBox siga funcionando
-                    if (columna.Name != "Estado")
+                    // Dejamos libre la columna "Estado" y el botón "Modificar"
+                    if (columna.Name != "Estado" && columna.Name != "Modificar")
                     {
                         columna.ReadOnly = true;
                     }
                 }
 
-                // 2. Seleccionar la fila completa al hacer clic (mejora la experiencia de usuario)
                 dataGridView1.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-
                 dataGridView1.ClearSelection();
             }
             catch (Exception ex)
