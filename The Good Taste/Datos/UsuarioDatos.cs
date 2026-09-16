@@ -28,21 +28,21 @@ namespace The_Good_Taste.Datos
 
         public UsuarioSistema Autenticar(string user, string pass)
         {
-            string hashPassword = GenerarHashSHA256(pass);
+            // Borramos la línea de string hashPassword = GenerarHashSHA256(pass);
 
             string query = @"
-                SELECT IdUsuario, Username, NombreCompleto, IdRol, Activo
-                FROM Usuarios
-                WHERE Username = @user 
-                  AND PasswordHash = @pass 
-                  AND Activo = 1";
+        SELECT IdUsuario, Username, NombreCompleto, IdRol, Activo
+        FROM Usuarios
+        WHERE Username = @user 
+          AND PasswordHash = @pass 
+          AND Activo = 1";
 
             using (SqlConnection conexion = new SqlConnection(_cadenaConexion))
             {
                 using (SqlCommand cmd = new SqlCommand(query, conexion))
                 {
                     cmd.Parameters.AddWithValue("@user", user);
-                    cmd.Parameters.AddWithValue("@pass", hashPassword);
+                    cmd.Parameters.AddWithValue("@pass", pass); // Acá pasamos la contraseña en texto plano
 
                     conexion.Open();
 
@@ -60,7 +60,6 @@ namespace The_Good_Taste.Datos
                     }
                 }
             }
-
             return null;
         }
 
@@ -68,7 +67,7 @@ namespace The_Good_Taste.Datos
                              string nombre, string apellido, int dni, string direccion,
                              DateTime fechaNacimiento, string telefono, string email, string sexo)
         {
-            string hashPassword = GenerarHashSHA256(password);
+            // Borramos la línea de string hashPassword = ...
 
             string query = @"
         INSERT INTO Usuarios (Username, PasswordHash, NombreCompleto, IdRol, Activo, 
@@ -80,13 +79,12 @@ namespace The_Good_Taste.Datos
             {
                 using (SqlCommand cmd = new SqlCommand(query, conexion))
                 {
-                    // Parámetros originales
                     cmd.Parameters.AddWithValue("@user", username);
-                    cmd.Parameters.AddWithValue("@pass", hashPassword);
+                    cmd.Parameters.AddWithValue("@pass", password); // Acá pasamos la contraseña en texto plano
                     cmd.Parameters.AddWithValue("@nombreCompleto", nombreCompleto);
                     cmd.Parameters.AddWithValue("@rol", idRol);
 
-                    // Nuevos parámetros mapeados
+                    // ... (el resto de los parámetros quedan exactamente igual)
                     cmd.Parameters.AddWithValue("@nombre", nombre);
                     cmd.Parameters.AddWithValue("@apellido", apellido);
                     cmd.Parameters.AddWithValue("@dni", dni);
