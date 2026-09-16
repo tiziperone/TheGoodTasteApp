@@ -105,7 +105,7 @@ namespace The_Good_Taste.Datos
                     u.DNI AS [ID],
                     u.Username AS [Usuario],
                     (u.Nombre + ' ' + u.Apellido) AS [Nombre Completo],
-                    r.NombreRol AS [Rol],
+                    r.Nombre AS [Rol],
                     u.Activo AS [Estado]
                 FROM Usuarios u
                 INNER JOIN Roles r ON u.IdRol = r.IdRol
