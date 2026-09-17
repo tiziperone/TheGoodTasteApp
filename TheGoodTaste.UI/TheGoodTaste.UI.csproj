@@ -52,6 +52,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="FormReporteGerente.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormReporteGerente.Designer.cs">
+      <DependentUpon>FormReporteGerente.cs</DependentUpon>
+    </Compile>
     <Compile Include="FormReportes.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -111,6 +117,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="FormPuntoVenta.resx">
       <DependentUpon>FormPuntoVenta.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FormReporteGerente.resx">
+      <DependentUpon>FormReporteGerente.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="FormReportes.resx">
       <DependentUpon>FormReportes.cs</DependentUpon>
