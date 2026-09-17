@@ -421,8 +421,7 @@ namespace TheGoodTaste.UI
             textBoxDir.Clear();
             textBoxNroTel.Clear();
             textBoxPass.UseSystemPasswordChar = true;
-            chkVerPassUsuario.Checked = false;
-            chkVerPassUsuario.Text = "👁️";
+            
 
             comboBox1.SelectedIndex = -1;
             if (comboBoxLocalidad != null) comboBoxLocalidad.SelectedIndex = -1;
@@ -484,19 +483,7 @@ namespace TheGoodTaste.UI
         private void buttonDel_Click_1(object sender, EventArgs e) => buttonDel_Click(sender, e);
         private void comboBox1_SelectedIndexChanged(object sender, EventArgs e) { }
 
-        private void btnMostrarPassword_Click(object sender, EventArgs e)
-        {
-            textBoxPass.UseSystemPasswordChar = !textBoxPass.UseSystemPasswordChar;
-            chkVerPassUsuario.Text = textBoxPass.UseSystemPasswordChar ? "👁️" : "🙈";
-        }
-
-        private void chkVerPassUsuario_CheckedChanged(object sender, EventArgs e)
-        {
-            textBoxPass.UseSystemPasswordChar = !chkVerPassUsuario.Checked;
-            chkVerPassUsuario.Text = chkVerPassUsuario.Checked ? "🙈" : "👁️";
-        }
-
-        private void btnMostrarPassword_CheckedChanged(object sender, EventArgs e) => chkVerPassUsuario_CheckedChanged(sender, e);
+      
 
         private void label8_Click(object sender, EventArgs e)
         {

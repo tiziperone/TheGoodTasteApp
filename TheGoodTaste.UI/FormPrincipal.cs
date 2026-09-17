@@ -13,7 +13,7 @@ namespace TheGoodTaste.UI
         public FormPrincipal()
         {
             InitializeComponent();
-            this.KeyPreview = true; // Activa la escucha de atajos globales (F1-F4)
+            this.KeyPreview = true; // Activa la escucha de atajos globales (F1-F5 y ESC)
         }
 
         public FormPrincipal(UsuarioSistema usuario) : this()
@@ -41,6 +41,7 @@ namespace TheGoodTaste.UI
             switch (_usuarioActual.Rol)
             {
                 case RolUsuario.Admin:
+                    // El Admin conserva el acceso a todas las opciones
                     break;
 
                 case RolUsuario.Gerente:
@@ -50,11 +51,12 @@ namespace TheGoodTaste.UI
                 case RolUsuario.Vendedor:
                     if (btnUsuarios != null) btnUsuarios.Visible = false;
                     if (btnProductos != null) btnProductos.Visible = false;
+                    if (btnReportes != null) btnReportes.Visible = false;
                     break;
             }
         }
 
-        // Atajos de teclado (F1 a F4 y ESC)
+        // Atajos de teclado (F1 a F5 y ESC)
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
             switch (keyData)
@@ -71,13 +73,15 @@ namespace TheGoodTaste.UI
                 case Keys.F4:
                     if (btnUsuarios != null && btnUsuarios.Visible) btnUsuarios.PerformClick();
                     return true;
+                case Keys.F6:
+                    if (btnReportes != null && btnReportes.Visible) btnReportes.PerformClick();
+                    return true;
                 case Keys.Escape:
                     if (btnSalir != null) btnSalir.PerformClick();
                     return true;
             }
             return base.ProcessCmdKey(ref msg, keyData);
         }
-
 
         // CONSTANTES DE COLOR
         private readonly Color ColorFondoPanel = Color.FromArgb(35, 25, 20);   // Marrón oscuro
@@ -161,7 +165,7 @@ namespace TheGoodTaste.UI
             formularioHijo.Show();
         }
 
-        // Métodos que deben vincularse a cada botón
+        // Métodos vinculados a cada botón
         public void btnProductos_Click(object sender, EventArgs e)
         {
             AbrirFormularioEnPanel(new FormProductos(), (Button)sender);
@@ -180,6 +184,11 @@ namespace TheGoodTaste.UI
         public void btnUsuarios_Click(object sender, EventArgs e)
         {
             AbrirFormularioEnPanel(new FormUsuarios(), (Button)sender);
+        }
+
+        public void btnReportes_Click(object sender, EventArgs e)
+        {
+            AbrirFormularioEnPanel(new FormReporteGerente(), (Button)sender);
         }
 
         public void btnSalir_Click(object sender, EventArgs e)
@@ -207,6 +216,5 @@ namespace TheGoodTaste.UI
 
         private void panelContenedor_Paint(object sender, PaintEventArgs e) { }
         private void pbLogoInicio_Click(object sender, EventArgs e) { }
-        private void button2_Click(object sender, EventArgs e) { }
     }
 }
