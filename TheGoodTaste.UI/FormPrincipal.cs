@@ -41,14 +41,16 @@ namespace TheGoodTaste.UI
             switch (_usuarioActual.Rol)
             {
                 case RolUsuario.Admin:
-                    // El Admin conserva el acceso a todas las opciones
+                    // El Admin tiene acceso total, todos los botones quedan habilitados por defecto
                     break;
 
                 case RolUsuario.Gerente:
+                    // Apagamos Usuarios
                     if (btnUsuarios != null) btnUsuarios.Visible = false;
                     break;
 
                 case RolUsuario.Vendedor:
+                    // Apagamos Usuarios, Productos y Reportes
                     if (btnUsuarios != null) btnUsuarios.Visible = false;
                     if (btnProductos != null) btnProductos.Visible = false;
                     if (btnReportes != null) btnReportes.Visible = false;
@@ -62,22 +64,23 @@ namespace TheGoodTaste.UI
             switch (keyData)
             {
                 case Keys.F1:
-                    if (btnProductos != null && btnProductos.Visible) btnProductos.PerformClick();
+                    // Verificamos .Enabled en lugar de .Visible para bloquear el atajo si no hay permisos
+                    if (btnProductos != null && btnProductos.Enabled) btnProductos.PerformClick();
                     return true;
                 case Keys.F2:
-                    if (btnClientes != null && btnClientes.Visible) btnClientes.PerformClick();
+                    if (btnClientes != null && btnClientes.Enabled) btnClientes.PerformClick();
                     return true;
                 case Keys.F3:
-                    if (btnVentas != null && btnVentas.Visible) btnVentas.PerformClick();
+                    if (btnVentas != null && btnVentas.Enabled) btnVentas.PerformClick();
                     return true;
                 case Keys.F4:
-                    if (btnUsuarios != null && btnUsuarios.Visible) btnUsuarios.PerformClick();
+                    if (btnUsuarios != null && btnUsuarios.Enabled) btnUsuarios.PerformClick();
                     return true;
                 case Keys.F6:
                     if (btnReportes != null && btnReportes.Visible) btnReportes.PerformClick();
                     return true;
                 case Keys.Escape:
-                    if (btnSalir != null) btnSalir.PerformClick();
+                    if (btnSalir != null && btnSalir.Enabled) btnSalir.PerformClick();
                     return true;
             }
             return base.ProcessCmdKey(ref msg, keyData);
