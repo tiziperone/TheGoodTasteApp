@@ -41,11 +41,11 @@ namespace TheGoodTaste.UI
         private void CargarRoles()
         {
             var roles = new Dictionary<int, string>
-{
-{ 1, "Admin" },
-{ 2, "Gerente" },
-{ 3, "Vendedor" }
-};
+            {
+                { 1, "Admin" },
+                { 2, "Gerente" },
+                { 3, "Vendedor" }
+            };
 
             comboBox1.DataSource = new BindingSource(roles, null);
             comboBox1.DisplayMember = "Value";
@@ -76,10 +76,10 @@ namespace TheGoodTaste.UI
                 AutoCompleteStringCollection callesSugeridas = new AutoCompleteStringCollection();
                 string[] listaCalles = new string[]
                 {
-"Av. 3 de Abril", "Av. Pedro Ferré", "Av. Gobernador Ruiz", "Av. Armenia",
-"Av. Independencia", "Av. Maipú", "Av. Centenario", "Junín",
-"Pellegrini", "9 de Julio", "San Martín", "Córdoba", "Mendoza",
-"Salta", "Tucumán", "Buenos Aires", "Belgrano", "Bolívar", "Sarmiento"
+                    "Av. 3 de Abril", "Av. Pedro Ferré", "Av. Gobernador Ruiz", "Av. Armenia",
+                    "Av. Independencia", "Av. Maipú", "Av. Centenario", "Junín",
+                    "Pellegrini", "9 de Julio", "San Martín", "Córdoba", "Mendoza",
+                    "Salta", "Tucumán", "Buenos Aires", "Belgrano", "Bolívar", "Sarmiento"
                 };
 
                 callesSugeridas.AddRange(listaCalles);
@@ -103,8 +103,11 @@ namespace TheGoodTaste.UI
             textBoxUser.TextChanged += Control_Modificado;
             textBoxEmail.TextChanged += Control_Modificado;
             textBoxDNI.TextChanged += Control_Modificado;
+            textBoxDir.TextChanged += Control_Modificado;
+            textBoxNroTel.TextChanged += Control_Modificado;
             comboBox1.SelectedIndexChanged += Control_Modificado;
             comboBoxLocalidad.SelectedIndexChanged += Control_Modificado;
+            dateTimePickerFechNac.ValueChanged += Control_Modificado;
 
             radioButtonHom.CheckedChanged += Control_Modificado;
             radioButtonMuj.CheckedChanged += Control_Modificado;
@@ -266,7 +269,13 @@ namespace TheGoodTaste.UI
             !string.IsNullOrWhiteSpace(textBoxUser.Text) ||
             !string.IsNullOrWhiteSpace(textBoxEmail.Text) ||
             !string.IsNullOrWhiteSpace(textBoxDNI.Text) ||
-            comboBox1.SelectedIndex != -1;
+            !string.IsNullOrWhiteSpace(textBoxDir.Text) ||
+            !string.IsNullOrWhiteSpace(textBoxNroTel.Text) ||
+            comboBox1.SelectedIndex != -1 ||
+            comboBoxLocalidad.SelectedIndex != -1 ||
+            radioButtonHom.Checked ||
+            radioButtonMuj.Checked ||
+            dateTimePickerFechNac.Value.Date != DateTime.Today.AddYears(-18).Date;
 
             bool obligatoriosCompletos = !string.IsNullOrWhiteSpace(textBoxName.Text) &&
             !string.IsNullOrWhiteSpace(textBoxApellido.Text) &&
@@ -288,7 +297,19 @@ namespace TheGoodTaste.UI
                 string nom = textBoxName.Text.Trim().ToLower().Replace(" ", "");
                 string ape = textBoxApellido.Text.Trim().ToLower().Replace(" ", "");
 
-                if (!string.IsNullOrEmpty(nom) || !string.IsNullOrEmpty(ape))
+                if (string.IsNullOrEmpty(nom) && string.IsNullOrEmpty(ape))
+                {
+                    textBoxUser.Text = "";
+                }
+                else if (string.IsNullOrEmpty(nom))
+                {
+                    textBoxUser.Text = ape;
+                }
+                else if (string.IsNullOrEmpty(ape))
+                {
+                    textBoxUser.Text = nom;
+                }
+                else
                 {
                     textBoxUser.Text = $"{nom}.{ape}";
                 }
@@ -312,7 +333,6 @@ namespace TheGoodTaste.UI
                 return;
             }
 
-            // 3. VALIDACIÓN DE EDAD MÍNIMA (AQUÍ AGREGAS LA NUEVA)
             // 3. VALIDACIÓN DE EDAD MÍNIMA
             DateTime fechaNacimientoSeleccionada = dateTimePickerFechNac.Value.Date;
             DateTime fechaHoy = DateTime.Today;
@@ -436,7 +456,6 @@ namespace TheGoodTaste.UI
             textBoxDir.Clear();
             textBoxNroTel.Clear();
             textBoxPass.UseSystemPasswordChar = true;
-
 
             comboBox1.SelectedIndex = -1;
             if (comboBoxLocalidad != null) comboBoxLocalidad.SelectedIndex = -1;
