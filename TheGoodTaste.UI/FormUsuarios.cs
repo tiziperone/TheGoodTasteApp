@@ -124,7 +124,19 @@ namespace TheGoodTaste.UI
             {
                 if (c is TextBox)
                 {
-                    c.KeyDown += (s, e) => { if (e.KeyCode == Keys.Enter) SelectNextControl((Control)s, true, true, true, true); };
+                    c.KeyDown += (s, e) =>
+                    {
+                        if (e.KeyCode == Keys.Enter || e.KeyCode == Keys.Down)
+                        {
+                            e.SuppressKeyPress = true; 
+                            SelectNextControl((Control)s, true, true, true, true);
+                        }
+                        else if (e.KeyCode == Keys.Up)
+                        {
+                            e.SuppressKeyPress = true;
+                            SelectNextControl((Control)s, false, true, true, true);
+                        }
+                    };
                 }
             }
 
