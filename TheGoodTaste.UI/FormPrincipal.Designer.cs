@@ -58,7 +58,7 @@
             this.panelContenedor.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panelContenedor.Location = new System.Drawing.Point(0, 0);
             this.panelContenedor.Name = "panelContenedor";
-            this.panelContenedor.Size = new System.Drawing.Size(1046, 573);
+            this.panelContenedor.Size = new System.Drawing.Size(1219, 673);
             this.panelContenedor.TabIndex = 1;
             this.panelContenedor.Paint += new System.Windows.Forms.PaintEventHandler(this.panelContenedor_Paint);
             // 
@@ -74,7 +74,7 @@
             this.panelSuperior.Dock = System.Windows.Forms.DockStyle.Top;
             this.panelSuperior.Location = new System.Drawing.Point(0, 0);
             this.panelSuperior.Name = "panelSuperior";
-            this.panelSuperior.Size = new System.Drawing.Size(1046, 113);
+            this.panelSuperior.Size = new System.Drawing.Size(1219, 113);
             this.panelSuperior.TabIndex = 1;
             // 
             // btnSalir
@@ -88,7 +88,7 @@
             this.btnSalir.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(80)))), ((int)(((byte)(58)))), ((int)(((byte)(45)))));
             this.btnSalir.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnSalir.ForeColor = System.Drawing.SystemColors.ButtonHighlight;
-            this.btnSalir.Location = new System.Drawing.Point(810, 12);
+            this.btnSalir.Location = new System.Drawing.Point(983, 12);
             this.btnSalir.Name = "btnSalir";
             this.btnSalir.Size = new System.Drawing.Size(128, 86);
             this.btnSalir.TabIndex = 0;
@@ -109,7 +109,7 @@
             this.btnReportes.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(80)))), ((int)(((byte)(58)))), ((int)(((byte)(45)))));
             this.btnReportes.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnReportes.ForeColor = System.Drawing.SystemColors.ButtonHighlight;
-            this.btnReportes.Location = new System.Drawing.Point(663, 12);
+            this.btnReportes.Location = new System.Drawing.Point(749, 12);
             this.btnReportes.Name = "btnReportes";
             this.btnReportes.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
             this.btnReportes.Size = new System.Drawing.Size(128, 86);
@@ -130,7 +130,7 @@
             this.btnUsuarios.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(80)))), ((int)(((byte)(58)))), ((int)(((byte)(45)))));
             this.btnUsuarios.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnUsuarios.ForeColor = System.Drawing.SystemColors.ButtonHighlight;
-            this.btnUsuarios.Location = new System.Drawing.Point(507, 12);
+            this.btnUsuarios.Location = new System.Drawing.Point(593, 12);
             this.btnUsuarios.Name = "btnUsuarios";
             this.btnUsuarios.RightToLeft = System.Windows.Forms.RightToLeft.No;
             this.btnUsuarios.Size = new System.Drawing.Size(128, 86);
@@ -151,7 +151,7 @@
             this.btnVentas.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(80)))), ((int)(((byte)(58)))), ((int)(((byte)(45)))));
             this.btnVentas.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnVentas.ForeColor = System.Drawing.SystemColors.ButtonHighlight;
-            this.btnVentas.Location = new System.Drawing.Point(360, 12);
+            this.btnVentas.Location = new System.Drawing.Point(446, 12);
             this.btnVentas.Name = "btnVentas";
             this.btnVentas.Size = new System.Drawing.Size(128, 86);
             this.btnVentas.TabIndex = 0;
@@ -171,7 +171,7 @@
             this.btnClientes.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(80)))), ((int)(((byte)(58)))), ((int)(((byte)(45)))));
             this.btnClientes.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnClientes.ForeColor = System.Drawing.SystemColors.ButtonHighlight;
-            this.btnClientes.Location = new System.Drawing.Point(214, 12);
+            this.btnClientes.Location = new System.Drawing.Point(300, 12);
             this.btnClientes.Name = "btnClientes";
             this.btnClientes.Size = new System.Drawing.Size(128, 86);
             this.btnClientes.TabIndex = 0;
@@ -191,7 +191,7 @@
             this.btnProductos.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(80)))), ((int)(((byte)(58)))), ((int)(((byte)(45)))));
             this.btnProductos.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnProductos.ForeColor = System.Drawing.SystemColors.ButtonHighlight;
-            this.btnProductos.Location = new System.Drawing.Point(69, 12);
+            this.btnProductos.Location = new System.Drawing.Point(155, 12);
             this.btnProductos.Name = "btnProductos";
             this.btnProductos.Size = new System.Drawing.Size(128, 86);
             this.btnProductos.TabIndex = 0;
@@ -207,7 +207,7 @@
             this.pbLogoInicio.Image = ((System.Drawing.Image)(resources.GetObject("pbLogoInicio.Image")));
             this.pbLogoInicio.Location = new System.Drawing.Point(0, 0);
             this.pbLogoInicio.Name = "pbLogoInicio";
-            this.pbLogoInicio.Size = new System.Drawing.Size(1046, 573);
+            this.pbLogoInicio.Size = new System.Drawing.Size(1219, 673);
             this.pbLogoInicio.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.pbLogoInicio.TabIndex = 0;
             this.pbLogoInicio.TabStop = false;
@@ -217,7 +217,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1046, 573);
+            this.ClientSize = new System.Drawing.Size(1219, 673);
             this.Controls.Add(this.panelContenedor);
             this.Controls.Add(this.panel1);
             this.Name = "FormPrincipal";
