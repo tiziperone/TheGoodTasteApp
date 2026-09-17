@@ -234,13 +234,14 @@
             // radioButtonMuj
             // 
             this.radioButtonMuj.AutoSize = true;
-            this.radioButtonMuj.Location = new System.Drawing.Point(602, 182);
+            this.radioButtonMuj.Location = new System.Drawing.Point(602, 185);
             this.radioButtonMuj.Name = "radioButtonMuj";
             this.radioButtonMuj.Size = new System.Drawing.Size(61, 20);
             this.radioButtonMuj.TabIndex = 22;
             this.radioButtonMuj.TabStop = true;
             this.radioButtonMuj.Text = "Mujer";
             this.radioButtonMuj.UseVisualStyleBackColor = true;
+            this.radioButtonMuj.CheckedChanged += new System.EventHandler(this.radioButtonMuj_CheckedChanged);
             // 
             // buttonSave
             // 

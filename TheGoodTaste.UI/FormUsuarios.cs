@@ -297,7 +297,7 @@ namespace TheGoodTaste.UI
                 return;
             }
 
-            // 3. VALIDACIÓN DE EDAD MÍNIMA (AQUÍ AGREGAS LA NUEVA)
+            // 3. VALIDACIÓN DE EDAD MÍNIMA
             DateTime fechaNacimientoSeleccionada = dateTimePickerFechNac.Value.Date;
             DateTime fechaHoy = DateTime.Today;
             int edad = fechaHoy.Year - fechaNacimientoSeleccionada.Year;
@@ -367,6 +367,17 @@ namespace TheGoodTaste.UI
 
                     string sexoOriginal = _datosOriginales["Sexo"]?.ToString() ?? "";
                     if (sexoOriginal != sexo) cambios.Add($"• Sexo: '{sexoOriginal}' -> '{sexo}'");
+
+                    // VALIDACIÓN DE FECHA DE NACIMIENTO
+                    DateTime? fechaOriginal = _datosOriginales["FechaNacimiento"] != DBNull.Value ? Convert.ToDateTime(_datosOriginales["FechaNacimiento"]) : (DateTime?)null;
+                    if (fechaOriginal.HasValue && fechaOriginal.Value.Date != fechaNacimiento.Date)
+                    {
+                        cambios.Add($"• Fecha Nacimiento: '{fechaOriginal.Value.ToShortDateString()}' -> '{fechaNacimiento.ToShortDateString()}'");
+                    }
+                    else if (!fechaOriginal.HasValue)
+                    {
+                        cambios.Add($"• Fecha Nacimiento: 'Sin registrar' -> '{fechaNacimiento.ToShortDateString()}'");
+                    }
 
                     if (cambios.Count == 0)
                     {
