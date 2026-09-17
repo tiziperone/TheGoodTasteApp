@@ -12,7 +12,7 @@ namespace TheGoodTaste.UI
     public partial class FormUsuarios : Form
     {
         private int? _idUsuarioSeleccionado = null;
-        private DataRow _datosOriginales = null; // Para guardar los datos al hacer clic en modificar
+        private DataRow _datosOriginales = null;
 
         public FormUsuarios()
         {
@@ -22,13 +22,13 @@ namespace TheGoodTaste.UI
         private void FormUsuarios_Load(object sender, EventArgs e)
         {
             TemaVisual.AplicarEstilo(this);
+            ConfigurarLimitesCaracteres(); // Se establecen límites y bloqueos
             CargarRoles();
             CargarLocalidades();
             ConfigurarEventos();
             ConfigurarAutocompletadoDireccion();
             LimpiarCampos();
 
-            // Restringe el DateTimePicker para que no permita seleccionar fechas menores a 18 años atrás
             dateTimePickerFechNac.MaxDate = DateTime.Today.AddYears(-18);
 
             dataGridView1.AllowUserToAddRows = false;
@@ -36,6 +36,21 @@ namespace TheGoodTaste.UI
             dataGridView1.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
 
             CargarGrillaUsuarios(true);
+        }
+
+        private void ConfigurarLimitesCaracteres()
+        {
+            // Se limita la cantidad de caracteres según la base de datos
+            textBoxName.MaxLength = 50;
+            textBoxApellido.MaxLength = 50;
+            textBoxDNI.MaxLength = 8;
+            textBoxUser.MaxLength = 50;
+            textBoxEmail.MaxLength = 100;
+            textBoxDir.MaxLength = 100;
+            textBoxNroTel.MaxLength = 15;
+
+            // Se bloquea la contraseña para que el usuario no pueda editarla manualmente
+            textBoxPass.ReadOnly = true;
         }
 
         private void CargarRoles()
@@ -117,6 +132,7 @@ namespace TheGoodTaste.UI
 
             textBoxDNI.TextChanged += (s, e) =>
             {
+                // Sigue replicando el DNI en la contraseña (aunque esté bloqueada)
                 if (!_idUsuarioSeleccionado.HasValue)
                     textBoxPass.Text = textBoxDNI.Text.Trim();
             };
@@ -130,13 +146,11 @@ namespace TheGoodTaste.UI
                 {
                     c.KeyDown += (s, e) =>
                     {
-                        // Enter o Flecha Abajo -> Avanza al siguiente campo
                         if (e.KeyCode == Keys.Enter || e.KeyCode == Keys.Down)
                         {
-                            e.SuppressKeyPress = true; // Evita el 'beep' de Windows
+                            e.SuppressKeyPress = true;
                             SelectNextControl((Control)s, true, true, true, true);
                         }
-                        // Flecha Arriba -> Vuelve al campo anterior
                         else if (e.KeyCode == Keys.Up)
                         {
                             e.SuppressKeyPress = true;
@@ -150,14 +164,12 @@ namespace TheGoodTaste.UI
             radioButtonInac.Click += (s, e) => CargarGrillaUsuarios(false);
         }
 
-        // Este evento ahora maneja tanto el clic en el botón "Modificar" como en el checkbox de "Estado"
         private void DataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
             if (e.RowIndex >= 0)
             {
                 DataGridViewRow fila = dataGridView1.Rows[e.RowIndex];
 
-                // 1. Lógica para el botón "Modificar"
                 if (dataGridView1.Columns[e.ColumnIndex].Name == "Modificar")
                 {
                     if (fila.Cells["ID"].Value != DBNull.Value && fila.Cells["ID"].Value != null)
@@ -165,15 +177,14 @@ namespace TheGoodTaste.UI
                         int dni = Convert.ToInt32(fila.Cells["ID"].Value);
 
                         UsuarioDatos repo = new UsuarioDatos();
-                        _datosOriginales = repo.ObtenerUsuarioPorDNI(dni); // Traemos la fila entera desde SQL
+                        _datosOriginales = repo.ObtenerUsuarioPorDNI(dni);
 
                         if (_datosOriginales != null)
                         {
                             _idUsuarioSeleccionado = dni;
 
-                            // Cargamos los campos en el formulario
                             textBoxDNI.Text = _datosOriginales["DNI"].ToString();
-                            textBoxDNI.ReadOnly = true; // Bloqueamos el DNI para que no lo cambien por error
+                            textBoxDNI.ReadOnly = true;
 
                             textBoxName.Text = _datosOriginales["Nombre"].ToString();
                             textBoxApellido.Text = _datosOriginales["Apellido"].ToString();
@@ -200,10 +211,9 @@ namespace TheGoodTaste.UI
                             ValidarReglaNegocioBotones();
                         }
                     }
-                    return; // Salimos para no evaluar el checkbox
+                    return;
                 }
 
-                // 2. Lógica para el CheckBox "Estado" (Dar de baja / reactivar)
                 if (dataGridView1.Columns[e.ColumnIndex].Name == "Estado")
                 {
                     if (fila.Cells["ID"].Value != DBNull.Value && fila.Cells["ID"].Value != null)
@@ -333,7 +343,13 @@ namespace TheGoodTaste.UI
                 return;
             }
 
-            // 3. VALIDACIÓN DE EDAD MÍNIMA
+            if (textBoxNroTel.Text.Trim().Length < 10)
+            {
+                MessageBox.Show("El número de teléfono debe tener al menos 10 dígitos (código de área + número).", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                textBoxNroTel.Focus();
+                return;
+            }
+
             DateTime fechaNacimientoSeleccionada = dateTimePickerFechNac.Value.Date;
             DateTime fechaHoy = DateTime.Today;
             int edad = fechaHoy.Year - fechaNacimientoSeleccionada.Year;
@@ -354,7 +370,7 @@ namespace TheGoodTaste.UI
             {
                 int dni = Convert.ToInt32(textBoxDNI.Text.Trim());
                 string username = textBoxUser.Text.Trim();
-                string password = string.IsNullOrWhiteSpace(textBoxPass.Text) ? textBoxDNI.Text.Trim() : textBoxPass.Text.Trim();
+                string password = textBoxDNI.Text.Trim(); // Como está bloqueado, forzamos que siempre sea el DNI
                 string nombre = textBoxName.Text.Trim();
                 string apellido = textBoxApellido.Text.Trim();
                 int idRol = Convert.ToInt32(comboBox1.SelectedValue);
@@ -375,6 +391,24 @@ namespace TheGoodTaste.UI
                         textBoxDNI.Focus();
                         return;
                     }
+                    if (repo.ExisteUsuario(username))
+                    {
+                        MessageBox.Show("El nombre de usuario autogenerado ya está en uso. Por favor, agregue algún número o modifíquelo manualmente.", "Usuario Duplicado", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        textBoxUser.Focus();
+                        return;
+                    }
+                    if (repo.ExisteEmail(email))
+                    {
+                        MessageBox.Show("El correo electrónico ya se encuentra registrado.", "Email Duplicado", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        textBoxEmail.Focus();
+                        return;
+                    }
+                    if (repo.ExisteTelefono(telefono))
+                    {
+                        MessageBox.Show("El número de teléfono ya está asociado a otro usuario.", "Teléfono Duplicado", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        textBoxNroTel.Focus();
+                        return;
+                    }
 
                     if (repo.RegistrarUsuario(dni, username, password, idRol, nombre, apellido, direccion, idLocalidad, fechaNacimiento, telefono, email, sexo))
                     {
@@ -385,12 +419,31 @@ namespace TheGoodTaste.UI
                 }
                 else // MODIFICACIÓN
                 {
+                    // Validaciones para asegurar que los nuevos datos no choquen con OTROS registros
+                    if (username != _datosOriginales["Username"].ToString() && repo.ExisteUsuario(username))
+                    {
+                        MessageBox.Show("El nuevo nombre de usuario ya está siendo utilizado por otra persona.", "Usuario Duplicado", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        textBoxUser.Focus();
+                        return;
+                    }
+                    if (email != _datosOriginales["Email"].ToString() && repo.ExisteEmail(email))
+                    {
+                        MessageBox.Show("El nuevo correo electrónico ya está registrado en otra cuenta.", "Email Duplicado", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        textBoxEmail.Focus();
+                        return;
+                    }
+                    if (telefono != _datosOriginales["Telefono"].ToString() && repo.ExisteTelefono(telefono))
+                    {
+                        MessageBox.Show("El nuevo número de teléfono ya pertenece a otro usuario.", "Teléfono Duplicado", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        textBoxNroTel.Focus();
+                        return;
+                    }
+
                     List<string> cambios = new List<string>();
 
                     if (_datosOriginales["Nombre"].ToString() != nombre) cambios.Add($"• Nombre: '{_datosOriginales["Nombre"]}' -> '{nombre}'");
                     if (_datosOriginales["Apellido"].ToString() != apellido) cambios.Add($"• Apellido: '{_datosOriginales["Apellido"]}' -> '{apellido}'");
                     if (_datosOriginales["Username"].ToString() != username) cambios.Add($"• Usuario: '{_datosOriginales["Username"]}' -> '{username}'");
-                    if (password != "********") cambios.Add("• Contraseña: Se ingresó una nueva contraseña");
                     if (Convert.ToInt32(_datosOriginales["IdRol"]) != idRol) cambios.Add($"• Rol modificado");
                     if (Convert.ToInt32(_datosOriginales["IdLocalidad"] == DBNull.Value ? 0 : _datosOriginales["IdLocalidad"]) != idLocalidad) cambios.Add($"• Localidad modificada");
                     if (_datosOriginales["Email"].ToString() != email) cambios.Add($"• Email: '{_datosOriginales["Email"]}' -> '{email}'");
@@ -404,7 +457,6 @@ namespace TheGoodTaste.UI
                     string sexoOriginal = _datosOriginales["Sexo"]?.ToString() ?? "";
                     if (sexoOriginal != sexo) cambios.Add($"• Sexo: '{sexoOriginal}' -> '{sexo}'");
 
-                    // VALIDACIÓN DE FECHA DE NACIMIENTO
                     DateTime? fechaOriginal = _datosOriginales["FechaNacimiento"] != DBNull.Value ? Convert.ToDateTime(_datosOriginales["FechaNacimiento"]) : (DateTime?)null;
                     if (fechaOriginal.HasValue && fechaOriginal.Value.Date != fechaNacimiento.Date)
                     {
@@ -426,7 +478,10 @@ namespace TheGoodTaste.UI
 
                     if (confirmacion == DialogResult.Yes)
                     {
-                        if (repo.ActualizarUsuario(dni, username, password, idRol, nombre, apellido, direccion, idLocalidad, fechaNacimiento, telefono, email, sexo))
+                        // Para la actualización mantenemos el password original (no lo alteramos desde esta UI)
+                        string currentDbPassword = _datosOriginales["Clave"].ToString(); // Asumiendo que tu BD se llama 'Clave' o adaptarlo
+
+                        if (repo.ActualizarUsuario(dni, username, currentDbPassword, idRol, nombre, apellido, direccion, idLocalidad, fechaNacimiento, telefono, email, sexo))
                         {
                             MessageBox.Show("Usuario actualizado con éxito en la base de datos.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
                             LimpiarCampos();
@@ -482,7 +537,6 @@ namespace TheGoodTaste.UI
                 UsuarioDatos repo = new UsuarioDatos();
                 dataGridView1.DataSource = repo.ObtenerUsuariosPorEstado(verActivos);
 
-                // Agregamos la columna de botón si no existe
                 if (!dataGridView1.Columns.Contains("Modificar"))
                 {
                     DataGridViewButtonColumn btnModificar = new DataGridViewButtonColumn();
@@ -490,14 +544,11 @@ namespace TheGoodTaste.UI
                     btnModificar.HeaderText = "Acción";
                     btnModificar.Text = "Modificar";
                     btnModificar.UseColumnTextForButtonValue = true;
-                    // La agregamos al principio de todo
                     dataGridView1.Columns.Insert(0, btnModificar);
                 }
 
-                // Bloquear la edición de todas las columnas de texto
                 foreach (DataGridViewColumn columna in dataGridView1.Columns)
                 {
-                    // Dejamos libre la columna "Estado" y el botón "Modificar"
                     if (columna.Name != "Estado" && columna.Name != "Modificar")
                     {
                         columna.ReadOnly = true;
@@ -516,10 +567,6 @@ namespace TheGoodTaste.UI
         private void buttonSave_Click_1(object sender, EventArgs e) => buttonSave_Click(sender, e);
         private void buttonDel_Click_1(object sender, EventArgs e) => buttonDel_Click(sender, e);
         private void comboBox1_SelectedIndexChanged(object sender, EventArgs e) { }
-
-
-        private void label8_Click(object sender, EventArgs e)
-        {
-        }
+        private void label8_Click(object sender, EventArgs e) { }
     }
 }

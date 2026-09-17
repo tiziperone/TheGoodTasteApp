@@ -140,7 +140,49 @@ namespace The_Good_Taste.Datos
             }
         }
 
-        // 5. OBTENER FILA COMPLETA POR DNI (Para el doble clic)
+        // 5. EXISTE USUARIO
+        public bool ExisteUsuario(string username)
+        {
+            using (SqlConnection conexion = new SqlConnection(_cadenaConexion))
+            {
+                conexion.Open();
+                string query = "SELECT COUNT(*) FROM Usuarios WHERE Username = @Username";
+                SqlCommand cmd = new SqlCommand(query, conexion);
+                cmd.Parameters.AddWithValue("@Username", username);
+
+                return (int)cmd.ExecuteScalar() > 0;
+            }
+        }
+
+        // 6. EXISTE EMAIL
+        public bool ExisteEmail(string email)
+        {
+            using (SqlConnection conexion = new SqlConnection(_cadenaConexion))
+            {
+                conexion.Open();
+                string query = "SELECT COUNT(*) FROM Usuarios WHERE Email = @Email";
+                SqlCommand cmd = new SqlCommand(query, conexion);
+                cmd.Parameters.AddWithValue("@Email", email);
+
+                return (int)cmd.ExecuteScalar() > 0;
+            }
+        }
+
+        // 7. EXISTE TELEFONO
+        public bool ExisteTelefono(string telefono)
+        {
+            using (SqlConnection conexion = new SqlConnection(_cadenaConexion))
+            {
+                conexion.Open();
+                string query = "SELECT COUNT(*) FROM Usuarios WHERE Telefono = @Telefono";
+                SqlCommand cmd = new SqlCommand(query, conexion);
+                cmd.Parameters.AddWithValue("@Telefono", telefono);
+
+                return (int)cmd.ExecuteScalar() > 0;
+            }
+        }
+
+        // 8. OBTENER FILA COMPLETA POR DNI (Para el doble clic)
         public DataRow ObtenerUsuarioPorDNI(int dni)
         {
             DataTable dt = new DataTable();
@@ -160,7 +202,7 @@ namespace The_Good_Taste.Datos
             return dt.Rows.Count > 0 ? dt.Rows[0] : null;
         }
 
-        // 6. GRILLA
+        // 9. GRILLA
         public DataTable ObtenerUsuariosPorEstado(bool activos)
         {
             DataTable dt = new DataTable();
@@ -190,7 +232,7 @@ namespace The_Good_Taste.Datos
             return dt;
         }
 
-        // 7. CAMBIAR ESTADO
+        // 10. CAMBIAR ESTADO
         public bool CambiarEstadoUsuario(int dni, bool nuevoEstado)
         {
             using (SqlConnection conexion = new SqlConnection(_cadenaConexion))
@@ -206,7 +248,7 @@ namespace The_Good_Taste.Datos
             }
         }
 
-        // 8. OBTENER LOCALIDADES
+        // 11. OBTENER LOCALIDADES
         public DataTable ObtenerLocalidades()
         {
             DataTable dt = new DataTable();
