@@ -41,19 +41,19 @@ namespace TheGoodTaste.UI
             switch (_usuarioActual.Rol)
             {
                 case RolUsuario.Admin:
-                    // El Admin tiene acceso total, todos los botones quedan habilitados por defecto
+                    // El Admin tiene acceso total por defecto
                     break;
 
                 case RolUsuario.Gerente:
-                    // Apagamos Usuarios
+                    // Ocultamos Usuarios
                     if (btnUsuarios != null) btnUsuarios.Visible = false;
                     break;
 
                 case RolUsuario.Vendedor:
-                    // Apagamos Usuarios, Productos y Reportes
+                    // Ocultamos Usuarios y Reportes
                     if (btnUsuarios != null) btnUsuarios.Visible = false;
-                    if (btnProductos != null) btnProductos.Visible = false;
                     if (btnReportes != null) btnReportes.Visible = false;
+                    if (btnProductos != null) btnProductos.Visible = true;
                     break;
             }
         }
