@@ -40,8 +40,13 @@
             this.botonProductoVendido = new System.Windows.Forms.Button();
             this.botonVentas = new System.Windows.Forms.Button();
             this.botonRecaudacion = new System.Windows.Forms.Button();
+            this.panelClientes = new System.Windows.Forms.Panel();
+            this.listaClientes = new System.Windows.Forms.DataGridView();
+            this.label2 = new System.Windows.Forms.Label();
             this.panelReportes.SuspendLayout();
             this.panelVentasVendedor.SuspendLayout();
+            this.panelClientes.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.listaClientes)).BeginInit();
             this.SuspendLayout();
             // 
             // panelReportes
@@ -171,11 +176,54 @@
             this.botonRecaudacion.UseVisualStyleBackColor = true;
             this.botonRecaudacion.Click += new System.EventHandler(this.botonRecaudacion_Click);
             // 
+            // panelClientes
+            // 
+            this.panelClientes.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.panelClientes.Controls.Add(this.listaClientes);
+            this.panelClientes.Location = new System.Drawing.Point(707, 73);
+            this.panelClientes.Name = "panelClientes";
+            this.panelClientes.Size = new System.Drawing.Size(445, 363);
+            this.panelClientes.TabIndex = 1;
+            // 
+            // listaClientes
+            // 
+            this.listaClientes.AllowUserToAddRows = false;
+            this.listaClientes.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.listaClientes.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
+            this.listaClientes.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.listaClientes.Location = new System.Drawing.Point(18, 47);
+            this.listaClientes.Name = "listaClientes";
+            this.listaClientes.ReadOnly = true;
+            this.listaClientes.RowHeadersWidth = 51;
+            this.listaClientes.RowTemplate.Height = 24;
+            this.listaClientes.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
+            this.listaClientes.Size = new System.Drawing.Size(413, 267);
+            this.listaClientes.TabIndex = 0;
+            // 
+            // label2
+            // 
+            this.label2.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(704, 54);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(121, 16);
+            this.label2.TabIndex = 2;
+            this.label2.Text = "Listado de Clientes";
+            this.label2.Click += new System.EventHandler(this.tituloDesde_Click);
+            // 
             // FormReporteGerente
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1164, 524);
+            this.Controls.Add(this.panelClientes);
+            this.Controls.Add(this.label2);
             this.Controls.Add(this.panelReportes);
             this.Name = "FormReporteGerente";
             this.Text = "FormReporteGerente";
@@ -184,6 +232,8 @@
             this.panelReportes.PerformLayout();
             this.panelVentasVendedor.ResumeLayout(false);
             this.panelVentasVendedor.PerformLayout();
+            this.panelClientes.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.listaClientes)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -203,5 +253,8 @@
         private System.Windows.Forms.Label tituloDesde;
         private System.Windows.Forms.DateTimePicker fechaHasta;
         private System.Windows.Forms.DateTimePicker fechaDesde;
+        private System.Windows.Forms.Panel panelClientes;
+        private System.Windows.Forms.DataGridView listaClientes;
+        private System.Windows.Forms.Label label2;
     }
 }
