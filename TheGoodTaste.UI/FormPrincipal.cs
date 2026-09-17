@@ -10,10 +10,16 @@ namespace TheGoodTaste.UI
         private readonly UsuarioSistema _usuarioActual;
         private Button _botonActivo = null;
 
+        // CONSTANTES DE COLOR
+        private readonly Color ColorFondoPanel = Color.FromArgb(35, 25, 20);   // Marrón oscuro
+        private readonly Color ColorBotonBase = Color.FromArgb(60, 42, 33);    // Marrón café
+        private readonly Color ColorBotonActivo = Color.FromArgb(180, 130, 40); // Dorado
+        private readonly Color ColorTextoBoton = Color.White;
+
         public FormPrincipal()
         {
             InitializeComponent();
-            this.KeyPreview = true; // Activa la escucha de atajos globales (F1-F5 y ESC)
+            this.KeyPreview = true; // Activa la escucha de atajos globales (F1-F6 y ESC)
         }
 
         public FormPrincipal(UsuarioSistema usuario) : this()
@@ -34,6 +40,21 @@ namespace TheGoodTaste.UI
             CentrarLogo();
         }
 
+
+        private void DeshabilitarBoton(Button btn)
+        {
+            if (btn != null)
+            {
+                btn.Enabled = false; // Bloquea los clics
+
+                // Efecto visual de apagado/transparencia
+                btn.BackColor = ColorFondoPanel; // Se funde con el fondo del panel
+                btn.ForeColor = Color.DimGray;   // Letras grises
+                btn.FlatStyle = FlatStyle.Flat;
+                btn.FlatAppearance.BorderSize = 0;
+            }
+        }
+
         private void ConfigurarPermisosPorRol()
         {
             if (_usuarioActual == null) return;
@@ -41,34 +62,34 @@ namespace TheGoodTaste.UI
             switch (_usuarioActual.Rol)
             {
                 case RolUsuario.Admin:
-                    // El Admin tiene acceso total por defecto
+                    // El Admin tiene acceso total por defecto, no bloqueamos nada
                     break;
 
                 case RolUsuario.Gerente:
-                    if (btnUsuarios != null) btnUsuarios.Visible = false;
-                    if (btnVentas != null) btnVentas.Visible = false;
-                    if (btnReportes != null) btnReportes.Visible = false;
-                    if (btnProductos != null) btnProductos.Visible = false;
-                    if (btnClientes != null) btnClientes.Visible = false;
-                    if (btnReportes != null) btnReportes.Visible = true;
+                    // Bloqueamos los módulos que no debe usar
+                    DeshabilitarBoton(btnUsuarios);
+                    DeshabilitarBoton(btnVentas);
+                    DeshabilitarBoton(btnProductos);
+                    DeshabilitarBoton(btnClientes);
+                    // Reportes queda habilitado
                     break;
 
                 case RolUsuario.Vendedor:
-                    
-                    if (btnUsuarios != null) btnUsuarios.Visible = false;
-                    if (btnReportes != null) btnReportes.Visible = false;
-                    if (btnProductos != null) btnProductos.Visible = true;
+                    // Bloqueamos Usuarios y Reportes
+                    DeshabilitarBoton(btnUsuarios);
+                    DeshabilitarBoton(btnReportes);
+                    // Productos, Clientes y Ventas quedan habilitados
                     break;
             }
         }
 
-        // Atajos de teclado (F1 a F5 y ESC)
+        // Atajos de teclado (F1 a F6 y ESC)
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
             switch (keyData)
             {
                 case Keys.F1:
-                    // Verificamos .Enabled en lugar de .Visible para bloquear el atajo si no hay permisos
+                    // Verificamos .Enabled para que no pueda entrar con atajos si está bloqueado
                     if (btnProductos != null && btnProductos.Enabled) btnProductos.PerformClick();
                     return true;
                 case Keys.F2:
@@ -81,7 +102,7 @@ namespace TheGoodTaste.UI
                     if (btnUsuarios != null && btnUsuarios.Enabled) btnUsuarios.PerformClick();
                     return true;
                 case Keys.F6:
-                    if (btnReportes != null && btnReportes.Visible) btnReportes.PerformClick();
+                    if (btnReportes != null && btnReportes.Enabled) btnReportes.PerformClick();
                     return true;
                 case Keys.Escape:
                     if (btnSalir != null && btnSalir.Enabled) btnSalir.PerformClick();
@@ -89,12 +110,6 @@ namespace TheGoodTaste.UI
             }
             return base.ProcessCmdKey(ref msg, keyData);
         }
-
-        // CONSTANTES DE COLOR
-        private readonly Color ColorFondoPanel = Color.FromArgb(35, 25, 20);   // Marrón oscuro
-        private readonly Color ColorBotonBase = Color.FromArgb(60, 42, 33);    // Marrón café
-        private readonly Color ColorBotonActivo = Color.FromArgb(180, 130, 40); // Dorado
-        private readonly Color ColorTextoBoton = Color.White;
 
         private void ResaltarBotonActivo(Button botonPresionado)
         {
@@ -107,16 +122,20 @@ namespace TheGoodTaste.UI
             {
                 if (control is Button btn && btn != btnSalir)
                 {
-                    btn.BackColor = ColorBotonBase;
-                    btn.ForeColor = ColorTextoBoton;
-                    btn.FlatStyle = FlatStyle.Flat;
-                    btn.FlatAppearance.BorderSize = 0;
-                    btn.Font = new Font(btn.Font, FontStyle.Regular);
+                    // IMPORTANTE: Solo restauramos el color si el botón tiene permisos (Enabled)
+                    if (btn.Enabled)
+                    {
+                        btn.BackColor = ColorBotonBase;
+                        btn.ForeColor = ColorTextoBoton;
+                        btn.FlatStyle = FlatStyle.Flat;
+                        btn.FlatAppearance.BorderSize = 0;
+                        btn.Font = new Font(btn.Font, FontStyle.Regular);
+                    }
                 }
             }
 
             // Estilo sutil para el botón Salir
-            if (btnSalir != null)
+            if (btnSalir != null && btnSalir.Enabled)
             {
                 btnSalir.BackColor = Color.FromArgb(140, 40, 40);
                 btnSalir.ForeColor = ColorTextoBoton;
@@ -124,9 +143,9 @@ namespace TheGoodTaste.UI
                 btnSalir.FlatAppearance.BorderSize = 0;
             }
 
-            // Marca la pestaña activa
+            // Marca la pestaña activa (si tiene permiso)
             _botonActivo = botonPresionado;
-            if (_botonActivo != null)
+            if (_botonActivo != null && _botonActivo.Enabled)
             {
                 _botonActivo.BackColor = ColorBotonActivo;
                 _botonActivo.Font = new Font(_botonActivo.Font, FontStyle.Bold);
@@ -135,6 +154,9 @@ namespace TheGoodTaste.UI
 
         private void AbrirFormularioEnPanel(Form formularioHijo, Button botonPresionado)
         {
+            // Si el botón no está habilitado, cancelamos la apertura
+            if (botonPresionado != null && !botonPresionado.Enabled) return;
+
             ResaltarBotonActivo(botonPresionado);
 
             if (pbLogoInicio != null)

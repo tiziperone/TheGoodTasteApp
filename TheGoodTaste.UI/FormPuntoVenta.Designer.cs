@@ -2,15 +2,8 @@
 {
     partial class FormPuntoVenta
     {
-        /// <summary>
-        /// Required designer variable.
-        /// </summary>
         private System.ComponentModel.IContainer components = null;
 
-        /// <summary>
-        /// Clean up any resources being used.
-        /// </summary>
-        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
         protected override void Dispose(bool disposing)
         {
             if (disposing && (components != null))
@@ -22,10 +15,6 @@
 
         #region Windows Form Designer generated code
 
-        /// <summary>
-        /// Required method for Designer support - do not modify
-        /// the contents of this method with the code editor.
-        /// </summary>
         private void InitializeComponent()
         {
             this.label1 = new System.Windows.Forms.Label();
@@ -174,13 +163,13 @@
             this.btnAgregar.TabIndex = 13;
             this.btnAgregar.Text = "Agregar Producto";
             this.btnAgregar.UseVisualStyleBackColor = true;
-            this.btnAgregar.Click += new System.EventHandler(this.btnAgregar_Click_1);
+            this.btnAgregar.Click += new System.EventHandler(this.btnAgregar_Click);
             // 
             // dgvDetalles
             // 
             this.dgvDetalles.AllowUserToAddRows = false;
-            this.dgvDetalles.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
+            this.dgvDetalles.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.dgvDetalles.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
             this.dgvDetalles.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
@@ -196,7 +185,6 @@
             this.dgvDetalles.RowTemplate.Height = 24;
             this.dgvDetalles.Size = new System.Drawing.Size(320, 254);
             this.dgvDetalles.TabIndex = 14;
-            this.dgvDetalles.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvDetalles_CellContentClick);
             // 
             // colIdProducto
             // 
@@ -255,7 +243,7 @@
             this.btnGuardarVenta.Text = "Confirmar Venta";
             this.btnGuardarVenta.TextImageRelation = System.Windows.Forms.TextImageRelation.TextAboveImage;
             this.btnGuardarVenta.UseVisualStyleBackColor = true;
-            this.btnGuardarVenta.Click += new System.EventHandler(this.btnGuardarVenta_Click_1);
+            this.btnGuardarVenta.Click += new System.EventHandler(this.btnGuardarVenta_Click);
             // 
             // btnLimpiar
             // 
@@ -265,7 +253,7 @@
             this.btnLimpiar.TabIndex = 18;
             this.btnLimpiar.Text = "Limpiar";
             this.btnLimpiar.UseVisualStyleBackColor = true;
-            this.btnLimpiar.Click += new System.EventHandler(this.btnLimpiar_Click_1);
+            this.btnLimpiar.Click += new System.EventHandler(this.btnLimpiar_Click);
             // 
             // FormPuntoVenta
             // 

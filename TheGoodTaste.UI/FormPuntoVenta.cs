@@ -1,20 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using The_Good_Taste.Datos;
+using TheGoodTaste.Negocio;
 using The_Good_Taste.Entidades;
 
 namespace TheGoodTaste.UI
 {
     public partial class FormPuntoVenta : Form
     {
+        private readonly VentaNegocio _negocio = new VentaNegocio();
+
         public FormPuntoVenta()
         {
             InitializeComponent();
@@ -30,10 +26,7 @@ namespace TheGoodTaste.UI
 
         private void ConfigurarEventos()
         {
-            // Restricción: el precio solo acepta números y coma/punto decimal
             txtPrecio.KeyPress += SoloDecimales_KeyPress;
-
-            
             cboCliente.SelectedIndexChanged += Control_Modificado;
             cboTipoFactura.SelectedIndexChanged += Control_Modificado;
             cboProducto.SelectedIndexChanged += Control_Modificado;
@@ -43,7 +36,6 @@ namespace TheGoodTaste.UI
 
         private void InicializarTablaDetalles()
         {
-            // Configurar columnas si no fueron creadas desde el diseñador
             if (dgvDetalles.Columns.Count == 0)
             {
                 dgvDetalles.Columns.Add("ID", "ID");
@@ -54,57 +46,23 @@ namespace TheGoodTaste.UI
             }
         }
 
-       
         private void SoloDecimales_KeyPress(object sender, KeyPressEventArgs e)
         {
             char decSep = CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator[0];
-
-            if (!char.IsDigit(e.KeyChar) && !char.IsControl(e.KeyChar) && e.KeyChar != '.' && e.KeyChar != ',')
-            {
-                e.Handled = true;
-                return;
-            }
-
-            if (e.KeyChar == '.' || e.KeyChar == ',')
-            {
-                e.KeyChar = decSep;
-                if (txtPrecio.Text.Contains(decSep.ToString()))
-                {
-                    e.Handled = true;
-                }
-            }
+            if (!char.IsDigit(e.KeyChar) && !char.IsControl(e.KeyChar) && e.KeyChar != '.' && e.KeyChar != ',') { e.Handled = true; return; }
+            if (e.KeyChar == '.' || e.KeyChar == ',') { e.KeyChar = decSep; if (txtPrecio.Text.Contains(decSep.ToString())) e.Handled = true; }
         }
 
-        
-        // botones
-        
-        private void Control_Modificado(object sender, EventArgs e)
-        {
-            ActualizarEstadoBotones();
-        }
+        private void Control_Modificado(object sender, EventArgs e) => ActualizarEstadoBotones();
 
         private void ActualizarEstadoBotones()
         {
-            decimal precio = 0;
-            bool precioValido = decimal.TryParse(txtPrecio.Text.Trim(), out precio) && precio > 0;
-            bool productoListo = cboProducto.SelectedIndex != -1 && nudCantidad.Value > 0 && precioValido;
-            btnAgregar.Enabled = productoListo;
-
-            bool cabeceraLista = cboCliente.SelectedIndex != -1 && cboTipoFactura.SelectedIndex != -1;
-            bool tieneItems = dgvDetalles.Rows.Count > 0;
-            btnGuardarVenta.Enabled = cabeceraLista && tieneItems;
-
-            bool hayDatos = cboCliente.SelectedIndex != -1 ||
-                            cboTipoFactura.SelectedIndex != -1 ||
-                            cboProducto.SelectedIndex != -1 ||
-                            !string.IsNullOrWhiteSpace(txtPrecio.Text) ||
-                            dgvDetalles.Rows.Count > 0;
-            btnLimpiar.Enabled = hayDatos;
+            bool precioValido = decimal.TryParse(txtPrecio.Text.Trim(), out decimal precio) && precio > 0;
+            btnAgregar.Enabled = cboProducto.SelectedIndex != -1 && nudCantidad.Value > 0 && precioValido;
+            btnGuardarVenta.Enabled = cboCliente.SelectedIndex != -1 && cboTipoFactura.SelectedIndex != -1 && dgvDetalles.Rows.Count > 0;
+            btnLimpiar.Enabled = cboCliente.SelectedIndex != -1 || cboTipoFactura.SelectedIndex != -1 || cboProducto.SelectedIndex != -1 || !string.IsNullOrWhiteSpace(txtPrecio.Text) || dgvDetalles.Rows.Count > 0;
         }
 
-        // =======================
-        // ACCIONES DE BOTONES
-        // =======================
         private void btnAgregar_Click(object sender, EventArgs e)
         {
             if (!decimal.TryParse(txtPrecio.Text.Trim(), out decimal precio) || precio <= 0)
@@ -116,125 +74,62 @@ namespace TheGoodTaste.UI
 
             int cantidad = (int)nudCantidad.Value;
             decimal subtotal = precio * cantidad;
-            string nombreProducto = cboProducto.Text;
-            string idProducto = (cboProducto.SelectedIndex + 1).ToString();
+            dgvDetalles.Rows.Add((cboProducto.SelectedIndex + 1).ToString(), cboProducto.Text, precio.ToString("N2"), cantidad, subtotal.ToString("N2"));
 
-            dgvDetalles.Rows.Add(idProducto, nombreProducto, precio.ToString("N2"), cantidad, subtotal.ToString("N2"));
-
-            cboProducto.SelectedIndex = -1;
-            nudCantidad.Value = 1;
-            txtPrecio.Clear();
-
+            cboProducto.SelectedIndex = -1; nudCantidad.Value = 1; txtPrecio.Clear();
             CalcularTotalVenta();
             ActualizarEstadoBotones();
         }
 
         private void btnGuardarVenta_Click(object sender, EventArgs e)
         {
-            if (dgvDetalles.Rows.Count == 0)
-            {
-                MessageBox.Show("Debe agregar al menos un producto a la venta.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-
             try
             {
-                decimal totalVenta = CalcularTotalVenta();
-
                 Venta nuevaVenta = new Venta
                 {
                     Fecha = dtpFechaVenta.Value,
                     IdCliente = cboCliente.SelectedIndex != -1 ? Convert.ToInt32(cboCliente.SelectedValue) : 1,
                     MetodoEnvio = "Local",
                     DireccionEnvio = "Retiro en sucursal",
-                    Total = totalVenta,
+                    Total = CalcularTotalVenta(),
                     Detalles = new List<VentaDetalle>()
                 };
 
                 foreach (DataGridViewRow row in dgvDetalles.Rows)
                 {
                     if (row.IsNewRow) continue;
-
-                    VentaDetalle detalle = new VentaDetalle
+                    nuevaVenta.Detalles.Add(new VentaDetalle
                     {
                         IdProducto = Convert.ToInt32(row.Cells["ID"].Value),
                         Cantidad = Convert.ToInt32(row.Cells["Cantidad"].Value),
                         PrecioUnitario = Convert.ToDecimal(row.Cells["Precio"].Value)
-                    };
-
-                    nuevaVenta.Detalles.Add(detalle);
+                    });
                 }
 
-                bool exito = VentaDatos.RegistrarVenta(nuevaVenta);
-
-                if (exito)
-                {
-                    MessageBox.Show("Venta registrada con éxito en la base de datos.", "Venta Exitosa", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    LimpiarTodo();
-                }
+                _negocio.RegistrarVenta(nuevaVenta);
+                MessageBox.Show("Venta registrada con éxito.", "Venta Exitosa", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                LimpiarTodo();
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Ocurrió un error al registrar la venta: " + ex.Message, "Error de Base de Datos", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(ex.Message, "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
 
-        private void btnLimpiar_Click(object sender, EventArgs e)
-        {
-            LimpiarTodo();
-        }
+        private void btnLimpiar_Click(object sender, EventArgs e) => LimpiarTodo();
 
-        
         private decimal CalcularTotalVenta()
         {
             decimal total = 0;
             foreach (DataGridViewRow row in dgvDetalles.Rows)
-            {
-                if (row.Cells["Subtotal"].Value != null)
-                {
-                    if (decimal.TryParse(row.Cells["Subtotal"].Value.ToString(), out decimal sub))
-                    {
-                        total += sub;
-                    }
-                }
-            }
-
+                if (row.Cells["Subtotal"].Value != null && decimal.TryParse(row.Cells["Subtotal"].Value.ToString(), out decimal sub)) total += sub;
             return total;
         }
 
         private void LimpiarTodo()
         {
-            cboCliente.SelectedIndex = -1;
-            cboTipoFactura.SelectedIndex = -1;
-            dtpFechaVenta.Value = DateTime.Today;
-            cboProducto.SelectedIndex = -1;
-            nudCantidad.Value = 1;
-            txtPrecio.Clear();
-            dgvDetalles.Rows.Clear();
-
-            CalcularTotalVenta();
-            ActualizarEstadoBotones();
-        }
-
-
-        private void btnAgregar_Click_1(object sender, EventArgs e)
-        {
-            btnAgregar_Click(sender, e);
-        }
-
-        private void btnGuardarVenta_Click_1(object sender, EventArgs e)
-        {
-            btnGuardarVenta_Click(sender, e);
-        }
-
-        private void btnLimpiar_Click_1(object sender, EventArgs e)
-        {
-            btnLimpiar_Click(sender, e);
-        }
-
-        private void dgvDetalles_CellContentClick(object sender, DataGridViewCellEventArgs e)
-        {
-
+            cboCliente.SelectedIndex = -1; cboTipoFactura.SelectedIndex = -1; dtpFechaVenta.Value = DateTime.Today; cboProducto.SelectedIndex = -1; nudCantidad.Value = 1; txtPrecio.Clear(); dgvDetalles.Rows.Clear();
+            CalcularTotalVenta(); ActualizarEstadoBotones();
         }
     }
 }

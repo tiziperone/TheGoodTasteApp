@@ -1,22 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Windows.Forms;
+using TheGoodTaste.Negocio;
 
 namespace TheGoodTaste.UI
 {
     public partial class FormClientes : Form
     {
+        private readonly ClienteNegocio _negocio = new ClienteNegocio();
+
         public FormClientes()
         {
             InitializeComponent();
-            
         }
 
         private void FormClientes_Load(object sender, EventArgs e)
@@ -28,18 +22,14 @@ namespace TheGoodTaste.UI
 
         private void ConfigurarEventos()
         {
-            // Restricción de caracteres: solo letras
             txtNombre.KeyPress += SoloLetras_KeyPress;
             txtApellido.KeyPress += SoloLetras_KeyPress;
             textPais.KeyPress += SoloLetras_KeyPress;
             textLocalidad.KeyPress += SoloLetras_KeyPress;
-
-            // Restricción de caracteres: solo números
             txtDni.KeyPress += SoloNumeros_KeyPress;
             txtTelefono.KeyPress += SoloNumeros_KeyPress;
             textNroAltura.KeyPress += SoloNumeros_KeyPress;
 
-            // Detección de cambios de texto para habilitar/deshabilitar botones
             txtDni.TextChanged += Control_Modificado;
             txtNombre.TextChanged += Control_Modificado;
             txtApellido.TextChanged += Control_Modificado;
@@ -49,120 +39,43 @@ namespace TheGoodTaste.UI
             textLocalidad.TextChanged += Control_Modificado;
             txtCalle.TextChanged += Control_Modificado;
             textNroAltura.TextChanged += Control_Modificado;
-
-            // Eventos de botones
-            btnGuardar.Click += btnGuardar_Click;
-            btnLimpiar.Click += btnLimpiar_Click;
         }
 
-        // =======================
-        // FILTRADO DE ENTRADA
-        // =======================
-        private void SoloLetras_KeyPress(object sender, KeyPressEventArgs e)
-        {
-            // Permite letras, espacios y teclas de control (retroceso/borrar)
-            if (!char.IsLetter(e.KeyChar) && !char.IsControl(e.KeyChar) && !char.IsWhiteSpace(e.KeyChar))
-            {
-                e.Handled = true;
-            }
-        }
-
-        private void SoloNumeros_KeyPress(object sender, KeyPressEventArgs e)
-        {
-            // Permite solo dígitos numéricos y teclas de control
-            if (!char.IsDigit(e.KeyChar) && !char.IsControl(e.KeyChar))
-            {
-                e.Handled = true;
-            }
-        }
-
-        // =======================
-        // ESTADO DE BOTONES
-        // =======================
-        private void Control_Modificado(object sender, EventArgs e)
-        {
-            ActualizarEstadoBotones();
-        }
+        private void SoloLetras_KeyPress(object sender, KeyPressEventArgs e) { if (!char.IsLetter(e.KeyChar) && !char.IsControl(e.KeyChar) && !char.IsWhiteSpace(e.KeyChar)) e.Handled = true; }
+        private void SoloNumeros_KeyPress(object sender, KeyPressEventArgs e) { if (!char.IsDigit(e.KeyChar) && !char.IsControl(e.KeyChar)) e.Handled = true; }
+        private void Control_Modificado(object sender, EventArgs e) => ActualizarEstadoBotones();
 
         private void ActualizarEstadoBotones()
         {
-            // Limpiar se habilita si hay al menos un dato escrito
-            bool algunCampoLleno = !string.IsNullOrWhiteSpace(txtDni.Text) ||
-                                  !string.IsNullOrWhiteSpace(txtNombre.Text) ||
-                                  !string.IsNullOrWhiteSpace(txtApellido.Text) ||
-                                  !string.IsNullOrWhiteSpace(txtEmail.Text) ||
-                                  !string.IsNullOrWhiteSpace(txtTelefono.Text) ||
-                                  !string.IsNullOrWhiteSpace(textPais.Text) ||
-                                  !string.IsNullOrWhiteSpace(textLocalidad.Text) ||
-                                  !string.IsNullOrWhiteSpace(txtCalle.Text) ||
-                                  !string.IsNullOrWhiteSpace(textNroAltura.Text);
-
-            // Guardar se habilita cuando los datos obligatorios están completos
-            bool obligatoriosLlenos = !string.IsNullOrWhiteSpace(txtDni.Text) &&
-                                      !string.IsNullOrWhiteSpace(txtNombre.Text) &&
-                                      !string.IsNullOrWhiteSpace(txtApellido.Text) &&
-                                      !string.IsNullOrWhiteSpace(txtEmail.Text) &&
-                                      !string.IsNullOrWhiteSpace(txtTelefono.Text);
-
-            btnLimpiar.Enabled = algunCampoLleno;
-            btnGuardar.Enabled = obligatoriosLlenos;
-
-         
+            btnLimpiar.Enabled = !string.IsNullOrWhiteSpace(txtDni.Text) || !string.IsNullOrWhiteSpace(txtNombre.Text) || !string.IsNullOrWhiteSpace(txtApellido.Text) || !string.IsNullOrWhiteSpace(txtEmail.Text) || !string.IsNullOrWhiteSpace(txtTelefono.Text) || !string.IsNullOrWhiteSpace(textPais.Text) || !string.IsNullOrWhiteSpace(textLocalidad.Text) || !string.IsNullOrWhiteSpace(txtCalle.Text) || !string.IsNullOrWhiteSpace(textNroAltura.Text);
+            btnGuardar.Enabled = !string.IsNullOrWhiteSpace(txtDni.Text) && !string.IsNullOrWhiteSpace(txtNombre.Text) && !string.IsNullOrWhiteSpace(txtApellido.Text) && !string.IsNullOrWhiteSpace(txtEmail.Text) && !string.IsNullOrWhiteSpace(txtTelefono.Text);
         }
 
-        // =======================
-        // ACCIONES DE BOTONES
-        // =======================
         private void btnGuardar_Click(object sender, EventArgs e)
         {
-            // Validación de formato de Email
-            string emailPattern = @"^[^@\s]+@[^@\s]+\.[^@\s]+$";
-            if (!Regex.IsMatch(txtEmail.Text.Trim(), emailPattern))
+            try
             {
-                MessageBox.Show("El correo electrónico no tiene un formato válido (ejemplo: usuario@correo.com).",
-                                "Formato Inválido", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                txtEmail.Focus();
-                return;
+                _negocio.GuardarCliente(txtDni.Text.Trim(), txtNombre.Text.Trim(), txtApellido.Text.Trim(), txtEmail.Text.Trim(), txtTelefono.Text.Trim());
+                MessageBox.Show("Cliente guardado exitosamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                LimpiarCampos();
             }
-
-            // Validación de longitud de DNI (7 u 8 dígitos)
-            if (txtDni.Text.Trim().Length < 7 || txtDni.Text.Trim().Length > 8)
+            catch (Exception ex)
             {
-                MessageBox.Show("El DNI debe tener 7 u 8 dígitos.",
-                                "Formato Inválido", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                txtDni.Focus();
-                return;
+                MessageBox.Show(ex.Message, "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
-
-            // Lógica de inserción en base de datos aquí...
-            MessageBox.Show("Cliente guardado exitosamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            LimpiarCampos();
         }
 
         private void btnModificar_Click(object sender, EventArgs e)
         {
-            // Lógica de actualización en base de datos aquí...
             MessageBox.Show("Cliente modificado exitosamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
             LimpiarCampos();
         }
 
-        private void btnLimpiar_Click(object sender, EventArgs e)
-        {
-            LimpiarCampos();
-        }
+        private void btnLimpiar_Click(object sender, EventArgs e) => LimpiarCampos();
 
         private void LimpiarCampos()
         {
-            txtDni.Clear();
-            txtNombre.Clear();
-            txtApellido.Clear();
-            txtEmail.Clear();
-            txtTelefono.Clear();
-            textPais.Clear();
-            textLocalidad.Clear();
-            txtCalle.Clear();
-            textNroAltura.Clear();
-
+            txtDni.Clear(); txtNombre.Clear(); txtApellido.Clear(); txtEmail.Clear(); txtTelefono.Clear(); textPais.Clear(); textLocalidad.Clear(); txtCalle.Clear(); textNroAltura.Clear();
             ActualizarEstadoBotones();
         }
     }

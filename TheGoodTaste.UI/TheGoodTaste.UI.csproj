@@ -155,6 +155,10 @@
       <Project>{64bc27b0-82e7-4636-8e0b-a8d533c1f8c7}</Project>
       <Name>The Good Taste</Name>
     </ProjectReference>
+    <ProjectReference Include="..\TheGoodTaste.Negocio\TheGoodTaste.Negocio.csproj">
+      <Project>{300c8df8-c114-4143-b0be-0233eeacddc7}</Project>
+      <Name>TheGoodTaste.Negocio</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\LogoOscuro.png" />

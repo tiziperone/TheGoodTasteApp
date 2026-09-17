@@ -2,15 +2,8 @@
 {
     partial class FormLogin
     {
-        /// <summary>
-        /// Required designer variable.
-        /// </summary>
         private System.ComponentModel.IContainer components = null;
 
-        /// <summary>
-        /// Clean up any resources being used.
-        /// </summary>
-        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
         protected override void Dispose(bool disposing)
         {
             if (disposing && (components != null))
@@ -22,10 +15,6 @@
 
         #region Windows Form Designer generated code
 
-        /// <summary>
-        /// Required method for Designer support - do not modify
-        /// the contents of this method with the code editor.
-        /// </summary>
         private void InitializeComponent()
         {
             this.txtUsuario = new System.Windows.Forms.TextBox();
@@ -46,8 +35,8 @@
             // 
             // txtPassword
             // 
-            this.txtPassword.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
+            this.txtPassword.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.txtPassword.Location = new System.Drawing.Point(324, 195);
             this.txtPassword.Name = "txtPassword";
@@ -67,8 +56,8 @@
             // 
             // labelUserName
             // 
-            this.labelUserName.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
+            this.labelUserName.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.labelUserName.AutoSize = true;
             this.labelUserName.Location = new System.Drawing.Point(233, 150);
@@ -79,8 +68,8 @@
             // 
             // labelPassword
             // 
-            this.labelPassword.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
+            this.labelPassword.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.labelPassword.AutoSize = true;
             this.labelPassword.Location = new System.Drawing.Point(233, 201);
@@ -99,12 +88,12 @@
             this.btnVerPassword.TabIndex = 5;
             this.btnVerPassword.Text = "👁️";
             this.btnVerPassword.UseVisualStyleBackColor = true;
-            this.btnVerPassword.CheckedChanged += new System.EventHandler(this.btnVerPassword_CheckedChanged);
+            this.btnVerPassword.CheckedChanged += new System.EventHandler(this.chkVerPassLogin_CheckedChanged);
             // 
             // chkVerPassLogin
             // 
-            this.chkVerPassLogin.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
+            this.chkVerPassLogin.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.chkVerPassLogin.Appearance = System.Windows.Forms.Appearance.Button;
             this.chkVerPassLogin.AutoSize = true;
@@ -115,7 +104,7 @@
             this.chkVerPassLogin.TabIndex = 5;
             this.chkVerPassLogin.Text = "👁️";
             this.chkVerPassLogin.UseVisualStyleBackColor = true;
-            this.chkVerPassLogin.CheckedChanged += new System.EventHandler(this.btnVerPassword_CheckedChanged);
+            this.chkVerPassLogin.CheckedChanged += new System.EventHandler(this.chkVerPassLogin_CheckedChanged);
             // 
             // FormLogin
             // 
