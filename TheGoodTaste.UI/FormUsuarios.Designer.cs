@@ -224,23 +224,22 @@
             this.radioButtonHom.AutoSize = true;
             this.radioButtonHom.Location = new System.Drawing.Point(510, 185);
             this.radioButtonHom.Name = "radioButtonHom";
-            this.radioButtonHom.Size = new System.Drawing.Size(77, 20);
+            this.radioButtonHom.Size = new System.Drawing.Size(39, 20);
             this.radioButtonHom.TabIndex = 21;
             this.radioButtonHom.TabStop = true;
-            this.radioButtonHom.Text = "Hombre";
+            this.radioButtonHom.Text = "M";
             this.radioButtonHom.UseVisualStyleBackColor = true;
             // 
             // radioButtonMuj
             // 
             this.radioButtonMuj.AutoSize = true;
-            this.radioButtonMuj.Location = new System.Drawing.Point(602, 185);
+            this.radioButtonMuj.Location = new System.Drawing.Point(583, 185);
             this.radioButtonMuj.Name = "radioButtonMuj";
-            this.radioButtonMuj.Size = new System.Drawing.Size(61, 20);
+            this.radioButtonMuj.Size = new System.Drawing.Size(36, 20);
             this.radioButtonMuj.TabIndex = 22;
             this.radioButtonMuj.TabStop = true;
-            this.radioButtonMuj.Text = "Mujer";
+            this.radioButtonMuj.Text = "F";
             this.radioButtonMuj.UseVisualStyleBackColor = true;
-          
             // 
             // buttonSave
             // 
