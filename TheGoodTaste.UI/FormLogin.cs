@@ -35,6 +35,10 @@ namespace TheGoodTaste.UI
             // Asegura que la contraseña inicie oculta con los caracteres nativos del sistema
             txtPassword.UseSystemPasswordChar = true;
 
+            // Suscribe los cuadros de texto al evento para moverse con flechas
+            txtUsuario.KeyDown += Campos_KeyDown;
+            txtPassword.KeyDown += Campos_KeyDown;
+
             // Foco inicial en el usuario
             txtUsuario.Focus();
         }
@@ -46,6 +50,21 @@ namespace TheGoodTaste.UI
             {
                 this.DialogResult = DialogResult.Cancel;
                 this.Close();
+            }
+        }
+
+        // Navegación con flechas entre Usuario y Contraseña
+        private void Campos_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Down)
+            {
+                e.SuppressKeyPress = true; // Evita el sonido de alerta de Windows
+                SelectNextControl((Control)sender, true, true, true, true);
+            }
+            else if (e.KeyCode == Keys.Up)
+            {
+                e.SuppressKeyPress = true;
+                SelectNextControl((Control)sender, false, true, true, true);
             }
         }
 
