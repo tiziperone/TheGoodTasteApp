@@ -41,11 +41,11 @@ namespace TheGoodTaste.UI
         private void CargarRoles()
         {
             var roles = new Dictionary<int, string>
-            {
-                { 1, "Admin" },
-                { 2, "Gerente" },
-                { 3, "Vendedor" }
-            };
+{
+{ 1, "Admin" },
+{ 2, "Gerente" },
+{ 3, "Vendedor" }
+};
 
             comboBox1.DataSource = new BindingSource(roles, null);
             comboBox1.DisplayMember = "Value";
@@ -76,10 +76,10 @@ namespace TheGoodTaste.UI
                 AutoCompleteStringCollection callesSugeridas = new AutoCompleteStringCollection();
                 string[] listaCalles = new string[]
                 {
-                    "Av. 3 de Abril", "Av. Pedro Ferré", "Av. Gobernador Ruiz", "Av. Armenia",
-                    "Av. Independencia", "Av. Maipú", "Av. Centenario", "Junín",
-                    "Pellegrini", "9 de Julio", "San Martín", "Córdoba", "Mendoza",
-                    "Salta", "Tucumán", "Buenos Aires", "Belgrano", "Bolívar", "Sarmiento"
+"Av. 3 de Abril", "Av. Pedro Ferré", "Av. Gobernador Ruiz", "Av. Armenia",
+"Av. Independencia", "Av. Maipú", "Av. Centenario", "Junín",
+"Pellegrini", "9 de Julio", "San Martín", "Córdoba", "Mendoza",
+"Salta", "Tucumán", "Buenos Aires", "Belgrano", "Bolívar", "Sarmiento"
                 };
 
                 callesSugeridas.AddRange(listaCalles);
@@ -112,7 +112,8 @@ namespace TheGoodTaste.UI
             textBoxName.TextChanged += GenerarUsuarioSugerido;
             textBoxApellido.TextChanged += GenerarUsuarioSugerido;
 
-            textBoxDNI.TextChanged += (s, e) => {
+            textBoxDNI.TextChanged += (s, e) =>
+            {
                 if (!_idUsuarioSeleccionado.HasValue)
                     textBoxPass.Text = textBoxDNI.Text.Trim();
             };
@@ -124,19 +125,7 @@ namespace TheGoodTaste.UI
             {
                 if (c is TextBox)
                 {
-                    c.KeyDown += (s, e) =>
-                    {
-                        if (e.KeyCode == Keys.Enter || e.KeyCode == Keys.Down)
-                        {
-                            e.SuppressKeyPress = true; 
-                            SelectNextControl((Control)s, true, true, true, true);
-                        }
-                        else if (e.KeyCode == Keys.Up)
-                        {
-                            e.SuppressKeyPress = true;
-                            SelectNextControl((Control)s, false, true, true, true);
-                        }
-                    };
+                    c.KeyDown += (s, e) => { if (e.KeyCode == Keys.Enter) SelectNextControl((Control)s, true, true, true, true); };
                 }
             }
 
@@ -209,11 +198,11 @@ namespace TheGoodTaste.UI
                         string accion = nuevoEstado ? "reactivar" : "dar de baja";
 
                         DialogResult result = MessageBox.Show(
-                            $"¿Está seguro de que desea {accion} al usuario '{usuarioNombre}'?",
-                            "Confirmación de Estado",
-                            MessageBoxButtons.YesNo,
-                            MessageBoxIcon.Question,
-                            MessageBoxDefaultButton.Button2
+                        $"¿Está seguro de que desea {accion} al usuario '{usuarioNombre}'?",
+                        "Confirmación de Estado",
+                        MessageBoxButtons.YesNo,
+                        MessageBoxIcon.Question,
+                        MessageBoxDefaultButton.Button2
                         );
 
                         if (result == DialogResult.Yes)
@@ -259,20 +248,20 @@ namespace TheGoodTaste.UI
         private void ValidarReglaNegocioBotones()
         {
             bool algunCampoConDato = !string.IsNullOrWhiteSpace(textBoxName.Text) ||
-                                     !string.IsNullOrWhiteSpace(textBoxApellido.Text) ||
-                                     !string.IsNullOrWhiteSpace(textBoxUser.Text) ||
-                                     !string.IsNullOrWhiteSpace(textBoxEmail.Text) ||
-                                     !string.IsNullOrWhiteSpace(textBoxDNI.Text) ||
-                                     comboBox1.SelectedIndex != -1;
+            !string.IsNullOrWhiteSpace(textBoxApellido.Text) ||
+            !string.IsNullOrWhiteSpace(textBoxUser.Text) ||
+            !string.IsNullOrWhiteSpace(textBoxEmail.Text) ||
+            !string.IsNullOrWhiteSpace(textBoxDNI.Text) ||
+            comboBox1.SelectedIndex != -1;
 
             bool obligatoriosCompletos = !string.IsNullOrWhiteSpace(textBoxName.Text) &&
-                                         !string.IsNullOrWhiteSpace(textBoxApellido.Text) &&
-                                         !string.IsNullOrWhiteSpace(textBoxUser.Text) &&
-                                         !string.IsNullOrWhiteSpace(textBoxEmail.Text) &&
-                                         !string.IsNullOrWhiteSpace(textBoxDNI.Text) &&
-                                         comboBox1.SelectedIndex != -1 &&
-                                         comboBoxLocalidad.SelectedIndex != -1 &&
-                                         (radioButtonHom.Checked || radioButtonMuj.Checked);
+            !string.IsNullOrWhiteSpace(textBoxApellido.Text) &&
+            !string.IsNullOrWhiteSpace(textBoxUser.Text) &&
+            !string.IsNullOrWhiteSpace(textBoxEmail.Text) &&
+            !string.IsNullOrWhiteSpace(textBoxDNI.Text) &&
+            comboBox1.SelectedIndex != -1 &&
+            comboBoxLocalidad.SelectedIndex != -1 &&
+            (radioButtonHom.Checked || radioButtonMuj.Checked);
 
             buttonDel.Enabled = algunCampoConDato || _idUsuarioSeleccionado.HasValue;
             buttonSave.Enabled = obligatoriosCompletos;
@@ -309,6 +298,7 @@ namespace TheGoodTaste.UI
                 return;
             }
 
+            // 3. VALIDACIÓN DE EDAD MÍNIMA (AQUÍ AGREGAS LA NUEVA)
             // 3. VALIDACIÓN DE EDAD MÍNIMA
             DateTime fechaNacimientoSeleccionada = dateTimePickerFechNac.Value.Date;
             DateTime fechaHoy = DateTime.Today;
@@ -432,8 +422,7 @@ namespace TheGoodTaste.UI
             textBoxDir.Clear();
             textBoxNroTel.Clear();
             textBoxPass.UseSystemPasswordChar = true;
-            chkVerPassUsuario.Checked = false;
-            chkVerPassUsuario.Text = "👁️";
+
 
             comboBox1.SelectedIndex = -1;
             if (comboBoxLocalidad != null) comboBoxLocalidad.SelectedIndex = -1;
@@ -495,19 +484,11 @@ namespace TheGoodTaste.UI
         private void buttonDel_Click_1(object sender, EventArgs e) => buttonDel_Click(sender, e);
         private void comboBox1_SelectedIndexChanged(object sender, EventArgs e) { }
 
-        private void btnMostrarPassword_Click(object sender, EventArgs e)
-        {
-            textBoxPass.UseSystemPasswordChar = !textBoxPass.UseSystemPasswordChar;
-            chkVerPassUsuario.Text = textBoxPass.UseSystemPasswordChar ? "👁️" : "🙈";
-        }
 
-        private void chkVerPassUsuario_CheckedChanged(object sender, EventArgs e)
-        {
-            textBoxPass.UseSystemPasswordChar = !chkVerPassUsuario.Checked;
-            chkVerPassUsuario.Text = chkVerPassUsuario.Checked ? "🙈" : "👁️";
-        }
 
-        private void btnMostrarPassword_CheckedChanged(object sender, EventArgs e) => chkVerPassUsuario_CheckedChanged(sender, e);
+
+
+
 
         private void label8_Click(object sender, EventArgs e)
         {

@@ -240,7 +240,7 @@
             this.radioButtonMuj.TabStop = true;
             this.radioButtonMuj.Text = "Mujer";
             this.radioButtonMuj.UseVisualStyleBackColor = true;
-            this.radioButtonMuj.CheckedChanged += new System.EventHandler(this.radioButtonMuj_CheckedChanged);
+          
             // 
             // buttonSave
             // 
