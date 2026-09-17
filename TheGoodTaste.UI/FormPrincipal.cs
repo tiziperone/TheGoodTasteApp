@@ -45,12 +45,16 @@ namespace TheGoodTaste.UI
                     break;
 
                 case RolUsuario.Gerente:
-                    // Ocultamos Usuarios
                     if (btnUsuarios != null) btnUsuarios.Visible = false;
+                    if (btnVentas != null) btnVentas.Visible = false;
+                    if (btnReportes != null) btnReportes.Visible = false;
+                    if (btnProductos != null) btnProductos.Visible = false;
+                    if (btnClientes != null) btnClientes.Visible = false;
+                    if (btnReportes != null) btnReportes.Visible = true;
                     break;
 
                 case RolUsuario.Vendedor:
-                    // Ocultamos Usuarios y Reportes
+                    
                     if (btnUsuarios != null) btnUsuarios.Visible = false;
                     if (btnReportes != null) btnReportes.Visible = false;
                     if (btnProductos != null) btnProductos.Visible = true;
