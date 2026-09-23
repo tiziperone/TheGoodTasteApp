@@ -58,6 +58,8 @@
             this.textBoxDir = new System.Windows.Forms.TextBox();
             this.comboBoxLocalidad = new System.Windows.Forms.ComboBox();
             this.label12 = new System.Windows.Forms.Label();
+            this.textBoxBuscar = new System.Windows.Forms.TextBox();
+            this.label13 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -282,18 +284,18 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.dataGridView1.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
             this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridView1.Location = new System.Drawing.Point(34, 352);
+            this.dataGridView1.Location = new System.Drawing.Point(34, 389);
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.RowHeadersWidth = 51;
             this.dataGridView1.RowTemplate.Height = 24;
-            this.dataGridView1.Size = new System.Drawing.Size(1037, 195);
+            this.dataGridView1.Size = new System.Drawing.Size(1446, 338);
             this.dataGridView1.TabIndex = 26;
             // 
             // radioButtonAct
             // 
             this.radioButtonAct.Appearance = System.Windows.Forms.Appearance.Button;
             this.radioButtonAct.AutoSize = true;
-            this.radioButtonAct.Location = new System.Drawing.Point(34, 311);
+            this.radioButtonAct.Location = new System.Drawing.Point(1325, 348);
             this.radioButtonAct.Name = "radioButtonAct";
             this.radioButtonAct.Size = new System.Drawing.Size(61, 26);
             this.radioButtonAct.TabIndex = 27;
@@ -305,7 +307,7 @@
             // 
             this.radioButtonInac.Appearance = System.Windows.Forms.Appearance.Button;
             this.radioButtonInac.AutoSize = true;
-            this.radioButtonInac.Location = new System.Drawing.Point(110, 311);
+            this.radioButtonInac.Location = new System.Drawing.Point(1410, 348);
             this.radioButtonInac.Name = "radioButtonInac";
             this.radioButtonInac.Size = new System.Drawing.Size(70, 26);
             this.radioButtonInac.TabIndex = 28;
@@ -337,11 +339,30 @@
             this.label12.TabIndex = 32;
             this.label12.Text = "Localidad";
             // 
+            // textBoxBuscar
+            // 
+            this.textBoxBuscar.Location = new System.Drawing.Point(34, 348);
+            this.textBoxBuscar.Name = "textBoxBuscar";
+            this.textBoxBuscar.Size = new System.Drawing.Size(280, 22);
+            this.textBoxBuscar.TabIndex = 33;
+            // 
+            // label13
+            // 
+            this.label13.AutoSize = true;
+            this.label13.Location = new System.Drawing.Point(31, 316);
+            this.label13.Name = "label13";
+            this.label13.Size = new System.Drawing.Size(120, 20);
+            this.label13.TabIndex = 34;
+            this.label13.Text = "Buscar usuario";
+            this.label13.Click += new System.EventHandler(this.label13_Click);
+            // 
             // FormUsuarios
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1106, 711);
+            this.ClientSize = new System.Drawing.Size(1515, 854);
+            this.Controls.Add(this.label13);
+            this.Controls.Add(this.textBoxBuscar);
             this.Controls.Add(this.label12);
             this.Controls.Add(this.comboBoxLocalidad);
             this.Controls.Add(this.textBoxDir);
@@ -413,5 +434,7 @@
         private System.Windows.Forms.TextBox textBoxDir;
         private System.Windows.Forms.ComboBox comboBoxLocalidad;
         private System.Windows.Forms.Label label12;
+        private System.Windows.Forms.TextBox textBoxBuscar;
+        private System.Windows.Forms.Label label13;
     }
 }

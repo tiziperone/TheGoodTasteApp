@@ -130,6 +130,12 @@ namespace TheGoodTaste.UI //Clase que representa el formulario de gestión de us
             textBoxName.TextChanged += GenerarUsuarioSugerido;
             textBoxApellido.TextChanged += GenerarUsuarioSugerido;
 
+            // Evento del buscador
+            if (textBoxBuscar != null)
+            {
+                textBoxBuscar.TextChanged += textBoxBuscar_TextChanged;
+            }
+
             textBoxDNI.TextChanged += (s, e) =>
             {
                 //Sigue replicando el DNI en la contraseña (aunque esté bloqueada)
@@ -142,7 +148,7 @@ namespace TheGoodTaste.UI //Clase que representa el formulario de gestión de us
 
             foreach (Control c in this.Controls)
             {
-                if (c is TextBox)
+                if (c is TextBox && c.Name != "textBoxBuscar") // Evitamos que el buscador salte al presionar enter
                 {
                     c.KeyDown += (s, e) =>
                     {
@@ -160,8 +166,36 @@ namespace TheGoodTaste.UI //Clase que representa el formulario de gestión de us
                 }
             }
 
-            radioButtonAct.Click += (s, e) => CargarGrillaUsuarios(true);
-            radioButtonInac.Click += (s, e) => CargarGrillaUsuarios(false);
+            radioButtonAct.Click += (s, e) =>
+            {
+                if (textBoxBuscar != null) textBoxBuscar.Clear();
+                CargarGrillaUsuarios(true);
+            };
+
+            radioButtonInac.Click += (s, e) =>
+            {
+                if (textBoxBuscar != null) textBoxBuscar.Clear();
+                CargarGrillaUsuarios(false);
+            };
+        }
+
+        private void textBoxBuscar_TextChanged(object sender, EventArgs e)
+        {
+            if (dataGridView1.DataSource is DataTable dt)
+            {
+                string filtro = textBoxBuscar.Text.Trim().Replace("'", "''");
+
+                if (string.IsNullOrEmpty(filtro))
+                {
+                    dt.DefaultView.RowFilter = "";
+                }
+                else
+                {
+                    dt.DefaultView.RowFilter = $"(Convert(ID, 'System.String') LIKE '%{filtro}%') OR " +
+                                               $"(Usuario LIKE '%{filtro}%') OR " +
+                                               $"([Nombre Completo] LIKE '%{filtro}%')";
+                }
+            }
         }
 
         private void DataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
@@ -172,6 +206,14 @@ namespace TheGoodTaste.UI //Clase que representa el formulario de gestión de us
 
                 if (dataGridView1.Columns[e.ColumnIndex].Name == "Modificar")
                 {
+                    // Bloqueo para no modificar inactivos
+                    if (radioButtonInac.Checked)
+                    {
+                        MessageBox.Show("No se pueden modificar los datos de un usuario dado de baja. Para editarlo, primero debe reactivarlo desde la columna 'Estado'.",
+                                        "Acción no permitida", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        return;
+                    }
+
                     if (fila.Cells["ID"].Value != DBNull.Value && fila.Cells["ID"].Value != null)
                     {
                         int dni = Convert.ToInt32(fila.Cells["ID"].Value);
@@ -478,7 +520,7 @@ namespace TheGoodTaste.UI //Clase que representa el formulario de gestión de us
 
                     if (confirmacion == DialogResult.Yes)
                     {
-                        string currentDbPassword = _datosOriginales["Clave"].ToString();
+                        string currentDbPassword = _datosOriginales["PasswordHash"].ToString();
 
                         if (repo.ActualizarUsuario(dni, username, currentDbPassword, idRol, nombre, apellido, direccion, idLocalidad, fechaNacimiento, telefono, email, sexo))
                         {
@@ -567,5 +609,7 @@ namespace TheGoodTaste.UI //Clase que representa el formulario de gestión de us
         private void buttonDel_Click_1(object sender, EventArgs e) => buttonDel_Click(sender, e);
         private void comboBox1_SelectedIndexChanged(object sender, EventArgs e) { }
         private void label8_Click(object sender, EventArgs e) { }
+
+        private void label13_Click(object sender, EventArgs e) { }
     }
 }
