@@ -40,7 +40,6 @@ namespace TheGoodTaste.UI
             CentrarLogo();
         }
 
-
         private void DeshabilitarBoton(Button btn)
         {
             if (btn != null)
@@ -62,7 +61,10 @@ namespace TheGoodTaste.UI
             switch (_usuarioActual.Rol)
             {
                 case RolUsuario.Admin:
-                    // El Admin tiene acceso total por defecto, no bloqueamos nada
+                    // El Admin solo ve Reportes y Usuarios
+                    DeshabilitarBoton(btnProductos);
+                    DeshabilitarBoton(btnClientes);
+                    DeshabilitarBoton(btnVentas);
                     break;
 
                 case RolUsuario.Gerente:
