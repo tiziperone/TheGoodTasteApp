@@ -5,9 +5,9 @@ using System.Drawing;
 using System.Globalization;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
-using The_Good_Taste.Datos;
+using TheGoodTaste.Negocio;
 
-namespace TheGoodTaste.UI //Clase que representa el formulario de gestión de usuarios
+namespace TheGoodTaste.UI
 {
     public partial class FormUsuarios : Form
     {
@@ -22,7 +22,7 @@ namespace TheGoodTaste.UI //Clase que representa el formulario de gestión de us
         private void FormUsuarios_Load(object sender, EventArgs e)
         {
             TemaVisual.AplicarEstilo(this);
-            ConfigurarLimitesCaracteres(); //Se establecen límites y bloqueos
+            ConfigurarLimitesCaracteres();
             CargarRoles();
             CargarLocalidades();
             ConfigurarEventos();
@@ -40,7 +40,6 @@ namespace TheGoodTaste.UI //Clase que representa el formulario de gestión de us
 
         private void ConfigurarLimitesCaracteres()
         {
-            //Se limita la cantidad de caracteres según la base de datos
             textBoxName.MaxLength = 50;
             textBoxApellido.MaxLength = 50;
             textBoxDNI.MaxLength = 8;
@@ -48,8 +47,6 @@ namespace TheGoodTaste.UI //Clase que representa el formulario de gestión de us
             textBoxEmail.MaxLength = 100;
             textBoxDir.MaxLength = 100;
             textBoxNroTel.MaxLength = 15;
-
-            //Se bloquea la contraseña para que el usuario no pueda editarla manualmente
             textBoxPass.ReadOnly = true;
         }
 
@@ -72,15 +69,18 @@ namespace TheGoodTaste.UI //Clase que representa el formulario de gestión de us
         {
             try
             {
-                UsuarioDatos repo = new UsuarioDatos();
-                comboBoxLocalidad.DataSource = repo.ObtenerLocalidades();
+                UsuarioNegocio negocio = new UsuarioNegocio();
+                comboBoxLocalidad.DataSource = negocio.ObtenerLocalidades();
                 comboBoxLocalidad.DisplayMember = "Descripcion";
                 comboBoxLocalidad.ValueMember = "IdLocalidad";
+
+                // Aseguramos que el usuario pueda escribir libremente en el campo
+                comboBoxLocalidad.DropDownStyle = ComboBoxStyle.DropDown;
                 comboBoxLocalidad.SelectedIndex = -1;
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error al cargar localidades: " + ex.Message, "Error BD", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Error al cargar localidades: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
 
@@ -120,8 +120,12 @@ namespace TheGoodTaste.UI //Clase que representa el formulario de gestión de us
             textBoxDNI.TextChanged += Control_Modificado;
             textBoxDir.TextChanged += Control_Modificado;
             textBoxNroTel.TextChanged += Control_Modificado;
+
             comboBox1.SelectedIndexChanged += Control_Modificado;
             comboBoxLocalidad.SelectedIndexChanged += Control_Modificado;
+            // NUEVO: Escuchar el texto escrito en la localidad para habilitar el botón guardar
+            comboBoxLocalidad.TextChanged += Control_Modificado;
+
             dateTimePickerFechNac.ValueChanged += Control_Modificado;
 
             radioButtonHom.CheckedChanged += Control_Modificado;
@@ -130,7 +134,6 @@ namespace TheGoodTaste.UI //Clase que representa el formulario de gestión de us
             textBoxName.TextChanged += GenerarUsuarioSugerido;
             textBoxApellido.TextChanged += GenerarUsuarioSugerido;
 
-            // Evento del buscador
             if (textBoxBuscar != null)
             {
                 textBoxBuscar.TextChanged += textBoxBuscar_TextChanged;
@@ -138,7 +141,6 @@ namespace TheGoodTaste.UI //Clase que representa el formulario de gestión de us
 
             textBoxDNI.TextChanged += (s, e) =>
             {
-                //Sigue replicando el DNI en la contraseña (aunque esté bloqueada)
                 if (!_idUsuarioSeleccionado.HasValue)
                     textBoxPass.Text = textBoxDNI.Text.Trim();
             };
@@ -148,7 +150,7 @@ namespace TheGoodTaste.UI //Clase que representa el formulario de gestión de us
 
             foreach (Control c in this.Controls)
             {
-                if (c is TextBox && c.Name != "textBoxBuscar") // Evitamos que el buscador salte al presionar enter
+                if (c is TextBox && c.Name != "textBoxBuscar")
                 {
                     c.KeyDown += (s, e) =>
                     {
@@ -206,7 +208,6 @@ namespace TheGoodTaste.UI //Clase que representa el formulario de gestión de us
 
                 if (dataGridView1.Columns[e.ColumnIndex].Name == "Modificar")
                 {
-                    // Bloqueo para no modificar inactivos
                     if (radioButtonInac.Checked)
                     {
                         MessageBox.Show("No se pueden modificar los datos de un usuario dado de baja. Para editarlo, primero debe reactivarlo desde la columna 'Estado'.",
@@ -218,8 +219,8 @@ namespace TheGoodTaste.UI //Clase que representa el formulario de gestión de us
                     {
                         int dni = Convert.ToInt32(fila.Cells["ID"].Value);
 
-                        UsuarioDatos repo = new UsuarioDatos();
-                        _datosOriginales = repo.ObtenerUsuarioPorDNI(dni);
+                        UsuarioNegocio negocio = new UsuarioNegocio();
+                        _datosOriginales = negocio.ObtenerUsuarioPorDNI(dni);
 
                         if (_datosOriginales != null)
                         {
@@ -278,8 +279,8 @@ namespace TheGoodTaste.UI //Clase que representa el formulario de gestión de us
                         {
                             try
                             {
-                                UsuarioDatos repo = new UsuarioDatos();
-                                if (repo.CambiarEstadoUsuario(dni, nuevoEstado))
+                                UsuarioNegocio negocio = new UsuarioNegocio();
+                                if (negocio.CambiarEstadoUsuario(dni, nuevoEstado))
                                 {
                                     MessageBox.Show($"Usuario {(nuevoEstado ? "reactivado" : "dado de baja")} correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
                                     CargarGrillaUsuarios(radioButtonAct.Checked);
@@ -287,7 +288,7 @@ namespace TheGoodTaste.UI //Clase que representa el formulario de gestión de us
                             }
                             catch (Exception ex)
                             {
-                                MessageBox.Show("Error al cambiar el estado: " + ex.Message, "Error BD", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                MessageBox.Show("Error al cambiar el estado: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                                 fila.Cells["Estado"].Value = !nuevoEstado;
                             }
                         }
@@ -324,7 +325,7 @@ namespace TheGoodTaste.UI //Clase que representa el formulario de gestión de us
             !string.IsNullOrWhiteSpace(textBoxDir.Text) ||
             !string.IsNullOrWhiteSpace(textBoxNroTel.Text) ||
             comboBox1.SelectedIndex != -1 ||
-            comboBoxLocalidad.SelectedIndex != -1 ||
+            !string.IsNullOrWhiteSpace(comboBoxLocalidad.Text) || // MODIFICADO: Verifica el texto escrito, no solo el índice
             radioButtonHom.Checked ||
             radioButtonMuj.Checked ||
             dateTimePickerFechNac.Value.Date != DateTime.Today.AddYears(-18).Date;
@@ -335,7 +336,7 @@ namespace TheGoodTaste.UI //Clase que representa el formulario de gestión de us
             !string.IsNullOrWhiteSpace(textBoxEmail.Text) &&
             !string.IsNullOrWhiteSpace(textBoxDNI.Text) &&
             comboBox1.SelectedIndex != -1 &&
-            comboBoxLocalidad.SelectedIndex != -1 &&
+            !string.IsNullOrWhiteSpace(comboBoxLocalidad.Text) && // MODIFICADO: Obligatorio que tenga texto
             (radioButtonHom.Checked || radioButtonMuj.Checked);
 
             buttonDel.Enabled = algunCampoConDato || _idUsuarioSeleccionado.HasValue;
@@ -410,71 +411,82 @@ namespace TheGoodTaste.UI //Clase que representa el formulario de gestión de us
 
             try
             {
+                UsuarioNegocio negocio = new UsuarioNegocio();
+
+                // LÓGICA DE LOCALIDAD: Si seleccionó de la lista usa el ID, si escribió texto nuevo, lo crea
+                int idLocalidad;
+                if (comboBoxLocalidad.SelectedValue != null && comboBoxLocalidad.SelectedIndex != -1)
+                {
+                    idLocalidad = Convert.ToInt32(comboBoxLocalidad.SelectedValue);
+                }
+                else
+                {
+                    string nuevaLocalidadTexto = comboBoxLocalidad.Text.Trim();
+                    idLocalidad = negocio.RegistrarYObtenerIdLocalidad(nuevaLocalidadTexto);
+                }
+
                 int dni = Convert.ToInt32(textBoxDNI.Text.Trim());
                 string username = textBoxUser.Text.Trim();
-                string password = textBoxDNI.Text.Trim(); //Como está bloqueado, forzamos que siempre sea el DNI
+                string password = textBoxDNI.Text.Trim();
                 string nombre = textBoxName.Text.Trim();
                 string apellido = textBoxApellido.Text.Trim();
                 int idRol = Convert.ToInt32(comboBox1.SelectedValue);
                 string direccion = textBoxDir.Text.Trim();
-                int idLocalidad = comboBoxLocalidad.SelectedValue != null ? Convert.ToInt32(comboBoxLocalidad.SelectedValue) : 1;
                 DateTime fechaNacimiento = dateTimePickerFechNac.Value;
                 string telefono = textBoxNroTel.Text.Trim();
                 string email = textBoxEmail.Text.Trim();
                 string sexo = radioButtonHom.Checked ? "M" : (radioButtonMuj.Checked ? "F" : "Otro");
 
-                UsuarioDatos repo = new UsuarioDatos();
-
                 if (!_idUsuarioSeleccionado.HasValue) //Alta de nuevo usuario
                 {
-                    if (repo.ExisteDNI(dni))
+                    if (negocio.ExisteDNI(dni))
                     {
                         MessageBox.Show("El DNI ingresado ya está registrado.", "DNI Duplicado", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                         textBoxDNI.Focus();
                         return;
                     }
-                    if (repo.ExisteUsuario(username))
+                    if (negocio.ExisteUsuario(username))
                     {
                         MessageBox.Show("El nombre de usuario autogenerado ya está en uso. Por favor, agregue algún número o modifíquelo manualmente.", "Usuario Duplicado", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                         textBoxUser.Focus();
                         return;
                     }
-                    if (repo.ExisteEmail(email))
+                    if (negocio.ExisteEmail(email))
                     {
                         MessageBox.Show("El correo electrónico ya se encuentra registrado.", "Email Duplicado", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                         textBoxEmail.Focus();
                         return;
                     }
-                    if (repo.ExisteTelefono(telefono))
+                    if (negocio.ExisteTelefono(telefono))
                     {
                         MessageBox.Show("El número de teléfono ya está asociado a otro usuario.", "Teléfono Duplicado", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                         textBoxNroTel.Focus();
                         return;
                     }
 
-                    if (repo.RegistrarUsuario(dni, username, password, idRol, nombre, apellido, direccion, idLocalidad, fechaNacimiento, telefono, email, sexo))
+                    if (negocio.RegistrarUsuario(dni, username, password, idRol, nombre, apellido, direccion, idLocalidad, fechaNacimiento, telefono, email, sexo))
                     {
                         MessageBox.Show("Usuario registrado con éxito.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
                         LimpiarCampos();
+                        CargarLocalidades(); // Refrescamos por si se agregó una nueva localidad
                         CargarGrillaUsuarios(true);
                     }
                 }
                 else //Modificación de usuario existente
                 {
-                    // Validaciones para asegurar que los nuevos datos no choquen con OTROS registros
-                    if (username != _datosOriginales["Username"].ToString() && repo.ExisteUsuario(username))
+                    if (username != _datosOriginales["Username"].ToString() && negocio.ExisteUsuario(username))
                     {
                         MessageBox.Show("El nuevo nombre de usuario ya está siendo utilizado por otra persona.", "Usuario Duplicado", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                         textBoxUser.Focus();
                         return;
                     }
-                    if (email != _datosOriginales["Email"].ToString() && repo.ExisteEmail(email))
+                    if (email != _datosOriginales["Email"].ToString() && negocio.ExisteEmail(email))
                     {
                         MessageBox.Show("El nuevo correo electrónico ya está registrado en otra cuenta.", "Email Duplicado", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                         textBoxEmail.Focus();
                         return;
                     }
-                    if (telefono != _datosOriginales["Telefono"].ToString() && repo.ExisteTelefono(telefono))
+                    if (telefono != _datosOriginales["Telefono"].ToString() && negocio.ExisteTelefono(telefono))
                     {
                         MessageBox.Show("El nuevo número de teléfono ya pertenece a otro usuario.", "Teléfono Duplicado", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                         textBoxNroTel.Focus();
@@ -522,10 +534,11 @@ namespace TheGoodTaste.UI //Clase que representa el formulario de gestión de us
                     {
                         string currentDbPassword = _datosOriginales["PasswordHash"].ToString();
 
-                        if (repo.ActualizarUsuario(dni, username, currentDbPassword, idRol, nombre, apellido, direccion, idLocalidad, fechaNacimiento, telefono, email, sexo))
+                        if (negocio.ActualizarUsuario(dni, username, currentDbPassword, idRol, nombre, apellido, direccion, idLocalidad, fechaNacimiento, telefono, email, sexo))
                         {
-                            MessageBox.Show("Usuario actualizado con éxito en la base de datos.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                            MessageBox.Show("Usuario actualizado con éxito.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
                             LimpiarCampos();
+                            CargarLocalidades(); // Refrescamos por si se agregó una nueva localidad
                             CargarGrillaUsuarios(true);
                         }
                     }
@@ -533,7 +546,7 @@ namespace TheGoodTaste.UI //Clase que representa el formulario de gestión de us
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error al guardar/modificar: " + ex.Message, "Error BD", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Error al procesar la solicitud: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -554,7 +567,11 @@ namespace TheGoodTaste.UI //Clase que representa el formulario de gestión de us
             textBoxPass.UseSystemPasswordChar = true;
 
             comboBox1.SelectedIndex = -1;
-            if (comboBoxLocalidad != null) comboBoxLocalidad.SelectedIndex = -1;
+            if (comboBoxLocalidad != null)
+            {
+                comboBoxLocalidad.SelectedIndex = -1;
+                comboBoxLocalidad.Text = string.Empty;
+            }
 
             radioButtonHom.Checked = false;
             radioButtonMuj.Checked = false;
@@ -575,8 +592,8 @@ namespace TheGoodTaste.UI //Clase que representa el formulario de gestión de us
         {
             try
             {
-                UsuarioDatos repo = new UsuarioDatos();
-                dataGridView1.DataSource = repo.ObtenerUsuariosPorEstado(verActivos);
+                UsuarioNegocio negocio = new UsuarioNegocio();
+                dataGridView1.DataSource = negocio.ObtenerUsuariosPorEstado(verActivos);
 
                 if (!dataGridView1.Columns.Contains("Modificar"))
                 {
@@ -601,7 +618,7 @@ namespace TheGoodTaste.UI //Clase que representa el formulario de gestión de us
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error al cargar la lista: " + ex.Message, "Error BD", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Error al cargar la lista: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -609,7 +626,6 @@ namespace TheGoodTaste.UI //Clase que representa el formulario de gestión de us
         private void buttonDel_Click_1(object sender, EventArgs e) => buttonDel_Click(sender, e);
         private void comboBox1_SelectedIndexChanged(object sender, EventArgs e) { }
         private void label8_Click(object sender, EventArgs e) { }
-
         private void label13_Click(object sender, EventArgs e) { }
     }
 }

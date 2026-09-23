@@ -6,7 +6,7 @@ using The_Good_Taste.Entidades;
 
 namespace TheGoodTaste.Negocio
 {
-    public class UsuarioNegocio//Clase que maneja la lógica de negocio relacionada con los usuarios del sistema
+    public class UsuarioNegocio //Clase que maneja la lógica de negocio relacionada con los usuarios del sistema
     {
         private readonly UsuarioDatos _repo = new UsuarioDatos();
 
@@ -25,6 +25,42 @@ namespace TheGoodTaste.Negocio
         public DataRow ObtenerUsuarioPorDNI(int dni) => _repo.ObtenerUsuarioPorDNI(dni);
         public DataTable ObtenerLocalidades() => _repo.ObtenerLocalidades();
         public bool CambiarEstadoUsuario(int dni, bool nuevoEstado) => _repo.CambiarEstadoUsuario(dni, nuevoEstado);
+
+        public bool ExisteDNI(int dni) => _repo.ExisteDNI(dni);
+        public bool ExisteUsuario(string username) => _repo.ExisteUsuario(username);
+        public bool ExisteEmail(string email) => _repo.ExisteEmail(email);
+        public bool ExisteTelefono(string telefono) => _repo.ExisteTelefono(telefono);
+
+        // NUEVO MÉTODO: Validación y llamada para registrar nueva localidad separando la provincia
+        public int RegistrarYObtenerIdLocalidad(string textoIngresado)
+        {
+            if (string.IsNullOrWhiteSpace(textoIngresado))
+                throw new Exception("El nombre de la localidad no puede estar vacío.");
+
+            textoIngresado = textoIngresado.Trim();
+            string nombre = textoIngresado;
+            string provincia = "Corrientes"; // Provincia por defecto si el usuario no escribe paréntesis
+
+            // Buscar si el texto tiene el formato "Localidad (Provincia)"
+            var match = Regex.Match(textoIngresado, @"^(.*?)\s*\((.*?)\)$");
+            if (match.Success)
+            {
+                nombre = match.Groups[1].Value.Trim();
+                provincia = match.Groups[2].Value.Trim();
+            }
+
+            return _repo.RegistrarYObtenerIdLocalidad(nombre, provincia);
+        }
+
+        public bool RegistrarUsuario(int dni, string username, string password, int idRol, string nombre, string apellido, string direccion, int idLocalidad, DateTime fechaNacimiento, string telefono, string email, string sexo)
+        {
+            return _repo.RegistrarUsuario(dni, username, password, idRol, nombre, apellido, direccion, idLocalidad, fechaNacimiento, telefono, email, sexo);
+        }
+
+        public bool ActualizarUsuario(int dni, string username, string password, int idRol, string nombre, string apellido, string direccion, int idLocalidad, DateTime fechaNacimiento, string telefono, string email, string sexo)
+        {
+            return _repo.ActualizarUsuario(dni, username, password, idRol, nombre, apellido, direccion, idLocalidad, fechaNacimiento, telefono, email, sexo);
+        }
 
         public void GuardarUsuario(int? idSeleccionado, string dniTexto, string username, string nombre,
                                    string apellido, int idRol, string direccion, int idLocalidad,
@@ -64,7 +100,7 @@ namespace TheGoodTaste.Negocio
                 string usernameOrig = datosOriginales["Username"].ToString();
                 string emailOrig = datosOriginales["Email"].ToString();
                 string telOrig = datosOriginales["Telefono"]?.ToString() ?? "";
-                string passwordActual = datosOriginales["PasswordHash"].ToString(); //Asume que la columna se llama PasswordHash
+                string passwordActual = datosOriginales["PasswordHash"].ToString();
 
                 if (username != usernameOrig && _repo.ExisteUsuario(username)) throw new Exception("El nuevo nombre de usuario ya está siendo utilizado.");
                 if (email != emailOrig && _repo.ExisteEmail(email)) throw new Exception("El nuevo correo electrónico ya está registrado.");

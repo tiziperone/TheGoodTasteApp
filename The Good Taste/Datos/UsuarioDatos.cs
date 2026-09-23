@@ -46,6 +46,42 @@ namespace The_Good_Taste.Datos
             return null;
         }
 
+        // NUEVO MÉTODO: Registra una localidad nueva o devuelve el ID si ya existe (considera Provincia dinámicamente)
+        public int RegistrarYObtenerIdLocalidad(string nombre, string provincia)
+        {
+            using (SqlConnection conexion = new SqlConnection(_cadenaConexion))
+            {
+                conexion.Open();
+
+                // 1. Verificamos si la localidad ya existe buscando coincidencia por nombre y provincia
+                string checkQuery = "SELECT IdLocalidad FROM Localidad WHERE Nombre = @Nombre AND Provincia = @Provincia";
+                using (SqlCommand cmdCheck = new SqlCommand(checkQuery, conexion))
+                {
+                    cmdCheck.Parameters.AddWithValue("@Nombre", nombre);
+                    cmdCheck.Parameters.AddWithValue("@Provincia", provincia);
+                    object result = cmdCheck.ExecuteScalar();
+
+                    if (result != null && result != DBNull.Value)
+                    {
+                        return Convert.ToInt32(result); // Ya existía, retornamos su ID
+                    }
+                }
+
+                // 2. Si no existe, la insertamos utilizando la provincia extraída
+                string insertQuery = @"
+                    INSERT INTO Localidad (Nombre, Provincia) 
+                    OUTPUT INSERTED.IdLocalidad 
+                    VALUES (@Nombre, @Provincia)";
+
+                using (SqlCommand cmdInsert = new SqlCommand(insertQuery, conexion))
+                {
+                    cmdInsert.Parameters.AddWithValue("@Nombre", nombre);
+                    cmdInsert.Parameters.AddWithValue("@Provincia", provincia);
+                    return (int)cmdInsert.ExecuteScalar(); // Retorna el nuevo ID autogenerado
+                }
+            }
+        }
+
         //Ingresar un nuevo usuario
         public bool RegistrarUsuario(int dni, string username, string password, int idRol,
                                      string nombre, string apellido, string direccion, int idLocalidad,
