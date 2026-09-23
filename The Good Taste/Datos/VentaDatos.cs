@@ -15,7 +15,7 @@ namespace The_Good_Taste.Datos
 
                 try
                 {
-                    // 1. Insertar cabecera de la venta
+                    //Para registrar una venta
                     string queryVenta = @"INSERT INTO Ventas (Fecha, IdCliente, MetodoEnvio, DireccionEnvio, Total) 
                                           VALUES (@Fecha, @IdCliente, @MetodoEnvio, @DireccionEnvio, @Total);
                                           SELECT SCOPE_IDENTITY();";
@@ -29,7 +29,7 @@ namespace The_Good_Taste.Datos
 
                     int idVentaGenerado = Convert.ToInt32(cmdVenta.ExecuteScalar());
 
-                    // 2. Insertar cada detalle y descontar stock
+                    //Registrar los detalles de dicha venta y actualizar el stock del producto
                     foreach (var item in venta.Detalles)
                     {
                         string queryDetalle = @"INSERT INTO VentaDetalles (IdVenta, IdProducto, Cantidad, PrecioUnitario) 

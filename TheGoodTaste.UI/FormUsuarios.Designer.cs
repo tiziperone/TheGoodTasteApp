@@ -1,6 +1,6 @@
 ﻿namespace TheGoodTaste.UI
 {
-    partial class FormUsuarios
+    partial class FormUsuarios //Clase que representa el formulario de gestión de usuarios
     {
         /// <summary>
         /// Required designer variable.

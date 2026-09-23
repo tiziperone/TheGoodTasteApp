@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace The_Good_Taste.Entidades
+namespace The_Good_Taste.Entidades //Clase que representa un rol de un usuario del sistema
 {
     public enum RolUsuario
     {
@@ -15,8 +15,8 @@ namespace The_Good_Taste.Entidades
         public string NombreUsuario { get; set; }
         public string Email { get; set; }
         public string PasswordHash { get; set; }
-        public RolUsuario Rol { get; set; } // "admin" o "vendedor"
-        public bool Activo { get; set; }// "asas"
+        public RolUsuario Rol { get; set; } // "admin" o "vendedor" o "gerente"
+        public bool Activo { get; set; }
         public DateTime? LastSeenAt { get; set; }
     }
 }

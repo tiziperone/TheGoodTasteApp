@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace TheGoodTaste.UI
+namespace TheGoodTaste.UI //Clase que representa el formulario de reportes
 {
     public partial class FormReportes : Form
     {

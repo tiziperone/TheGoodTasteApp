@@ -7,7 +7,7 @@ using The_Good_Taste.Entidades;
 
 namespace TheGoodTaste.UI
 {
-    public partial class FormPuntoVenta : Form
+    public partial class FormPuntoVenta : Form //Clase que representa el formulario de punto de venta
     {
         private readonly VentaNegocio _negocio = new VentaNegocio();
 

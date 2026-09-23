@@ -4,7 +4,7 @@ using TheGoodTaste.Negocio;
 
 namespace TheGoodTaste.UI
 {
-    public partial class FormClientes : Form
+    public partial class FormClientes : Form //Clase que maneja la interfaz de usuario para la gestión de clientes
     {
         private readonly ClienteNegocio _negocio = new ClienteNegocio();
 

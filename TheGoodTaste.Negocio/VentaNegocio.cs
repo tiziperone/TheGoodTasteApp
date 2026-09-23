@@ -4,7 +4,7 @@ using The_Good_Taste.Entidades;
 
 namespace TheGoodTaste.Negocio
 {
-    public class VentaNegocio
+    public class VentaNegocio//Clase que maneja la lógica de negocio relacionada con las ventas
     {
         public void RegistrarVenta(Venta nuevaVenta)
         {

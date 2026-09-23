@@ -6,7 +6,7 @@ namespace The_Good_Taste.Datos
 {
     internal static class Conexion
     {
-        // Obtiene la cadena de conexión dinámicamente desde el archivo App.config
+        // Obtiene la cadena de conexión desde el archivo App.config
         private static readonly string CadenaConexion =
             ConfigurationManager.ConnectionStrings["CadenaConexion"]?.ConnectionString
             ?? throw new InvalidOperationException("No se encontró la cadena 'CadenaConexion' en el archivo App.config.");

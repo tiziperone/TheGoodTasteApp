@@ -10,7 +10,7 @@ namespace The_Good_Taste.Datos
     {
         private readonly string _cadenaConexion = ConfigurationManager.ConnectionStrings["CadenaConexion"].ConnectionString;
 
-        // 1. LOGIN
+        //Login
         public UsuarioSistema Autenticar(string user, string pass)
         {
             string query = @"
@@ -46,7 +46,7 @@ namespace The_Good_Taste.Datos
             return null;
         }
 
-        // 2. INSERTAR NUEVO USUARIO
+        //Ingresar un nuevo usuario
         public bool RegistrarUsuario(int dni, string username, string password, int idRol,
                                      string nombre, string apellido, string direccion, int idLocalidad,
                                      DateTime fechaNacimiento, string telefono, string email, string sexo)
@@ -80,12 +80,11 @@ namespace The_Good_Taste.Datos
             }
         }
 
-        // 3. ACTUALIZAR USUARIO EXISTENTE
+        //Actualizar algun dato de algun usuario existente
         public bool ActualizarUsuario(int dni, string username, string password, int idRol,
                              string nombre, string apellido, string direccion, int idLocalidad,
                              DateTime fechaNacimiento, string telefono, string email, string sexo)
         {
-            // Solo actualizamos la contraseña si escribieron algo distinto a los asteriscos
             bool actualizaPass = password != "********" && !string.IsNullOrWhiteSpace(password);
 
             string query = @"
@@ -126,7 +125,7 @@ namespace The_Good_Taste.Datos
             }
         }
 
-        // 4. EXISTE DNI
+        //Comprueba si existe ya algun usuario con ese dni
         public bool ExisteDNI(int dni)
         {
             using (SqlConnection conexion = new SqlConnection(_cadenaConexion))
@@ -140,7 +139,7 @@ namespace The_Good_Taste.Datos
             }
         }
 
-        // 5. EXISTE USUARIO
+        //Comprueba si existe algun usuario con ese mismo nombre de usuario
         public bool ExisteUsuario(string username)
         {
             using (SqlConnection conexion = new SqlConnection(_cadenaConexion))
@@ -154,7 +153,7 @@ namespace The_Good_Taste.Datos
             }
         }
 
-        // 6. EXISTE EMAIL
+        //Comprueba si es que existe algun usuario con ese mail
         public bool ExisteEmail(string email)
         {
             using (SqlConnection conexion = new SqlConnection(_cadenaConexion))
@@ -168,7 +167,7 @@ namespace The_Good_Taste.Datos
             }
         }
 
-        // 7. EXISTE TELEFONO
+        //Comprueba si existe algun usuario con ese numero de telefono asociado
         public bool ExisteTelefono(string telefono)
         {
             using (SqlConnection conexion = new SqlConnection(_cadenaConexion))
@@ -182,7 +181,7 @@ namespace The_Good_Taste.Datos
             }
         }
 
-        // 8. OBTENER FILA COMPLETA POR DNI (Para el doble clic)
+        //Obtiene un usuario por su dni (PK), devuelve null si no existe
         public DataRow ObtenerUsuarioPorDNI(int dni)
         {
             DataTable dt = new DataTable();
@@ -202,7 +201,7 @@ namespace The_Good_Taste.Datos
             return dt.Rows.Count > 0 ? dt.Rows[0] : null;
         }
 
-        // 9. GRILLA
+        //Graba un nuevo usuario en la base de datos, devuelve true si se pudo insertar correctamente
         public DataTable ObtenerUsuariosPorEstado(bool activos)
         {
             DataTable dt = new DataTable();
@@ -232,7 +231,7 @@ namespace The_Good_Taste.Datos
             return dt;
         }
 
-        // 10. CAMBIAR ESTADO
+        //Cambia el estado de un usuario (activo/inactivo)
         public bool CambiarEstadoUsuario(int dni, bool nuevoEstado)
         {
             using (SqlConnection conexion = new SqlConnection(_cadenaConexion))
@@ -248,7 +247,7 @@ namespace The_Good_Taste.Datos
             }
         }
 
-        // 11. OBTENER LOCALIDADES
+        //Obtiene todas las localidades de la base de datos, devuelve un DataTable con IdLocalidad y Descripcion
         public DataTable ObtenerLocalidades()
         {
             DataTable dt = new DataTable();

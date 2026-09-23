@@ -1,6 +1,6 @@
 ﻿namespace TheGoodTaste.UI
 {
-    partial class FormLogin
+    partial class FormLogin //Clase que representa el formulario de inicio de sesión, en codigo
     {
         private System.ComponentModel.IContainer components = null;
 

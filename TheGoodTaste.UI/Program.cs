@@ -6,7 +6,7 @@ using System.Windows.Forms;
 
 namespace TheGoodTaste.UI
 {
-    internal static class Program
+    internal static class Program//Clase principal que inicia la aplicación
     {
         /// <summary>
         /// Punto de entrada principal para la aplicación.

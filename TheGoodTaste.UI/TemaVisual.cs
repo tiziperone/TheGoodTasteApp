@@ -3,7 +3,7 @@ using System.Windows.Forms;
 
 namespace TheGoodTaste.UI
 {
-    public static class TemaVisual
+    public static class TemaVisual//Clase estática que define el tema visual de la aplicación
     {
         public static Color ColorFondoGeneral = Color.FromArgb(52, 38, 30);
         public static Color ColorFondoGrilla = Color.FromArgb(40, 28, 22);

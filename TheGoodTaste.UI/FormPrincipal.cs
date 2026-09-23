@@ -5,12 +5,12 @@ using The_Good_Taste.Entidades;
 
 namespace TheGoodTaste.UI
 {
-    public partial class FormPrincipal : Form
+    public partial class FormPrincipal : Form //Clase principal del formulario que maneja la navegación y la interfaz de usuario
     {
         private readonly UsuarioSistema _usuarioActual;
         private Button _botonActivo = null;
 
-        // CONSTANTES DE COLOR
+        //Colores para el tema visual
         private readonly Color ColorFondoPanel = Color.FromArgb(35, 25, 20);   // Marrón oscuro
         private readonly Color ColorBotonBase = Color.FromArgb(60, 42, 33);    // Marrón café
         private readonly Color ColorBotonActivo = Color.FromArgb(180, 130, 40); // Dorado
@@ -89,7 +89,6 @@ namespace TheGoodTaste.UI
             switch (keyData)
             {
                 case Keys.F1:
-                    // Verificamos .Enabled para que no pueda entrar con atajos si está bloqueado
                     if (btnProductos != null && btnProductos.Enabled) btnProductos.PerformClick();
                     return true;
                 case Keys.F2:
@@ -117,12 +116,10 @@ namespace TheGoodTaste.UI
 
             panelSuperior.BackColor = ColorFondoPanel;
 
-            // Restablece el estilo base de los botones del panel
             foreach (Control control in panelSuperior.Controls)
             {
                 if (control is Button btn && btn != btnSalir)
                 {
-                    // IMPORTANTE: Solo restauramos el color si el botón tiene permisos (Enabled)
                     if (btn.Enabled)
                     {
                         btn.BackColor = ColorBotonBase;

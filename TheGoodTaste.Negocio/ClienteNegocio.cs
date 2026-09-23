@@ -3,7 +3,7 @@ using System.Text.RegularExpressions;
 
 namespace TheGoodTaste.Negocio
 {
-    public class ClienteNegocio
+    public class ClienteNegocio //Clase que contiene la lógica de negocio relacionada con los clientes
     {
         public void GuardarCliente(string dni, string nombre, string apellido, string email, string telefono)
         {
@@ -13,8 +13,6 @@ namespace TheGoodTaste.Negocio
             string emailPattern = @"^[^@\s]+@[^@\s]+\.[^@\s]+$";
             if (!Regex.IsMatch(email, emailPattern))
                 throw new Exception("El correo electrónico no tiene un formato válido (ejemplo: usuario@correo.com).");
-
-            // Aquí se llamaría a ClienteDatos.GuardarCliente(...)
         }
     }
 }

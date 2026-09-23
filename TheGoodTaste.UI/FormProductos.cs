@@ -7,7 +7,7 @@ using The_Good_Taste.Entidades;
 
 namespace TheGoodTaste.UI
 {
-    public partial class FormProductos : Form
+    public partial class FormProductos : Form //Clase que representa el formulario de gestión de productos
     {
         private readonly ProductoNegocio _negocio = new ProductoNegocio();
 

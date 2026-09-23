@@ -1,6 +1,6 @@
 ﻿namespace TheGoodTaste.UI
 {
-    partial class FormPrincipal
+    partial class FormPrincipal //Clase principal del formulario que maneja la navegación y la interfaz de usuario
     {
         /// <summary>
         /// Variable del diseñador necesaria.

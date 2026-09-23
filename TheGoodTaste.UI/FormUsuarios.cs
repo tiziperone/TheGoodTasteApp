@@ -7,7 +7,7 @@ using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using The_Good_Taste.Datos;
 
-namespace TheGoodTaste.UI
+namespace TheGoodTaste.UI //Clase que representa el formulario de gestión de usuarios
 {
     public partial class FormUsuarios : Form
     {
@@ -22,7 +22,7 @@ namespace TheGoodTaste.UI
         private void FormUsuarios_Load(object sender, EventArgs e)
         {
             TemaVisual.AplicarEstilo(this);
-            ConfigurarLimitesCaracteres(); // Se establecen límites y bloqueos
+            ConfigurarLimitesCaracteres(); //Se establecen límites y bloqueos
             CargarRoles();
             CargarLocalidades();
             ConfigurarEventos();
@@ -40,7 +40,7 @@ namespace TheGoodTaste.UI
 
         private void ConfigurarLimitesCaracteres()
         {
-            // Se limita la cantidad de caracteres según la base de datos
+            //Se limita la cantidad de caracteres según la base de datos
             textBoxName.MaxLength = 50;
             textBoxApellido.MaxLength = 50;
             textBoxDNI.MaxLength = 8;
@@ -49,7 +49,7 @@ namespace TheGoodTaste.UI
             textBoxDir.MaxLength = 100;
             textBoxNroTel.MaxLength = 15;
 
-            // Se bloquea la contraseña para que el usuario no pueda editarla manualmente
+            //Se bloquea la contraseña para que el usuario no pueda editarla manualmente
             textBoxPass.ReadOnly = true;
         }
 
@@ -132,7 +132,7 @@ namespace TheGoodTaste.UI
 
             textBoxDNI.TextChanged += (s, e) =>
             {
-                // Sigue replicando el DNI en la contraseña (aunque esté bloqueada)
+                //Sigue replicando el DNI en la contraseña (aunque esté bloqueada)
                 if (!_idUsuarioSeleccionado.HasValue)
                     textBoxPass.Text = textBoxDNI.Text.Trim();
             };
@@ -370,7 +370,7 @@ namespace TheGoodTaste.UI
             {
                 int dni = Convert.ToInt32(textBoxDNI.Text.Trim());
                 string username = textBoxUser.Text.Trim();
-                string password = textBoxDNI.Text.Trim(); // Como está bloqueado, forzamos que siempre sea el DNI
+                string password = textBoxDNI.Text.Trim(); //Como está bloqueado, forzamos que siempre sea el DNI
                 string nombre = textBoxName.Text.Trim();
                 string apellido = textBoxApellido.Text.Trim();
                 int idRol = Convert.ToInt32(comboBox1.SelectedValue);
@@ -383,7 +383,7 @@ namespace TheGoodTaste.UI
 
                 UsuarioDatos repo = new UsuarioDatos();
 
-                if (!_idUsuarioSeleccionado.HasValue) // ALTA
+                if (!_idUsuarioSeleccionado.HasValue) //Alta de nuevo usuario
                 {
                     if (repo.ExisteDNI(dni))
                     {
@@ -417,7 +417,7 @@ namespace TheGoodTaste.UI
                         CargarGrillaUsuarios(true);
                     }
                 }
-                else // MODIFICACIÓN
+                else //Modificación de usuario existente
                 {
                     // Validaciones para asegurar que los nuevos datos no choquen con OTROS registros
                     if (username != _datosOriginales["Username"].ToString() && repo.ExisteUsuario(username))
@@ -478,8 +478,7 @@ namespace TheGoodTaste.UI
 
                     if (confirmacion == DialogResult.Yes)
                     {
-                        // Para la actualización mantenemos el password original (no lo alteramos desde esta UI)
-                        string currentDbPassword = _datosOriginales["Clave"].ToString(); // Asumiendo que tu BD se llama 'Clave' o adaptarlo
+                        string currentDbPassword = _datosOriginales["Clave"].ToString();
 
                         if (repo.ActualizarUsuario(dni, username, currentDbPassword, idRol, nombre, apellido, direccion, idLocalidad, fechaNacimiento, telefono, email, sexo))
                         {

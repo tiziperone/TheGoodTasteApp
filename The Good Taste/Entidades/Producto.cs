@@ -2,7 +2,7 @@
 
 namespace The_Good_Taste.Entidades
 {
-    public class Producto
+    public class Producto //Clase que representa un producto en el sistema
     {
         public int IdProducto { get; set; }
         public string Codigo { get; set; }

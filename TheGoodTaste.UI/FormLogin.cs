@@ -5,7 +5,7 @@ using The_Good_Taste.Entidades;
 
 namespace TheGoodTaste.UI
 {
-    public partial class FormLogin : Form
+    public partial class FormLogin : Form //Clase que representa el formulario de inicio de sesión
     {
         public UsuarioSistema UsuarioAutenticado { get; private set; }
         private readonly UsuarioNegocio _negocio = new UsuarioNegocio();

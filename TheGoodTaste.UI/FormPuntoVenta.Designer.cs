@@ -2,7 +2,7 @@
 {
     partial class FormPuntoVenta
     {
-        private System.ComponentModel.IContainer components = null;
+        private System.ComponentModel.IContainer components = null; //Variable del diseñador necesaria.
 
         protected override void Dispose(bool disposing)
         {

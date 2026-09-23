@@ -2,7 +2,7 @@
 
 namespace The_Good_Taste.Entidades
 {
-    public class Cliente
+    public class Cliente // Clase que representa a un cliente en el sistema
     {
         public int IdCliente { get; set; }
         public string Dni { get; set; }
@@ -16,7 +16,6 @@ namespace The_Good_Taste.Entidades
         public string Localiad { get; set; }
         public string Provincia { get; set; }
         public string Pais { get; set; }
-
         public DateTime FechaAlta { get; set; }
         public bool Activo { get; set; }
     }

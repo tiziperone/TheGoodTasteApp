@@ -3,7 +3,7 @@ using System.Windows.Forms;
 
 namespace TheGoodTaste.UI
 {
-    public partial class FormReporteGerente : Form
+    public partial class FormReporteGerente : Form //Clase que representa el formulario de reportes para el gerente
     {
         public FormReporteGerente()
         {
@@ -12,7 +12,7 @@ namespace TheGoodTaste.UI
 
         private void FormReporteGerente_Load(object sender, EventArgs e)
         {
-            // Aplica los colores marrones/dorados a tus controles
+            //Aplica los colores marrones/dorados
             TemaVisual.AplicarEstilo(this);
 
             // Rango por defecto para las fechas
@@ -21,7 +21,7 @@ namespace TheGoodTaste.UI
             fechaHasta.MaxDate = DateTime.Today;
         }
 
-        // Métodos vacíos requeridos por el Diseñador para que no dé error al compilar
+        //Métodos vacíos requeridos por el Diseñador para que no dé error al compilar
         private void tituloDesde_Click(object sender, EventArgs e) { }
         private void label1_Click(object sender, EventArgs e) { }
         private void fechaDesde_ValueChanged(object sender, EventArgs e) { }

@@ -6,7 +6,7 @@ using The_Good_Taste.Entidades;
 
 namespace TheGoodTaste.Negocio
 {
-    public class UsuarioNegocio
+    public class UsuarioNegocio//Clase que maneja la lógica de negocio relacionada con los usuarios del sistema
     {
         private readonly UsuarioDatos _repo = new UsuarioDatos();
 
@@ -64,7 +64,7 @@ namespace TheGoodTaste.Negocio
                 string usernameOrig = datosOriginales["Username"].ToString();
                 string emailOrig = datosOriginales["Email"].ToString();
                 string telOrig = datosOriginales["Telefono"]?.ToString() ?? "";
-                string passwordActual = datosOriginales["PasswordHash"].ToString(); // Asume que la columna se llama PasswordHash
+                string passwordActual = datosOriginales["PasswordHash"].ToString(); //Asume que la columna se llama PasswordHash
 
                 if (username != usernameOrig && _repo.ExisteUsuario(username)) throw new Exception("El nuevo nombre de usuario ya está siendo utilizado.");
                 if (email != emailOrig && _repo.ExisteEmail(email)) throw new Exception("El nuevo correo electrónico ya está registrado.");

@@ -5,9 +5,8 @@ using The_Good_Taste.Entidades;
 
 namespace TheGoodTaste.Negocio
 {
-    public class ProductoNegocio
+    public class ProductoNegocio//Clase que representa la lógica de negocio para la gestión de productos en el sistema
     {
-        // Simulador de BD en memoria movido a la capa de negocio
         private static List<Producto> _listaProductosEnMemoria = new List<Producto>();
         private static int _contadorId = 1;
 

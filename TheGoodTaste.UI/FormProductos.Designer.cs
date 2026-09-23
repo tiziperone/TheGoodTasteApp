@@ -1,6 +1,6 @@
 ﻿namespace TheGoodTaste.UI
 {
-    partial class FormProductos
+    partial class FormProductos//Clase parcial que contiene el código generado por el diseñador para la interfaz de usuario del formulario de productos
     {
         /// <summary>
         /// Required designer variable.

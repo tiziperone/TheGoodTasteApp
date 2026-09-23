@@ -1,6 +1,6 @@
 ﻿namespace TheGoodTaste.UI
 {
-    partial class FormReportes
+    partial class FormReportes //Clase que representa el formulario de reportes
     {
         /// <summary>
         /// Required designer variable.
