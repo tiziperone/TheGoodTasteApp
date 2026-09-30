@@ -21,6 +21,7 @@ namespace TheGoodTaste.UI
 
         private void FormClientes_Load(object sender, EventArgs e)
         {
+            TemaVisual.AplicarEstilo(this);
             ConfigurarLimitesCaracteres();
             ConfigurarGrilla();
             ConfigurarEventos();
@@ -275,7 +276,6 @@ namespace TheGoodTaste.UI
 
         private void dgvClientes_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
-            // SOLUCIÓN AL ERROR DE TU IMAGEN: Asegurarse de que la fila sigue existiendo antes de procesarla.
             if (e.RowIndex < 0 || e.RowIndex >= dgvClientes.Rows.Count) return;
 
             string nombreColumna = dgvClientes.Columns[e.ColumnIndex].Name;
@@ -298,7 +298,6 @@ namespace TheGoodTaste.UI
             string dni = fila.Cells["dniCliente"].Value.ToString();
             string clienteNombre = fila.Cells["nombreCliente"]?.Value?.ToString() ?? "este cliente";
 
-            // Si vemos activos el nuevo estado es falso (baja), si vemos inactivos es verdadero (alta)
             bool nuevoEstado = !_verActivos;
             string accion = nuevoEstado ? "reactivar a" : "dar de baja a";
 
@@ -322,7 +321,7 @@ namespace TheGoodTaste.UI
 
         private void CargarClienteParaEdicion(DataGridViewRow fila)
         {
-            // Validamos lo que pediste: no se pueden modificar los inactivos
+            //  no se pueden modificar los inactivos
             if (!_verActivos)
             {
                 MessageBox.Show("No se pueden modificar datos de un cliente dado de baja.", "Acción no permitida", MessageBoxButtons.OK, MessageBoxIcon.Information);
