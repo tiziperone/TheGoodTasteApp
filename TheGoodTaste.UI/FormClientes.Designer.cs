@@ -208,7 +208,7 @@
             this.btnGuardar.TabIndex = 19;
             this.btnGuardar.Text = "Guardar";
             this.btnGuardar.UseVisualStyleBackColor = true;
-            this.btnGuardar.Click += new System.EventHandler(this.btnGuardar_Click_1);
+            
             // 
             // btnLimpiar
             // 
@@ -218,7 +218,7 @@
             this.btnLimpiar.TabIndex = 22;
             this.btnLimpiar.Text = "Limpiar";
             this.btnLimpiar.UseVisualStyleBackColor = true;
-            this.btnLimpiar.Click += new System.EventHandler(this.btnLimpiar_Click_1);
+            
             // 
             // label10
             // 
@@ -276,7 +276,7 @@
             this.btnActivo.TabIndex = 29;
             this.btnActivo.Text = "Activo";
             this.btnActivo.UseVisualStyleBackColor = true;
-            this.btnActivo.Click += new System.EventHandler(this.button1_Click);
+            
             // 
             // btnInactivo
             // 
@@ -286,7 +286,7 @@
             this.btnInactivo.TabIndex = 30;
             this.btnInactivo.Text = "Inactivo";
             this.btnInactivo.UseVisualStyleBackColor = true;
-            this.btnInactivo.Click += new System.EventHandler(this.button2_Click);
+          
             // 
             // FormClientes
             // 

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Data;
 using System.Text.RegularExpressions;
-using The_Good_Taste.Datos;
+using The_Good_Taste.Datos; // Ajustar namespace según tu capa de datos
 
 namespace TheGoodTaste.Negocio
 {
@@ -9,15 +9,28 @@ namespace TheGoodTaste.Negocio
     {
         private readonly ClienteDatos _datos = new ClienteDatos();
 
-        // Obtener clientes para la grilla
+        // Obtener clientes por estado (activos/inactivos)
         public DataTable ObtenerClientes(bool estadoActivo)
         {
             return _datos.ListarClientes(estadoActivo);
         }
 
+        // Obtener un cliente en particular por DNI
+        public DataRow ObtenerClientePorDNI(string dni)
+        {
+            if (string.IsNullOrWhiteSpace(dni))
+                throw new Exception("El DNI es requerido para la consulta.");
+
+            DataTable dt = _datos.ListarClientes(true); // O método equivalente en datos
+            DataRow[] filas = dt.Select($"DNI = '{dni.Replace("'", "''")}'");
+
+            return filas.Length > 0 ? filas[0] : null;
+        }
+
+        // Guardar cliente con validaciones completas
         public void GuardarCliente(string dni, string nombre, string apellido, DateTime fechaNacimiento, string email, string telefono, string pais, string localidad, string provincia, string calle, string altura)
         {
-            ValidarDatos(dni, fechaNacimiento, email, telefono);
+            ValidarDatos(dni, nombre, apellido, fechaNacimiento, email, telefono);
 
             string campoDuplicado = _datos.VerificarDuplicados(dni, email, telefono);
             if (!string.IsNullOrEmpty(campoDuplicado))
@@ -26,11 +39,11 @@ namespace TheGoodTaste.Negocio
             _datos.InsertarCliente(dni, nombre, apellido, fechaNacimiento, email, telefono, pais, localidad, provincia, calle, altura);
         }
 
+        // Modificar cliente con validación de duplicados excluyendo el propio DNI
         public void ModificarCliente(string dniOriginal, string dniNuevo, string nombre, string apellido, DateTime fechaNacimiento, string email, string telefono, string pais, string localidad, string provincia, string calle, string altura)
         {
-            ValidarDatos(dniNuevo, fechaNacimiento, email, telefono);
+            ValidarDatos(dniNuevo, nombre, apellido, fechaNacimiento, email, telefono);
 
-            // Validamos duplicados asegurándonos de NO contar al propio usuario que estamos modificando
             string campoDuplicado = _datos.VerificarDuplicadosModificacion(dniOriginal, dniNuevo, email, telefono);
             if (!string.IsNullOrEmpty(campoDuplicado))
                 throw new Exception($"No se puede modificar. Ya existe otro cliente con el mismo {campoDuplicado}.");
@@ -38,17 +51,32 @@ namespace TheGoodTaste.Negocio
             _datos.ModificarCliente(dniOriginal, dniNuevo, nombre, apellido, fechaNacimiento, email, telefono, pais, localidad, provincia, calle, altura);
         }
 
-        // Centralizamos las validaciones para no repetir código
-        private void ValidarDatos(string dni, DateTime fechaNacimiento, string email, string telefono)
+        // Alta / Baja lógica de cliente
+        public bool CambiarEstadoCliente(string dni, bool estado)
         {
-            if (dni.Length < 7 || dni.Length > 8)
-                throw new Exception("El DNI debe tener 7 u 8 dígitos.");
+            if (string.IsNullOrWhiteSpace(dni))
+                throw new Exception("No se especificó un DNI válido para cambiar el estado.");
 
-            if (telefono.Length < 10)
+            return _datos.CambiarEstadoCliente(dni, estado);
+        }
+
+        // Validaciones integrales
+        private void ValidarDatos(string dni, string nombre, string apellido, DateTime fechaNacimiento, string email, string telefono)
+        {
+            if (string.IsNullOrWhiteSpace(nombre))
+                throw new Exception("El nombre del cliente no puede estar vacío.");
+
+            if (string.IsNullOrWhiteSpace(apellido))
+                throw new Exception("El apellido del cliente no puede estar vacío.");
+
+            if (string.IsNullOrWhiteSpace(dni) || dni.Length < 7 || dni.Length > 8)
+                throw new Exception("El DNI debe contener entre 7 y 8 dígitos.");
+
+            if (string.IsNullOrWhiteSpace(telefono) || telefono.Length < 10)
                 throw new Exception("El número de teléfono debe tener al menos 10 dígitos.");
 
             string emailPattern = @"^[^@\s]+@[^@\s]+\.[^@\s]+$";
-            if (!Regex.IsMatch(email, emailPattern))
+            if (string.IsNullOrWhiteSpace(email) || !Regex.IsMatch(email, emailPattern))
                 throw new Exception("El correo electrónico no tiene un formato válido.");
 
             int edad = DateTime.Today.Year - fechaNacimiento.Year;

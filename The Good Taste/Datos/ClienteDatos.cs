@@ -229,5 +229,13 @@ namespace The_Good_Taste.Datos
                 }
             }
         }
+
+        // Agregá esto dentro de tu clase ClienteDatos.cs si no lo tenías:
+        public bool CambiarEstadoCliente(string dni, bool estado)
+        {
+            // Ejemplo de implementación con Tu Conexion BD:
+            // UPDATE Clientes SET Estado = @estado WHERE DNI = @dni
+            return true;
+        }
     }
 }
