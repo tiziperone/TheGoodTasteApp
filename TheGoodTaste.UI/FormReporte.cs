@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Drawing;
+using System.Data;
 using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
-using The_Good_Taste.Entidades;
+using TheGoodTaste.Negocio;
+using The_Good_Taste.Entidades; // Asegúrate de que aquí esté UsuarioSistema y RolUsuario
 
 namespace TheGoodTaste.UI
 {
@@ -18,36 +20,33 @@ namespace TheGoodTaste.UI
         private DataGridView dgvReportes;
         private Chart chartReportes;
 
-
         public FormReporte()
         {
             InitializeComponent();
         }
 
+        // El menú principal DEBE llamar a este constructor pasándole el usuario logueado
         public FormReporte(UsuarioSistema usuario) : this()
         {
             _usuarioActual = usuario;
         }
 
-        private void FormReporteGerente_Load(object sender, EventArgs e)
+        private void FormReporte_Load(object sender, EventArgs e)
         {
-            TemaVisual.AplicarEstilo(this);
+            // TemaVisual.AplicarEstilo(this); // Descomentar si usas tu clase de estilos
 
-            // 1. Maquetado de la vista por código
             ConstruirEstructuraVistas();
-
-            // 2. Configurar opciones y gráficos según el rol
             CargarOpcionesPorRol();
-            ConfigurarVistaSegunRol();
+            ConfigurarVistaInicialSegunRol();
         }
 
         private void ConstruirEstructuraVistas()
         {
             this.Controls.Clear();
             this.Padding = new Padding(15);
-            this.BackColor = Color.FromArgb(35, 25, 20); // Fondo del tema
+            this.BackColor = Color.FromArgb(35, 25, 20);
 
-            // --- PANEL DE FILTROS SUPERIOR ---
+            // PANEL SUPERIOR
             pnlSuperior = new Panel
             {
                 Dock = DockStyle.Top,
@@ -92,14 +91,13 @@ namespace TheGoodTaste.UI
             pnlSuperior.Controls.Add(cmbTipoReporte);
             pnlSuperior.Controls.Add(btnFiltrar);
 
-            // --- PANEL CENTRAL (Grilla a la Izquierda + Gráfico a la Derecha) ---
+            // PANEL CENTRAL
             pnlContenido = new Panel
             {
                 Dock = DockStyle.Fill,
                 Padding = new Padding(0, 10, 0, 0)
             };
 
-            // Gráfico (Chart)
             chartReportes = new Chart
             {
                 Dock = DockStyle.Right,
@@ -114,7 +112,10 @@ namespace TheGoodTaste.UI
             ca.AxisY.LineColor = Color.LightGray;
             chartReportes.ChartAreas.Add(ca);
 
-            // DataGridView (Tabla vacía lista para la BD)
+            // Inicializar la serie base
+            Series s = new Series("Serie1");
+            chartReportes.Series.Add(s);
+
             dgvReportes = new DataGridView
             {
                 Dock = DockStyle.Fill,
@@ -128,7 +129,6 @@ namespace TheGoodTaste.UI
             pnlContenido.Controls.Add(dgvReportes);
             pnlContenido.Controls.Add(chartReportes);
 
-            // Agregar al Formulario
             this.Controls.Add(pnlContenido);
             this.Controls.Add(pnlSuperior);
         }
@@ -137,12 +137,13 @@ namespace TheGoodTaste.UI
         {
             cmbTipoReporte.Items.Clear();
 
-            if (_usuarioActual?.Rol == RolUsuario.Vendedor)
+            if (_usuarioActual != null && _usuarioActual.Rol == RolUsuario.Vendedor)
             {
                 cmbTipoReporte.Items.Add("Mis Ventas por Período");
                 cmbTipoReporte.Items.Add("Mis Productos Más Vendidos");
+                cmbTipoReporte.Items.Add("Mis Ventas por Categoría");
             }
-            else // Gerente / Admin
+            else
             {
                 cmbTipoReporte.Items.Add("Recaudación Global");
                 cmbTipoReporte.Items.Add("Ventas por Vendedor");
@@ -153,63 +154,80 @@ namespace TheGoodTaste.UI
                 cmbTipoReporte.SelectedIndex = 0;
         }
 
-        private void ConfigurarVistaSegunRol()
+        private void ConfigurarVistaInicialSegunRol()
         {
             if (_usuarioActual == null) return;
 
             if (_usuarioActual.Rol == RolUsuario.Vendedor)
-            {
                 this.Text = $"Reportes - Vendedor: {_usuarioActual.NombreUsuario}";
-                ConfigurarGraficoVendedor();
-            }
-            else // Gerente / Admin
-            {
+            else
                 this.Text = "Reportes Estratégicos - Gerencia";
-                ConfigurarGraficoGerente();
-            }
-        }
-
-        private void ConfigurarGraficoGerente()
-        {
-            chartReportes.Series.Clear();
-            chartReportes.Titles.Clear();
-
-            Title t = chartReportes.Titles.Add("Recaudación General");
-            t.ForeColor = Color.White;
-            t.Font = new Font("Segoe UI", 10f, FontStyle.Bold);
-
-            // Estructura de Barras/Columnas para Gerente
-            Series s = new Series("SerieGerente")
-            {
-                ChartType = SeriesChartType.Column,
-                Color = Color.FromArgb(180, 130, 40) // Dorado
-            };
-            chartReportes.Series.Add(s);
-        }
-
-        private void ConfigurarGraficoVendedor()
-        {
-            chartReportes.Series.Clear();
-            chartReportes.Titles.Clear();
-
-            Title t = chartReportes.Titles.Add("Mis Ventas por Categoría");
-            t.ForeColor = Color.White;
-            t.Font = new Font("Segoe UI", 10f, FontStyle.Bold);
-
-            // Estructura de Anillo/Torta para Vendedor
-            Series s = new Series("SerieVendedor")
-            {
-                ChartType = SeriesChartType.Doughnut
-            };
-            chartReportes.Series.Add(s);
         }
 
         private void BtnFiltrar_Click(object sender, EventArgs e)
         {
-            // Aquí irá la consulta a la base de datos cuando la conectemos
+            if (cmbTipoReporte.SelectedItem == null)
+            {
+                MessageBox.Show("Seleccione un tipo de reporte.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            string reporteSeleccionado = cmbTipoReporte.SelectedItem.ToString();
+            ReporteNegocio negocio = new ReporteNegocio();
+            DataTable dtResultados;
+
+            try
+            {
+                // 1. Obtener datos (Corrección aplicada aquí)
+                if (_usuarioActual.Rol == RolUsuario.Vendedor)
+                    dtResultados = negocio.GenerarReporteVendedor(reporteSeleccionado, _usuarioActual.IdUsuario);
+                else
+                    dtResultados = negocio.GenerarReporteGerente(reporteSeleccionado);
+
+                // 2. Llenar la Grilla
+                dgvReportes.DataSource = dtResultados;
+
+                // 3. Renderizar Gráfico
+                if (dtResultados.Rows.Count > 0)
+                {
+                    string columnaX = dtResultados.Columns[0].ColumnName;
+                    string columnaY = dtResultados.Columns[1].ColumnName;
+
+                    chartReportes.Series[0].Points.DataBindXY(
+                        dtResultados.DefaultView, columnaX,
+                        dtResultados.DefaultView, columnaY
+                    );
+
+                    // 4. Ajustar tipo de gráfico según lo que quede mejor a la vista
+                    if (reporteSeleccionado.Contains("Categoría") || reporteSeleccionado == "Ventas por Vendedor")
+                        chartReportes.Series[0].ChartType = SeriesChartType.Doughnut;
+                    else if (reporteSeleccionado.Contains("Período") || reporteSeleccionado == "Recaudación Global")
+                        chartReportes.Series[0].ChartType = SeriesChartType.Line;
+                    else
+                        chartReportes.Series[0].ChartType = SeriesChartType.Column;
+
+                    chartReportes.Series[0].Color = Color.FromArgb(180, 130, 40); // Dorado del tema
+
+                    chartReportes.Titles.Clear();
+                    Title t = chartReportes.Titles.Add(reporteSeleccionado);
+                    t.ForeColor = Color.White;
+                    t.Font = new Font("Segoe UI", 10f, FontStyle.Bold);
+                }
+                else
+                {
+                    chartReportes.Series[0].Points.Clear();
+                    chartReportes.Titles.Clear();
+                    MessageBox.Show("No se encontraron datos para el reporte seleccionado.", "Sin datos", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error al generar el reporte: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
-        // Compatibilidad con eventos del diseñador previo
+        // Eventos requeridos por el diseñador anterior para evitar error CS1061
+        private void FormReporteGerente_Load(object sender, EventArgs e) => FormReporte_Load(sender, e);
         private void tituloDesde_Click(object sender, EventArgs e) { }
         private void label1_Click(object sender, EventArgs e) { }
         private void fechaDesde_ValueChanged(object sender, EventArgs e) { }
@@ -218,8 +236,6 @@ namespace TheGoodTaste.UI
         private void textBoxBuscarVendedor_TextChanged(object sender, EventArgs e) { }
         private void panelVentasVendedor_Paint(object sender, PaintEventArgs e) { }
         private void panelReportes_Paint(object sender, PaintEventArgs e) { }
-
-        // Métodos de eventos requeridos por el Diseñador para evitar el error CS1061
         private void botonVentasVendedor_Click(object sender, EventArgs e) { }
         private void botonProductoVendido_Click(object sender, EventArgs e) { }
         private void botonVentas_Click(object sender, EventArgs e) { }

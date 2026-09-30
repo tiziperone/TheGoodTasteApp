@@ -105,6 +105,9 @@ namespace TheGoodTaste.UI
                 case Keys.F6:
                     if (btnReportes != null && btnReportes.Enabled) btnReportes.PerformClick();
                     return true;
+                case Keys.F7:
+                    if (buttonCerrarSesion != null && buttonCerrarSesion.Enabled) buttonCerrarSesion.PerformClick();
+                    return true;
                 case Keys.Escape:
                     if (btnSalir != null && btnSalir.Enabled) btnSalir.PerformClick();
                     return true;
