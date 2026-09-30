@@ -32,6 +32,7 @@
             this.panel1 = new System.Windows.Forms.Panel();
             this.panelContenedor = new System.Windows.Forms.Panel();
             this.panelSuperior = new System.Windows.Forms.Panel();
+            this.buttonCerrarSesion = new System.Windows.Forms.Button();
             this.btnSalir = new System.Windows.Forms.Button();
             this.btnReportes = new System.Windows.Forms.Button();
             this.btnUsuarios = new System.Windows.Forms.Button();
@@ -39,7 +40,6 @@
             this.btnClientes = new System.Windows.Forms.Button();
             this.btnProductos = new System.Windows.Forms.Button();
             this.pbLogoInicio = new System.Windows.Forms.PictureBox();
-            this.buttonCerrarSesion = new System.Windows.Forms.Button();
             this.panelContenedor.SuspendLayout();
             this.panelSuperior.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pbLogoInicio)).BeginInit();
@@ -78,6 +78,27 @@
             this.panelSuperior.Name = "panelSuperior";
             this.panelSuperior.Size = new System.Drawing.Size(1219, 113);
             this.panelSuperior.TabIndex = 1;
+            // 
+            // buttonCerrarSesion
+            // 
+            this.buttonCerrarSesion.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.buttonCerrarSesion.BackColor = System.Drawing.Color.Transparent;
+            this.buttonCerrarSesion.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("buttonCerrarSesion.BackgroundImage")));
+            this.buttonCerrarSesion.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.buttonCerrarSesion.FlatAppearance.BorderSize = 0;
+            this.buttonCerrarSesion.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(130)))), ((int)(((byte)(40)))));
+            this.buttonCerrarSesion.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(80)))), ((int)(((byte)(58)))), ((int)(((byte)(45)))));
+            this.buttonCerrarSesion.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.buttonCerrarSesion.ForeColor = System.Drawing.SystemColors.ButtonHighlight;
+            this.buttonCerrarSesion.Location = new System.Drawing.Point(935, 12);
+            this.buttonCerrarSesion.Name = "buttonCerrarSesion";
+            this.buttonCerrarSesion.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
+            this.buttonCerrarSesion.Size = new System.Drawing.Size(128, 86);
+            this.buttonCerrarSesion.TabIndex = 1;
+            this.buttonCerrarSesion.Text = "[F7] Cerrar Sesion";
+            this.buttonCerrarSesion.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+            this.buttonCerrarSesion.UseVisualStyleBackColor = false;
+            this.buttonCerrarSesion.Click += new System.EventHandler(this.buttonCerrarSesion_Click);
             // 
             // btnSalir
             // 
@@ -214,26 +235,6 @@
             this.pbLogoInicio.TabIndex = 0;
             this.pbLogoInicio.TabStop = false;
             this.pbLogoInicio.Click += new System.EventHandler(this.pbLogoInicio_Click);
-            // 
-            // buttonCerrarSesion
-            // 
-            this.buttonCerrarSesion.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.buttonCerrarSesion.BackColor = System.Drawing.Color.Transparent;
-            this.buttonCerrarSesion.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
-            this.buttonCerrarSesion.FlatAppearance.BorderSize = 0;
-            this.buttonCerrarSesion.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(130)))), ((int)(((byte)(40)))));
-            this.buttonCerrarSesion.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(80)))), ((int)(((byte)(58)))), ((int)(((byte)(45)))));
-            this.buttonCerrarSesion.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.buttonCerrarSesion.ForeColor = System.Drawing.SystemColors.ButtonHighlight;
-            this.buttonCerrarSesion.Location = new System.Drawing.Point(935, 12);
-            this.buttonCerrarSesion.Name = "buttonCerrarSesion";
-            this.buttonCerrarSesion.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
-            this.buttonCerrarSesion.Size = new System.Drawing.Size(128, 86);
-            this.buttonCerrarSesion.TabIndex = 1;
-            this.buttonCerrarSesion.Text = "[F7] Cerrar Sesion";
-            this.buttonCerrarSesion.TextAlign = System.Drawing.ContentAlignment.TopCenter;
-            this.buttonCerrarSesion.UseVisualStyleBackColor = false;
-            this.buttonCerrarSesion.Click += new System.EventHandler(this.buttonCerrarSesion_Click);
             // 
             // FormPrincipal
             // 
