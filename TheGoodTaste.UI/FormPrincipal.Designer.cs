@@ -39,6 +39,7 @@
             this.btnClientes = new System.Windows.Forms.Button();
             this.btnProductos = new System.Windows.Forms.Button();
             this.pbLogoInicio = new System.Windows.Forms.PictureBox();
+            this.buttonCerrarSesion = new System.Windows.Forms.Button();
             this.panelContenedor.SuspendLayout();
             this.panelSuperior.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pbLogoInicio)).BeginInit();
@@ -65,6 +66,7 @@
             // panelSuperior
             // 
             this.panelSuperior.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(35)))), ((int)(((byte)(25)))), ((int)(((byte)(20)))));
+            this.panelSuperior.Controls.Add(this.buttonCerrarSesion);
             this.panelSuperior.Controls.Add(this.btnSalir);
             this.panelSuperior.Controls.Add(this.btnReportes);
             this.panelSuperior.Controls.Add(this.btnUsuarios);
@@ -88,7 +90,7 @@
             this.btnSalir.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(80)))), ((int)(((byte)(58)))), ((int)(((byte)(45)))));
             this.btnSalir.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnSalir.ForeColor = System.Drawing.SystemColors.ButtonHighlight;
-            this.btnSalir.Location = new System.Drawing.Point(983, 12);
+            this.btnSalir.Location = new System.Drawing.Point(1079, 12);
             this.btnSalir.Name = "btnSalir";
             this.btnSalir.Size = new System.Drawing.Size(128, 86);
             this.btnSalir.TabIndex = 0;
@@ -109,7 +111,7 @@
             this.btnReportes.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(80)))), ((int)(((byte)(58)))), ((int)(((byte)(45)))));
             this.btnReportes.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnReportes.ForeColor = System.Drawing.SystemColors.ButtonHighlight;
-            this.btnReportes.Location = new System.Drawing.Point(749, 12);
+            this.btnReportes.Location = new System.Drawing.Point(695, 12);
             this.btnReportes.Name = "btnReportes";
             this.btnReportes.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
             this.btnReportes.Size = new System.Drawing.Size(128, 86);
@@ -130,7 +132,7 @@
             this.btnUsuarios.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(80)))), ((int)(((byte)(58)))), ((int)(((byte)(45)))));
             this.btnUsuarios.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnUsuarios.ForeColor = System.Drawing.SystemColors.ButtonHighlight;
-            this.btnUsuarios.Location = new System.Drawing.Point(593, 12);
+            this.btnUsuarios.Location = new System.Drawing.Point(539, 12);
             this.btnUsuarios.Name = "btnUsuarios";
             this.btnUsuarios.RightToLeft = System.Windows.Forms.RightToLeft.No;
             this.btnUsuarios.Size = new System.Drawing.Size(128, 86);
@@ -151,7 +153,7 @@
             this.btnVentas.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(80)))), ((int)(((byte)(58)))), ((int)(((byte)(45)))));
             this.btnVentas.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnVentas.ForeColor = System.Drawing.SystemColors.ButtonHighlight;
-            this.btnVentas.Location = new System.Drawing.Point(446, 12);
+            this.btnVentas.Location = new System.Drawing.Point(394, 12);
             this.btnVentas.Name = "btnVentas";
             this.btnVentas.Size = new System.Drawing.Size(128, 86);
             this.btnVentas.TabIndex = 0;
@@ -171,7 +173,7 @@
             this.btnClientes.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(80)))), ((int)(((byte)(58)))), ((int)(((byte)(45)))));
             this.btnClientes.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnClientes.ForeColor = System.Drawing.SystemColors.ButtonHighlight;
-            this.btnClientes.Location = new System.Drawing.Point(300, 12);
+            this.btnClientes.Location = new System.Drawing.Point(237, 12);
             this.btnClientes.Name = "btnClientes";
             this.btnClientes.Size = new System.Drawing.Size(128, 86);
             this.btnClientes.TabIndex = 0;
@@ -191,7 +193,7 @@
             this.btnProductos.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(80)))), ((int)(((byte)(58)))), ((int)(((byte)(45)))));
             this.btnProductos.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnProductos.ForeColor = System.Drawing.SystemColors.ButtonHighlight;
-            this.btnProductos.Location = new System.Drawing.Point(155, 12);
+            this.btnProductos.Location = new System.Drawing.Point(65, 12);
             this.btnProductos.Name = "btnProductos";
             this.btnProductos.Size = new System.Drawing.Size(128, 86);
             this.btnProductos.TabIndex = 0;
@@ -212,6 +214,27 @@
             this.pbLogoInicio.TabIndex = 0;
             this.pbLogoInicio.TabStop = false;
             this.pbLogoInicio.Click += new System.EventHandler(this.pbLogoInicio_Click);
+            // 
+            // buttonCerrarSesion
+            // 
+            this.buttonCerrarSesion.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.buttonCerrarSesion.BackColor = System.Drawing.Color.Transparent;
+            this.buttonCerrarSesion.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("buttonCerrarSesion.BackgroundImage")));
+            this.buttonCerrarSesion.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.buttonCerrarSesion.FlatAppearance.BorderSize = 0;
+            this.buttonCerrarSesion.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(130)))), ((int)(((byte)(40)))));
+            this.buttonCerrarSesion.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(80)))), ((int)(((byte)(58)))), ((int)(((byte)(45)))));
+            this.buttonCerrarSesion.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.buttonCerrarSesion.ForeColor = System.Drawing.SystemColors.ButtonHighlight;
+            this.buttonCerrarSesion.Location = new System.Drawing.Point(935, 12);
+            this.buttonCerrarSesion.Name = "buttonCerrarSesion";
+            this.buttonCerrarSesion.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
+            this.buttonCerrarSesion.Size = new System.Drawing.Size(128, 86);
+            this.buttonCerrarSesion.TabIndex = 1;
+            this.buttonCerrarSesion.Text = "[F7] Cerrar Sesion";
+            this.buttonCerrarSesion.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+            this.buttonCerrarSesion.UseVisualStyleBackColor = false;
+            this.buttonCerrarSesion.Click += new System.EventHandler(this.buttonCerrarSesion_Click);
             // 
             // FormPrincipal
             // 
@@ -241,6 +264,7 @@
         private System.Windows.Forms.Button btnClientes;
         private System.Windows.Forms.Button btnSalir;
         private System.Windows.Forms.Button btnReportes;
+        private System.Windows.Forms.Button buttonCerrarSesion;
     }
 }
 

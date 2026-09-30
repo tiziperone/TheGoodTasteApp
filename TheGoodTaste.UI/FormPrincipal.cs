@@ -250,5 +250,22 @@ namespace TheGoodTaste.UI
 
         private void panelContenedor_Paint(object sender, PaintEventArgs e) { }
         private void pbLogoInicio_Click(object sender, EventArgs e) { }
+
+        private void buttonCerrarSesion_Click(object sender, EventArgs e)
+        {
+            // 1. Preguntamos al usuario si realmente quiere salir
+            DialogResult respuesta = MessageBox.Show(
+                "¿Está seguro que desea cerrar la sesión actual?",
+                "Cerrar Sesión",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Question
+            );
+
+            // 2. Si dice que sí, reiniciamos la aplicación
+            if (respuesta == DialogResult.Yes)
+            {
+                Application.Restart();
+            }
+        }
     }
 }
