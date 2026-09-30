@@ -71,8 +71,9 @@ namespace TheGoodTaste.UI
                     // Bloqueamos los módulos que no debe usar
                     DeshabilitarBoton(btnUsuarios);
                     DeshabilitarBoton(btnVentas);
-                    DeshabilitarBoton(btnProductos);
+                   
                     DeshabilitarBoton(btnClientes);
+
                     // Reportes queda habilitado
                     break;
 
@@ -80,6 +81,7 @@ namespace TheGoodTaste.UI
                     // Bloqueamos Usuarios y Reportes
                     DeshabilitarBoton(btnUsuarios);
                     DeshabilitarBoton(btnReportes);
+                    DeshabilitarBoton(btnProductos);
                     // Productos, Clientes y Ventas quedan habilitados
                     break;
             }
@@ -187,9 +189,15 @@ namespace TheGoodTaste.UI
                 ResaltarBotonActivo(null);
             };
 
+            // 1. Pausamos el rediseño para prevenir el fallo de los DataGridViews
+            formularioHijo.SuspendLayout();
+
             this.panelContenedor.Controls.Add(formularioHijo);
             this.panelContenedor.Tag = formularioHijo;
             formularioHijo.BringToFront();
+
+            // 2. Reanudamos el diseño y mostramos
+            formularioHijo.ResumeLayout(true);
             formularioHijo.Show();
         }
 
