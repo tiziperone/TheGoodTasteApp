@@ -7,24 +7,19 @@ namespace The_Good_Taste.Datos
 {
     public class ClienteDatos
     {
-        // ---------------------------------------------------------
-        // 1. MÉTODOS DE LECTURA Y FILTRADO
-        // ---------------------------------------------------------
-
-        public DataTable ListarClientes(bool estadoActivo)
+       
+        public DataTable ListarClientes()
         {
             DataTable dt = new DataTable();
             string query = @"SELECT c.dniCliente, c.nombreCliente, c.apellidoCliente, c.fechaNaciminetoCliente, 
                                     c.correoCliente, c.telefonoCliente, d.paisCliente, d.localidadCliente, 
                                     d.provinciaCliente, d.calleCliente, d.altura 
                              FROM Cliente c
-                             INNER JOIN DireccionCliente d ON c.idDireccionCliente = d.idDireccionCliente
-                             WHERE c.Activo = @Activo"; // Requiere que la columna Activo exista en SQL
+                             INNER JOIN DireccionCliente d ON c.idDireccionCliente = d.idDireccionCliente";
 
             using (SqlConnection con = Conexion.ObtenerConexion())
             {
                 SqlCommand cmd = new SqlCommand(query, con);
-                cmd.Parameters.AddWithValue("@Activo", estadoActivo ? 1 : 0);
                 SqlDataAdapter da = new SqlDataAdapter(cmd);
                 da.Fill(dt);
             }
@@ -66,9 +61,6 @@ namespace The_Good_Taste.Datos
             return cliente;
         }
 
-        // ---------------------------------------------------------
-        // 2. MÉTODOS DE VALIDACIÓN DE DUPLICADOS
-        // ---------------------------------------------------------
 
         public string VerificarDuplicados(string dni, string email, string telefono)
         {
@@ -121,10 +113,6 @@ namespace The_Good_Taste.Datos
             return string.Empty;
         }
 
-        // ---------------------------------------------------------
-        // 3. MÉTODOS DE ESCRITURA (INSERTAR Y MODIFICAR)
-        // ---------------------------------------------------------
-
         public void InsertarCliente(string dni, string nombre, string apellido, DateTime fechaNacimiento, string correo, string telefono, string pais, string localidad, string provincia, string calle, string altura)
         {
             using (SqlConnection con = Conexion.ObtenerConexion())
@@ -134,7 +122,7 @@ namespace The_Good_Taste.Datos
                 {
                     try
                     {
-                        // 1. Insertar la Dirección usando IDENTITY. Omitimos idDireccionCliente porque SQL lo genera solo.
+                        // 1. Insertar la Dirección
                         string queryDireccion = @"INSERT INTO DireccionCliente (paisCliente, localidadCliente, provinciaCliente, calleCliente, altura) 
                                                   OUTPUT INSERTED.idDireccionCliente 
                                                   VALUES (@Pais, @Localidad, @Provincia, @Calle, @Altura)";
@@ -150,7 +138,7 @@ namespace The_Good_Taste.Datos
 
                         // 2. Insertar el Cliente
                         string queryCliente = @"INSERT INTO Cliente (dniCliente, nombreCliente, apellidoCliente, fechaNaciminetoCliente, correoCliente, telefonoCliente, idDireccionCliente, Activo) 
-                                                VALUES (@Dni, @Nombre, @Apellido, @FechaNac, @Correo, @Telefono, @IdDireccion, 1)"; // Se guarda como Activo por defecto
+                                                VALUES (@Dni, @Nombre, @Apellido, @FechaNac, @Correo, @Telefono, @IdDireccion, 1)";
 
                         SqlCommand cmdCli = new SqlCommand(queryCliente, con, tran);
                         cmdCli.Parameters.AddWithValue("@Dni", dni);
@@ -230,11 +218,57 @@ namespace The_Good_Taste.Datos
             }
         }
 
-        public bool CambiarEstadoCliente(string dni, bool estado)
+        public bool EliminarCliente(string dni)
         {
-            // Ejemplo de implementación con Tu Conexion BD:
-            // UPDATE Clientes SET Estado = @estado WHERE DNI = @dni
-            return true;
+            using (SqlConnection con = Conexion.ObtenerConexion())
+            {
+                con.Open();
+                using (SqlTransaction tran = con.BeginTransaction())
+                {
+                    try
+                    {
+                        // 1. Obtener el idDireccionCliente antes de borrar el cliente
+                        string queryObtenerDir = "SELECT idDireccionCliente FROM Cliente WHERE dniCliente = @Dni";
+                        SqlCommand cmdDir = new SqlCommand(queryObtenerDir, con, tran);
+                        cmdDir.Parameters.AddWithValue("@Dni", dni);
+
+                        object result = cmdDir.ExecuteScalar();
+
+                        if (result != null && result != DBNull.Value)
+                        {
+                            int idDireccion = Convert.ToInt32(result);
+
+                            // 2. Eliminar el Cliente
+                            string queryDelCliente = "DELETE FROM Cliente WHERE dniCliente = @Dni";
+                            SqlCommand cmdDelCliente = new SqlCommand(queryDelCliente, con, tran);
+                            cmdDelCliente.Parameters.AddWithValue("@Dni", dni);
+                            cmdDelCliente.ExecuteNonQuery();
+
+                            // 3. Eliminar la Dirección asociada
+                            string queryDelDir = "DELETE FROM DireccionCliente WHERE idDireccionCliente = @IdDir";
+                            SqlCommand cmdDelDir = new SqlCommand(queryDelDir, con, tran);
+                            cmdDelDir.Parameters.AddWithValue("@IdDir", idDireccion);
+                            cmdDelDir.ExecuteNonQuery();
+                        }
+
+                        tran.Commit();
+                        return true;
+                    }
+                    catch (SqlException ex)
+                    {
+                        tran.Rollback();
+                        if (ex.Number == 547)
+                            throw new Exception("No se puede eliminar el cliente porque tiene registros asociados (ej: ventas o pedidos).");
+
+                        throw new Exception("Error en la base de datos al intentar eliminar el cliente.");
+                    }
+                    catch (Exception)
+                    {
+                        tran.Rollback();
+                        throw;
+                    }
+                }
+            }
         }
     }
 }

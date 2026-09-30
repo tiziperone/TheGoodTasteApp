@@ -12,7 +12,6 @@ namespace TheGoodTaste.UI
         private readonly ClienteNegocio _negocio = new ClienteNegocio();
         private string _dniSeleccionado = null;
         private DataRow _datosOriginales = null;
-        private bool _verActivos = true; // Control de estado actual mostrado en grilla
 
         public FormClientes()
         {
@@ -21,13 +20,15 @@ namespace TheGoodTaste.UI
 
         private void FormClientes_Load(object sender, EventArgs e)
         {
-            TemaVisual.AplicarEstilo(this);
+            // Asumiendo que el método AplicarEstilo existe en tu capa de UI
+            // TemaVisual.AplicarEstilo(this); 
+
             ConfigurarLimitesCaracteres();
             ConfigurarGrilla();
             ConfigurarEventos();
             LimpiarCampos();
 
-            CargarGrillaClientes(true);
+            CargarGrillaClientes();
         }
 
         private void ConfigurarLimitesCaracteres()
@@ -88,10 +89,6 @@ namespace TheGoodTaste.UI
             var dtp = ObtenerDateTimePicker();
             if (dtp != null) dtp.ValueChanged += Control_Modificado;
 
-            // Botones / Filtros de estado
-            if (btnActivo != null) btnActivo.Click += (s, e) => { _verActivos = true; CargarGrillaClientes(true); };
-            if (btnInactivo != null) btnInactivo.Click += (s, e) => { _verActivos = false; CargarGrillaClientes(false); };
-
             // Búsqueda en tiempo real
             Control txtBuscar = Controls.Find("txtBuscar", true).FirstOrDefault() ?? Controls.Find("textBoxBuscar", true).FirstOrDefault();
             if (txtBuscar is TextBox txtB)
@@ -137,21 +134,21 @@ namespace TheGoodTaste.UI
         private void ValidarReglaNegocioBotones()
         {
             bool algunCampoConDato = !string.IsNullOrWhiteSpace(txtDni?.Text) ||
-                                    !string.IsNullOrWhiteSpace(txtNombre?.Text) ||
-                                    !string.IsNullOrWhiteSpace(txtApellido?.Text) ||
-                                    !string.IsNullOrWhiteSpace(txtEmail?.Text) ||
-                                    !string.IsNullOrWhiteSpace(txtTelefono?.Text) ||
-                                    !string.IsNullOrWhiteSpace(textPais?.Text) ||
-                                    !string.IsNullOrWhiteSpace(txtProvincia?.Text) ||
-                                    !string.IsNullOrWhiteSpace(textLocalidad?.Text) ||
-                                    !string.IsNullOrWhiteSpace(txtCalle?.Text) ||
-                                    !string.IsNullOrWhiteSpace(textNroAltura?.Text);
+                                     !string.IsNullOrWhiteSpace(txtNombre?.Text) ||
+                                     !string.IsNullOrWhiteSpace(txtApellido?.Text) ||
+                                     !string.IsNullOrWhiteSpace(txtEmail?.Text) ||
+                                     !string.IsNullOrWhiteSpace(txtTelefono?.Text) ||
+                                     !string.IsNullOrWhiteSpace(textPais?.Text) ||
+                                     !string.IsNullOrWhiteSpace(txtProvincia?.Text) ||
+                                     !string.IsNullOrWhiteSpace(textLocalidad?.Text) ||
+                                     !string.IsNullOrWhiteSpace(txtCalle?.Text) ||
+                                     !string.IsNullOrWhiteSpace(textNroAltura?.Text);
 
             bool obligatoriosCompletos = !string.IsNullOrWhiteSpace(txtDni?.Text) &&
-                                        !string.IsNullOrWhiteSpace(txtNombre?.Text) &&
-                                        !string.IsNullOrWhiteSpace(txtApellido?.Text) &&
-                                        !string.IsNullOrWhiteSpace(txtEmail?.Text) &&
-                                        !string.IsNullOrWhiteSpace(txtTelefono?.Text);
+                                         !string.IsNullOrWhiteSpace(txtNombre?.Text) &&
+                                         !string.IsNullOrWhiteSpace(txtApellido?.Text) &&
+                                         !string.IsNullOrWhiteSpace(txtEmail?.Text) &&
+                                         !string.IsNullOrWhiteSpace(txtTelefono?.Text);
 
             if (btnLimpiar != null) btnLimpiar.Enabled = algunCampoConDato || !string.IsNullOrEmpty(_dniSeleccionado);
             if (btnGuardar != null) btnGuardar.Enabled = obligatoriosCompletos;
@@ -186,7 +183,7 @@ namespace TheGoodTaste.UI
 
                     MessageBox.Show("Cliente registrado con éxito.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     LimpiarCampos();
-                    CargarGrillaClientes(true);
+                    CargarGrillaClientes();
                 }
                 else
                 {
@@ -205,7 +202,7 @@ namespace TheGoodTaste.UI
 
                         MessageBox.Show("Cliente actualizado con éxito.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
                         LimpiarCampos();
-                        CargarGrillaClientes(true);
+                        CargarGrillaClientes();
                     }
                 }
             }
@@ -243,13 +240,12 @@ namespace TheGoodTaste.UI
             return cambios;
         }
 
-        private void CargarGrillaClientes(bool verActivos)
+        private void CargarGrillaClientes()
         {
             if (dgvClientes == null) return;
             try
             {
-                _verActivos = verActivos;
-                DataTable dt = _negocio.ObtenerClientes(verActivos);
+                DataTable dt = _negocio.ObtenerClientes();
                 dgvClientes.DataSource = dt;
 
                 if (!dgvClientes.Columns.Contains("Modificar"))
@@ -257,16 +253,31 @@ namespace TheGoodTaste.UI
                     var btnModificar = new DataGridViewButtonColumn
                     {
                         Name = "Modificar",
-                        HeaderText = "Acción",
+                        HeaderText = "Editar",
                         Text = "Modificar",
                         UseColumnTextForButtonValue = true
                     };
                     dgvClientes.Columns.Insert(0, btnModificar);
                 }
 
+                if (!dgvClientes.Columns.Contains("Eliminar"))
+                {
+                    var btnEliminar = new DataGridViewButtonColumn
+                    {
+                        Name = "Eliminar",
+                        HeaderText = "Borrar",
+                        Text = "Eliminar",
+                        UseColumnTextForButtonValue = true
+                    };
+                    dgvClientes.Columns.Insert(1, btnEliminar);
+                }
+
+                if (dgvClientes.Columns.Contains("Activo")) dgvClientes.Columns["Activo"].Visible = false;
+                if (dgvClientes.Columns.Contains("Estado")) dgvClientes.Columns["Estado"].Visible = false;
+
                 foreach (DataGridViewColumn col in dgvClientes.Columns)
                 {
-                    if (col.Name != "Estado" && col.Name != "Modificar")
+                    if (col.Name != "Modificar" && col.Name != "Eliminar")
                         col.ReadOnly = true;
                 }
 
@@ -289,20 +300,39 @@ namespace TheGoodTaste.UI
             {
                 CargarClienteParaEdicion(fila);
             }
-            else if (nombreColumna == "Estado" || nombreColumna == "Activo")
+            else if (nombreColumna == "Eliminar")
             {
-                ProcesarCambioEstado(fila);
+                ProcesarEliminacion(fila);
+            }
+        }
+
+        private void ProcesarEliminacion(DataGridViewRow fila)
+        {
+            if (fila.Cells["dniCliente"]?.Value == null || fila.Cells["dniCliente"].Value == DBNull.Value) return;
+
+            string dni = fila.Cells["dniCliente"].Value.ToString();
+            string clienteNombre = fila.Cells["nombreCliente"]?.Value?.ToString() ?? "este cliente";
+
+            if (MessageBox.Show($"¿Está seguro de que desea eliminar permanentemente a '{clienteNombre}'?\nEsta acción no se puede deshacer.",
+                "Confirmar Eliminación Física", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes)
+            {
+                try
+                {
+                    if (_negocio.EliminarCliente(dni))
+                    {
+                        MessageBox.Show("Cliente eliminado permanentemente de la base de datos.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        CargarGrillaClientes();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message, "No se pudo eliminar", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
             }
         }
 
         private void CargarClienteParaEdicion(DataGridViewRow fila)
         {
-            if (!_verActivos)
-            {
-                MessageBox.Show("No se pueden modificar datos de un cliente dado de baja.", "Acción no permitida", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                return;
-            }
-
             if (dgvClientes.DataSource is DataTable dt && fila.DataBoundItem is DataRowView drv)
             {
                 _datosOriginales = drv.Row;
@@ -353,40 +383,6 @@ namespace TheGoodTaste.UI
 
                 if (btnGuardar != null) btnGuardar.Enabled = true;
                 if (btnLimpiar != null) btnLimpiar.Enabled = true;
-            }
-        }
-
-        private void ProcesarCambioEstado(DataGridViewRow fila)
-        {
-            if (fila.Cells["dniCliente"]?.Value == null || fila.Cells["dniCliente"].Value == DBNull.Value) return;
-
-            string dni = fila.Cells["dniCliente"].Value.ToString();
-            string colEstado = dgvClientes.Columns.Contains("Activo") ? "Activo" : "Estado";
-            bool nuevoEstado = Convert.ToBoolean(fila.Cells[colEstado].Value);
-
-            string clienteNombre = fila.Cells["nombreCliente"]?.Value?.ToString() ?? "este cliente";
-            string accion = nuevoEstado ? "reactivar" : "dar de baja";
-
-            if (MessageBox.Show($"¿Está seguro de que desea {accion} a '{clienteNombre}'?", "Confirmación de Estado", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
-            {
-                try
-                {
-                    if (_negocio.CambiarEstadoCliente(dni, nuevoEstado))
-                    {
-                        MessageBox.Show($"Cliente {(nuevoEstado ? "reactivado" : "dado de baja")} correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                        CargarGrillaClientes(_verActivos);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("Error al cambiar el estado: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    fila.Cells[colEstado].Value = !nuevoEstado;
-                }
-            }
-            else
-            {
-                dgvClientes.CancelEdit();
-                CargarGrillaClientes(_verActivos);
             }
         }
 

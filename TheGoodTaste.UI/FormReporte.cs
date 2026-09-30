@@ -18,6 +18,7 @@ namespace TheGoodTaste.UI
         private DataGridView dgvReportes;
         private Chart chartReportes;
 
+
         public FormReporte()
         {
             InitializeComponent();

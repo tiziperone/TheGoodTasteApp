@@ -9,22 +9,30 @@ namespace TheGoodTaste.Negocio
     {
         private readonly ClienteDatos _datos = new ClienteDatos();
 
-        // Obtener clientes por estado (activos/inactivos)
-        public DataTable ObtenerClientes(bool estadoActivo)
+        // Ya no recibe parámetros de estado
+        public DataTable ObtenerClientes()
         {
-            return _datos.ListarClientes(estadoActivo);
+            return _datos.ListarClientes();
         }
 
-        // Obtener un cliente en particular por DNI
         public DataRow ObtenerClientePorDNI(string dni)
         {
             if (string.IsNullOrWhiteSpace(dni))
                 throw new Exception("El DNI es requerido para la consulta.");
 
-            DataTable dt = _datos.ListarClientes(true); // O método equivalente en datos
+            DataTable dt = _datos.ListarClientes();
             DataRow[] filas = dt.Select($"DNI = '{dni.Replace("'", "''")}'");
 
             return filas.Length > 0 ? filas[0] : null;
+        }
+
+        // NUEVO: Eliminación física
+        public bool EliminarCliente(string dni)
+        {
+            if (string.IsNullOrWhiteSpace(dni))
+                throw new Exception("No se especificó un DNI válido para eliminar.");
+
+            return _datos.EliminarCliente(dni);
         }
 
         // Guardar cliente con validaciones completas
@@ -49,15 +57,6 @@ namespace TheGoodTaste.Negocio
                 throw new Exception($"No se puede modificar. Ya existe otro cliente con el mismo {campoDuplicado}.");
 
             _datos.ModificarCliente(dniOriginal, dniNuevo, nombre, apellido, fechaNacimiento, email, telefono, pais, localidad, provincia, calle, altura);
-        }
-
-        // Alta / Baja lógica de cliente
-        public bool CambiarEstadoCliente(string dni, bool estado)
-        {
-            if (string.IsNullOrWhiteSpace(dni))
-                throw new Exception("No se especificó un DNI válido para cambiar el estado.");
-
-            return _datos.CambiarEstadoCliente(dni, estado);
         }
 
         // Validaciones integrales
