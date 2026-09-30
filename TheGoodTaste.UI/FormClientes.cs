@@ -8,7 +8,11 @@ namespace TheGoodTaste.UI
     public partial class FormClientes : Form
     {
         private readonly ClienteNegocio _negocio = new ClienteNegocio();
-        private string _dniSeleccionado = ""; // Guardará el DNI del cliente que se seleccione en la grilla para modificarlo
+        private string _dniSeleccionado = "";
+
+        // Variables para recordar los datos originales y comparar qué cambió
+        private string _dniOrig, _nombreOrig, _apellidoOrig, _emailOrig, _telefonoOrig, _paisOrig, _localidadOrig, _provinciaOrig, _calleOrig, _alturaOrig;
+        private DateTime _fechaNacOrig;
 
         public FormClientes()
         {
@@ -19,8 +23,9 @@ namespace TheGoodTaste.UI
         {
             TemaVisual.AplicarEstilo(this);
             ConfigurarEventos();
+            ConfigurarGrilla();
             LimpiarCampos();
-            CargarGrilla(true); // Carga los clientes activos por defecto al iniciar
+            CargarGrilla(true);
         }
 
         private void ConfigurarEventos()
@@ -49,8 +54,7 @@ namespace TheGoodTaste.UI
             btnActivo.Click += btnActivo_Click;
             btnInactivo.Click += btnInactivo_Click;
 
-            // Evento para seleccionar cliente de la grilla
-            dgvClientes.CellDoubleClick += dgvClientes_CellDoubleClick;
+            dgvClientes.CellContentClick += dgvClientes_CellContentClick;
         }
 
         private void SoloLetras_KeyPress(object sender, KeyPressEventArgs e)
@@ -87,7 +91,20 @@ namespace TheGoodTaste.UI
                                  !string.IsNullOrWhiteSpace(txtTelefono.Text);
         }
 
-        // --- MÉTODOS DE LA GRILLA Y BOTONES DE FILTRO ---
+        // --- CONFIGURACIÓN Y MÉTODOS DE LA GRILLA ---
+
+        private void ConfigurarGrilla()
+        {
+            if (!dgvClientes.Columns.Contains("btnModificarGrilla"))
+            {
+                DataGridViewButtonColumn btnColumn = new DataGridViewButtonColumn();
+                btnColumn.Name = "btnModificarGrilla";
+                btnColumn.HeaderText = "Acción";
+                btnColumn.Text = "Modificar";
+                btnColumn.UseColumnTextForButtonValue = true;
+                dgvClientes.Columns.Insert(0, btnColumn);
+            }
+        }
 
         private void CargarGrilla(bool estadoActivo)
         {
@@ -95,16 +112,13 @@ namespace TheGoodTaste.UI
             {
                 dgvClientes.DataSource = _negocio.ObtenerClientes(estadoActivo);
 
-                // Verificamos que la grilla tenga columnas antes de intentar ocultarlas
                 if (dgvClientes.Columns.Count > 0)
                 {
-                    // Ocultamos las columnas que NO queremos que se vean
                     dgvClientes.Columns["fechaNaciminetoCliente"].Visible = false;
                     dgvClientes.Columns["telefonoCliente"].Visible = false;
                     dgvClientes.Columns["paisCliente"].Visible = false;
                     dgvClientes.Columns["provinciaCliente"].Visible = false;
 
-                    // Cambiamos el texto del encabezado de las columnas que SÍ se ven para que quede prolijo
                     dgvClientes.Columns["dniCliente"].HeaderText = "DNI";
                     dgvClientes.Columns["nombreCliente"].HeaderText = "Nombre";
                     dgvClientes.Columns["apellidoCliente"].HeaderText = "Apellido";
@@ -112,10 +126,9 @@ namespace TheGoodTaste.UI
                     dgvClientes.Columns["localidadCliente"].HeaderText = "Localidad";
                     dgvClientes.Columns["calleCliente"].HeaderText = "Calle";
                     dgvClientes.Columns["altura"].HeaderText = "Nro";
-                }
 
-                // Habilitamos o deshabilitamos el botón de Modificar dependiendo de si estamos viendo los Activos o Inactivos
-                buttonMod.Enabled = estadoActivo;
+                    dgvClientes.Columns["btnModificarGrilla"].Visible = estadoActivo;
+                }
             }
             catch (Exception ex)
             {
@@ -131,54 +144,112 @@ namespace TheGoodTaste.UI
         private void btnInactivo_Click(object sender, EventArgs e)
         {
             CargarGrilla(false);
-            LimpiarCampos(); // Limpiamos por si había alguien seleccionado al cambiar de pestaña
+            LimpiarCampos();
         }
 
-        private void dgvClientes_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
+        private void dgvClientes_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
-            // Verificamos que se haya hecho clic en una fila válida (y que el botón de modificar esté activo)
-            if (e.RowIndex >= 0 && buttonMod.Enabled)
+            if (e.RowIndex >= 0 && dgvClientes.Columns[e.ColumnIndex].Name == "btnModificarGrilla")
             {
                 DataGridViewRow fila = dgvClientes.Rows[e.RowIndex];
 
-                // Aunque las columnas estén ocultas visualmente, los datos siguen ahí y podemos pasarlos a los TextBox
-                _dniSeleccionado = fila.Cells["dniCliente"].Value.ToString();
-                txtDni.Text = _dniSeleccionado;
-                txtNombre.Text = fila.Cells["nombreCliente"].Value.ToString();
-                txtApellido.Text = fila.Cells["apellidoCliente"].Value.ToString();
-
+                // Guardamos los datos originales en las variables para compararlos luego
+                _dniOrig = fila.Cells["dniCliente"].Value.ToString();
+                _nombreOrig = fila.Cells["nombreCliente"].Value.ToString();
+                _apellidoOrig = fila.Cells["apellidoCliente"].Value.ToString();
                 if (DateTime.TryParse(fila.Cells["fechaNaciminetoCliente"].Value.ToString(), out DateTime fechaNac))
-                    dtpFechaNacimiento.Value = fechaNac;
+                    _fechaNacOrig = fechaNac;
+                _emailOrig = fila.Cells["correoCliente"].Value.ToString();
+                _telefonoOrig = fila.Cells["telefonoCliente"].Value.ToString();
+                _paisOrig = fila.Cells["paisCliente"].Value.ToString();
+                _localidadOrig = fila.Cells["localidadCliente"].Value.ToString();
+                _provinciaOrig = fila.Cells["provinciaCliente"].Value.ToString();
+                _calleOrig = fila.Cells["calleCliente"].Value.ToString();
+                _alturaOrig = fila.Cells["altura"].Value.ToString();
 
-                txtEmail.Text = fila.Cells["correoCliente"].Value.ToString();
-                txtTelefono.Text = fila.Cells["telefonoCliente"].Value.ToString();
-                textPais.Text = fila.Cells["paisCliente"].Value.ToString();
-                textLocalidad.Text = fila.Cells["localidadCliente"].Value.ToString();
-                txtProvincia.Text = fila.Cells["provinciaCliente"].Value.ToString();
-                txtCalle.Text = fila.Cells["calleCliente"].Value.ToString();
-                textNroAltura.Text = fila.Cells["altura"].Value.ToString();
-            }
-            else if (!buttonMod.Enabled)
-            {
-                MessageBox.Show("No se pueden editar clientes inactivos.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                // Pasamos los datos a los TextBox
+                _dniSeleccionado = _dniOrig;
+                txtDni.Text = _dniOrig;
+                txtNombre.Text = _nombreOrig;
+                txtApellido.Text = _apellidoOrig;
+                dtpFechaNacimiento.Value = _fechaNacOrig;
+                txtEmail.Text = _emailOrig;
+                txtTelefono.Text = _telefonoOrig;
+                textPais.Text = _paisOrig;
+                textLocalidad.Text = _localidadOrig;
+                txtProvincia.Text = _provinciaOrig;
+                txtCalle.Text = _calleOrig;
+                textNroAltura.Text = _alturaOrig;
+
+                btnGuardar.Text = "Guardar Modificación";
             }
         }
 
-        // --- GUARDAR, MODIFICAR Y LIMPIAR ---
+        private void dgvClientes_CellDoubleClick(object sender, DataGridViewCellEventArgs e) { }
+
+        // --- GUARDAR Y LIMPIAR ---
 
         private void btnGuardar_Click_1(object sender, EventArgs e)
         {
             try
             {
-                if (!string.IsNullOrEmpty(_dniSeleccionado))
+                if (string.IsNullOrEmpty(_dniSeleccionado))
                 {
-                    MessageBox.Show("Tiene un cliente seleccionado. Si desea guardar uno nuevo, presione 'Limpiar' primero o use el botón 'Modificar'.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    return;
+                    _negocio.GuardarCliente(txtDni.Text.Trim(), txtNombre.Text.Trim(), txtApellido.Text.Trim(), dtpFechaNacimiento.Value, txtEmail.Text.Trim(), txtTelefono.Text.Trim(), textPais.Text.Trim(), textLocalidad.Text.Trim(), txtProvincia.Text.Trim(), txtCalle.Text.Trim(), textNroAltura.Text.Trim());
+                    MessageBox.Show("Cliente guardado exitosamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                else
+                {
+                    // Comparamos los valores originales con los nuevos y armamos el mensaje
+                    string cambios = "";
+
+                    if (_dniOrig != txtDni.Text.Trim())
+                        cambios += $"- DNI: {_dniOrig} ➔ {txtDni.Text.Trim()}\n";
+
+                    if (_nombreOrig != txtNombre.Text.Trim() || _apellidoOrig != txtApellido.Text.Trim())
+                        cambios += $"- Nombre: {_nombreOrig} {_apellidoOrig} ➔ {txtNombre.Text.Trim()} {txtApellido.Text.Trim()}\n";
+
+                    if (_fechaNacOrig.Date != dtpFechaNacimiento.Value.Date)
+                        cambios += $"- Fecha Nac.: {_fechaNacOrig.ToShortDateString()} ➔ {dtpFechaNacimiento.Value.ToShortDateString()}\n";
+
+                    if (_emailOrig != txtEmail.Text.Trim())
+                        cambios += $"- Email: {_emailOrig} ➔ {txtEmail.Text.Trim()}\n";
+
+                    if (_telefonoOrig != txtTelefono.Text.Trim())
+                        cambios += $"- Teléfono: {_telefonoOrig} ➔ {txtTelefono.Text.Trim()}\n";
+
+                    if (_paisOrig != textPais.Text.Trim())
+                        cambios += $"- País: {_paisOrig} ➔ {textPais.Text.Trim()}\n";
+
+                    if (_localidadOrig != textLocalidad.Text.Trim())
+                        cambios += $"- Localidad: {_localidadOrig} ➔ {textLocalidad.Text.Trim()}\n";
+
+                    if (_provinciaOrig != txtProvincia.Text.Trim())
+                        cambios += $"- Provincia: {_provinciaOrig} ➔ {txtProvincia.Text.Trim()}\n";
+
+                    if (_calleOrig != txtCalle.Text.Trim() || _alturaOrig != textNroAltura.Text.Trim())
+                        cambios += $"- Dirección: {_calleOrig} {_alturaOrig} ➔ {txtCalle.Text.Trim()} {textNroAltura.Text.Trim()}\n";
+
+                    // Si la variable "cambios" sigue vacía, significa que el usuario no tocó nada
+                    if (string.IsNullOrEmpty(cambios))
+                    {
+                        MessageBox.Show("No se detectó ningún cambio en los datos.", "Sin cambios", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        return;
+                    }
+
+                    string mensajeConfirmacion = $"Se detectaron los siguientes cambios:\n\n{cambios}\n¿Desea aceptar y guardar los cambios?";
+
+                    if (MessageBox.Show(mensajeConfirmacion, "Confirmar Modificación", MessageBoxButtons.OKCancel, MessageBoxIcon.Question) == DialogResult.OK)
+                    {
+                        _negocio.ModificarCliente(_dniSeleccionado, txtDni.Text.Trim(), txtNombre.Text.Trim(), txtApellido.Text.Trim(), dtpFechaNacimiento.Value, txtEmail.Text.Trim(), txtTelefono.Text.Trim(), textPais.Text.Trim(), textLocalidad.Text.Trim(), txtProvincia.Text.Trim(), txtCalle.Text.Trim(), textNroAltura.Text.Trim());
+                        MessageBox.Show("Cliente modificado exitosamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                    else
+                    {
+                        return;
+                    }
                 }
 
-                _negocio.GuardarCliente(txtDni.Text.Trim(), txtNombre.Text.Trim(), txtApellido.Text.Trim(), dtpFechaNacimiento.Value, txtEmail.Text.Trim(), txtTelefono.Text.Trim(), textPais.Text.Trim(), textLocalidad.Text.Trim(), txtProvincia.Text.Trim(), txtCalle.Text.Trim(), textNroAltura.Text.Trim());
-
-                MessageBox.Show("Cliente guardado exitosamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 LimpiarCampos();
                 CargarGrilla(true);
             }
@@ -188,44 +259,13 @@ namespace TheGoodTaste.UI
             }
         }
 
-        private void buttonMod_Click(object sender, EventArgs e)
-        {
-            if (string.IsNullOrEmpty(_dniSeleccionado))
-            {
-                MessageBox.Show("Seleccione un cliente de la lista haciendo doble clic para modificarlo.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-
-            // Resumen para confirmar cambios antes de impactar en base de datos
-            string mensajeConfirmacion = $"Se aplicarán los siguientes cambios:\n\n" +
-                                         $"- DNI: {txtDni.Text}\n" +
-                                         $"- Nombre: {txtNombre.Text} {txtApellido.Text}\n" +
-                                         $"- Email: {txtEmail.Text}\n" +
-                                         $"- Teléfono: {txtTelefono.Text}\n\n" +
-                                         $"¿Desea aceptar y guardar los cambios?";
-
-            if (MessageBox.Show(mensajeConfirmacion, "Confirmar Modificación", MessageBoxButtons.OKCancel, MessageBoxIcon.Question) == DialogResult.OK)
-            {
-                try
-                {
-                    _negocio.ModificarCliente(_dniSeleccionado, txtDni.Text.Trim(), txtNombre.Text.Trim(), txtApellido.Text.Trim(), dtpFechaNacimiento.Value, txtEmail.Text.Trim(), txtTelefono.Text.Trim(), textPais.Text.Trim(), textLocalidad.Text.Trim(), txtProvincia.Text.Trim(), txtCalle.Text.Trim(), textNroAltura.Text.Trim());
-
-                    MessageBox.Show("Cliente modificado exitosamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    LimpiarCampos();
-                    CargarGrilla(true);
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show(ex.Message, "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                }
-            }
-        }
-
         private void btnLimpiar_Click_1(object sender, EventArgs e) => LimpiarCampos();
 
         private void LimpiarCampos()
         {
-            _dniSeleccionado = ""; // Reseteamos la selección
+            _dniSeleccionado = "";
+            btnGuardar.Text = "Guardar";
+
             txtDni.Clear();
             txtNombre.Clear();
             txtApellido.Clear();
@@ -241,7 +281,7 @@ namespace TheGoodTaste.UI
             ActualizarEstadoBotones();
         }
 
-        private void dgvClientes_CellContentClick(object sender, DataGridViewCellEventArgs e) { }
+        private void buttonMod_Click(object sender, EventArgs e) { }
         private void button1_Click(object sender, EventArgs e) { }
         private void button2_Click(object sender, EventArgs e) { }
     }

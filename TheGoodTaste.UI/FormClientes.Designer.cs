@@ -55,7 +55,6 @@
             this.textNroAltura = new System.Windows.Forms.TextBox();
             this.btnActivo = new System.Windows.Forms.Button();
             this.btnInactivo = new System.Windows.Forms.Button();
-            this.buttonMod = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dgvClientes)).BeginInit();
             this.SuspendLayout();
             // 
@@ -197,7 +196,7 @@
             this.dgvClientes.RowHeadersWidth = 51;
             this.dgvClientes.RowTemplate.Height = 24;
             this.dgvClientes.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.dgvClientes.Size = new System.Drawing.Size(711, 150);
+            this.dgvClientes.Size = new System.Drawing.Size(866, 150);
             this.dgvClientes.TabIndex = 18;
             this.dgvClientes.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvClientes_CellContentClick);
             // 
@@ -271,9 +270,9 @@
             // 
             // btnActivo
             // 
-            this.btnActivo.Location = new System.Drawing.Point(62, 482);
+            this.btnActivo.Location = new System.Drawing.Point(62, 474);
             this.btnActivo.Name = "btnActivo";
-            this.btnActivo.Size = new System.Drawing.Size(81, 25);
+            this.btnActivo.Size = new System.Drawing.Size(91, 33);
             this.btnActivo.TabIndex = 29;
             this.btnActivo.Text = "Activo";
             this.btnActivo.UseVisualStyleBackColor = true;
@@ -281,30 +280,19 @@
             // 
             // btnInactivo
             // 
-            this.btnInactivo.Location = new System.Drawing.Point(176, 482);
+            this.btnInactivo.Location = new System.Drawing.Point(176, 474);
             this.btnInactivo.Name = "btnInactivo";
-            this.btnInactivo.Size = new System.Drawing.Size(75, 25);
+            this.btnInactivo.Size = new System.Drawing.Size(86, 33);
             this.btnInactivo.TabIndex = 30;
             this.btnInactivo.Text = "Inactivo";
             this.btnInactivo.UseVisualStyleBackColor = true;
             this.btnInactivo.Click += new System.EventHandler(this.button2_Click);
             // 
-            // buttonMod
-            // 
-            this.buttonMod.Location = new System.Drawing.Point(699, 484);
-            this.buttonMod.Name = "buttonMod";
-            this.buttonMod.Size = new System.Drawing.Size(75, 23);
-            this.buttonMod.TabIndex = 31;
-            this.buttonMod.Text = "Modificar";
-            this.buttonMod.UseVisualStyleBackColor = true;
-            this.buttonMod.Click += new System.EventHandler(this.buttonMod_Click);
-            // 
             // FormClientes
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(933, 749);
-            this.Controls.Add(this.buttonMod);
+            this.ClientSize = new System.Drawing.Size(1145, 749);
             this.Controls.Add(this.btnInactivo);
             this.Controls.Add(this.btnActivo);
             this.Controls.Add(this.textNroAltura);
@@ -370,6 +358,5 @@
         private System.Windows.Forms.TextBox textNroAltura;
         private System.Windows.Forms.Button btnActivo;
         private System.Windows.Forms.Button btnInactivo;
-        private System.Windows.Forms.Button buttonMod;
     }
 }
