@@ -85,6 +85,7 @@
     <Compile Include="Datos\ClienteDatos.cs" />
     <Compile Include="Datos\ProductoDatos.cs" />
     <Compile Include="Datos\Conexion.cs" />
+    <Compile Include="Datos\ReporteDatos.cs" />
     <Compile Include="Datos\UsuarioDatos.cs" />
     <Compile Include="Datos\VentaDatos.cs" />
     <Compile Include="Entidades\Categoria.cs" />
