@@ -6,7 +6,7 @@ using The_Good_Taste.Entidades;
 
 namespace TheGoodTaste.UI
 {
-    public partial class FormReporteGerente : Form
+    public partial class FormReporte : Form
     {
         private readonly UsuarioSistema _usuarioActual;
 
@@ -18,12 +18,12 @@ namespace TheGoodTaste.UI
         private DataGridView dgvReportes;
         private Chart chartReportes;
 
-        public FormReporteGerente()
+        public FormReporte()
         {
             InitializeComponent();
         }
 
-        public FormReporteGerente(UsuarioSistema usuario) : this()
+        public FormReporte(UsuarioSistema usuario) : this()
         {
             _usuarioActual = usuario;
         }
