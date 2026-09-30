@@ -34,7 +34,7 @@
             this.txtEmail = new System.Windows.Forms.TextBox();
             this.txtTelefono = new System.Windows.Forms.TextBox();
             this.txtCalle = new System.Windows.Forms.TextBox();
-            this.txtNumero = new System.Windows.Forms.TextBox();
+            this.txtProvincia = new System.Windows.Forms.TextBox();
             this.dtpFechaNacimiento = new System.Windows.Forms.DateTimePicker();
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
@@ -53,6 +53,8 @@
             this.label12 = new System.Windows.Forms.Label();
             this.textLocalidad = new System.Windows.Forms.TextBox();
             this.textNroAltura = new System.Windows.Forms.TextBox();
+            this.button1 = new System.Windows.Forms.Button();
+            this.button2 = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dgvClientes)).BeginInit();
             this.SuspendLayout();
             // 
@@ -98,12 +100,12 @@
             this.txtCalle.Size = new System.Drawing.Size(138, 22);
             this.txtCalle.TabIndex = 5;
             // 
-            // txtNumero
+            // txtProvincia
             // 
-            this.txtNumero.Location = new System.Drawing.Point(189, 332);
-            this.txtNumero.Name = "txtNumero";
-            this.txtNumero.Size = new System.Drawing.Size(135, 22);
-            this.txtNumero.TabIndex = 6;
+            this.txtProvincia.Location = new System.Drawing.Point(189, 332);
+            this.txtProvincia.Name = "txtProvincia";
+            this.txtProvincia.Size = new System.Drawing.Size(135, 22);
+            this.txtProvincia.TabIndex = 6;
             // 
             // dtpFechaNacimiento
             // 
@@ -188,7 +190,7 @@
             // dgvClientes
             // 
             this.dgvClientes.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dgvClientes.Location = new System.Drawing.Point(62, 437);
+            this.dgvClientes.Location = new System.Drawing.Point(63, 529);
             this.dgvClientes.Name = "dgvClientes";
             this.dgvClientes.ReadOnly = true;
             this.dgvClientes.RowHeadersWidth = 51;
@@ -199,21 +201,23 @@
             // 
             // btnGuardar
             // 
-            this.btnGuardar.Location = new System.Drawing.Point(215, 619);
+            this.btnGuardar.Location = new System.Drawing.Point(624, 399);
             this.btnGuardar.Name = "btnGuardar";
             this.btnGuardar.Size = new System.Drawing.Size(75, 23);
             this.btnGuardar.TabIndex = 19;
             this.btnGuardar.Text = "Guardar";
             this.btnGuardar.UseVisualStyleBackColor = true;
+            this.btnGuardar.Click += new System.EventHandler(this.btnGuardar_Click_1);
             // 
             // btnLimpiar
             // 
-            this.btnLimpiar.Location = new System.Drawing.Point(318, 619);
+            this.btnLimpiar.Location = new System.Drawing.Point(716, 399);
             this.btnLimpiar.Name = "btnLimpiar";
             this.btnLimpiar.Size = new System.Drawing.Size(75, 23);
             this.btnLimpiar.TabIndex = 22;
             this.btnLimpiar.Text = "Limpiar";
             this.btnLimpiar.UseVisualStyleBackColor = true;
+            this.btnLimpiar.Click += new System.EventHandler(this.btnLimpiar_Click_1);
             // 
             // label10
             // 
@@ -263,11 +267,33 @@
             this.textNroAltura.Size = new System.Drawing.Size(126, 22);
             this.textNroAltura.TabIndex = 28;
             // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(62, 482);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(81, 25);
+            this.button1.TabIndex = 29;
+            this.button1.Text = "Activo";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
+            // 
+            // button2
+            // 
+            this.button2.Location = new System.Drawing.Point(176, 482);
+            this.button2.Name = "button2";
+            this.button2.Size = new System.Drawing.Size(75, 25);
+            this.button2.TabIndex = 30;
+            this.button2.Text = "Inactivo";
+            this.button2.UseVisualStyleBackColor = true;
+            this.button2.Click += new System.EventHandler(this.button2_Click);
+            // 
             // FormClientes
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(933, 749);
+            this.Controls.Add(this.button2);
+            this.Controls.Add(this.button1);
             this.Controls.Add(this.textNroAltura);
             this.Controls.Add(this.textLocalidad);
             this.Controls.Add(this.label12);
@@ -286,7 +312,7 @@
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.dtpFechaNacimiento);
-            this.Controls.Add(this.txtNumero);
+            this.Controls.Add(this.txtProvincia);
             this.Controls.Add(this.txtCalle);
             this.Controls.Add(this.txtTelefono);
             this.Controls.Add(this.txtEmail);
@@ -310,7 +336,7 @@
         private System.Windows.Forms.TextBox txtEmail;
         private System.Windows.Forms.TextBox txtTelefono;
         private System.Windows.Forms.TextBox txtCalle;
-        private System.Windows.Forms.TextBox txtNumero;
+        private System.Windows.Forms.TextBox txtProvincia;
         private System.Windows.Forms.DateTimePicker dtpFechaNacimiento;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
@@ -329,5 +355,7 @@
         private System.Windows.Forms.Label label12;
         private System.Windows.Forms.TextBox textLocalidad;
         private System.Windows.Forms.TextBox textNroAltura;
+        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button button2;
     }
 }

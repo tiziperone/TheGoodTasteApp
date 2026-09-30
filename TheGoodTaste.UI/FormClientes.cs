@@ -42,7 +42,7 @@ namespace TheGoodTaste.UI
             txtTelefono.TextChanged += Control_Modificado;
             textPais.TextChanged += Control_Modificado;
             textLocalidad.TextChanged += Control_Modificado;
-            txtProvincia.TextChanged += Control_Modificado; // Agregado Provincia
+            txtProvincia.TextChanged += Control_Modificado;
             txtCalle.TextChanged += Control_Modificado;
             textNroAltura.TextChanged += Control_Modificado;
         }
@@ -75,7 +75,7 @@ namespace TheGoodTaste.UI
                                  !string.IsNullOrWhiteSpace(txtCalle.Text) ||
                                  !string.IsNullOrWhiteSpace(textNroAltura.Text);
 
-            // Se habilita Guardar si los campos principales están llenos (puedes agregar más requeridos si lo deseas)
+            // Se habilita Guardar si los campos principales están llenos
             btnGuardar.Enabled = !string.IsNullOrWhiteSpace(txtDni.Text) &&
                                  !string.IsNullOrWhiteSpace(txtNombre.Text) &&
                                  !string.IsNullOrWhiteSpace(txtApellido.Text) &&
@@ -83,7 +83,9 @@ namespace TheGoodTaste.UI
                                  !string.IsNullOrWhiteSpace(txtTelefono.Text);
         }
 
-        private void btnGuardar_Click(object sender, EventArgs e)
+        // ---------- EVENTOS VINCULADOS DESDE EL DISEÑADOR ----------
+
+        private void btnGuardar_Click_1(object sender, EventArgs e)
         {
             try
             {
@@ -111,29 +113,45 @@ namespace TheGoodTaste.UI
             }
         }
 
+        private void btnLimpiar_Click_1(object sender, EventArgs e) => LimpiarCampos();
+
+        // -----------------------------------------------------------
+
         private void btnModificar_Click(object sender, EventArgs e)
         {
             MessageBox.Show("Cliente modificado exitosamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
             LimpiarCampos();
         }
 
-        private void btnLimpiar_Click(object sender, EventArgs e) => LimpiarCampos();
-
         private void LimpiarCampos()
         {
             txtDni.Clear();
             txtNombre.Clear();
             txtApellido.Clear();
-            dtpFechaNacimiento.Value = DateTime.Now; // Reinicia la fecha
+
+            // Ponemos por defecto una fecha de hace 18 años para cumplir la validación visualmente al limpiar
+            dtpFechaNacimiento.Value = DateTime.Now.AddYears(-18);
+
             txtEmail.Clear();
             txtTelefono.Clear();
             textPais.Clear();
             textLocalidad.Clear();
-            txtProvincia.Clear(); // Limpia la provincia
+            txtProvincia.Clear();
             txtCalle.Clear();
             textNroAltura.Clear();
 
             ActualizarEstadoBotones();
+        }
+
+        // Eventos creados por accidente en el diseñador (dejarlos vacíos evita errores al compilar)
+        private void button1_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }

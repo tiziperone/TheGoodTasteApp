@@ -6,55 +6,42 @@ namespace The_Good_Taste.Datos
 {
     public class ClienteDatos
     {
-        public static Cliente ObtenerPorDni(string dni)
+        // Método para validar que no se repitan DNI, Correo o Teléfono
+        public string VerificarDuplicados(string dni, string email, string telefono)
         {
-            Cliente cliente = null;
-            // Ajusté los campos según los nombres de columna de tus nuevas tablas para que coincida con el SELECT
-            string query = @"SELECT c.dniCliente, c.nombreCliente, c.apellidoCliente, c.telefonoCliente, c.correoCliente, 
-                                    d.calleCliente, d.altura 
-                             FROM Cliente c
-                             INNER JOIN DireccionCliente d ON c.idDireccionCliente = d.idDireccionCliente
-                             WHERE c.dniCliente = @Dni";
+            string query = "SELECT dniCliente, correoCliente, telefonoCliente FROM Cliente WHERE dniCliente = @Dni OR correoCliente = @Email OR telefonoCliente = @Telefono";
 
             using (SqlConnection con = Conexion.ObtenerConexion())
             {
                 SqlCommand cmd = new SqlCommand(query, con);
                 cmd.Parameters.AddWithValue("@Dni", dni);
-                con.Open();
+                cmd.Parameters.AddWithValue("@Email", email);
+                cmd.Parameters.AddWithValue("@Telefono", telefono);
 
+                con.Open();
                 using (SqlDataReader dr = cmd.ExecuteReader())
                 {
                     if (dr.Read())
                     {
-                        cliente = new Cliente
-                        {
-                            Dni = dr["dniCliente"].ToString(),
-                            Nombre = dr["nombreCliente"].ToString(),
-                            Apellido = dr["apellidoCliente"].ToString(),
-                            Telefono = dr["telefonoCliente"].ToString(),
-                            Email = dr["correoCliente"].ToString(),
-                            Calle = dr["calleCliente"].ToString(),
-                            Numero = dr["altura"].ToString()
-                        };
+                        // Identificamos exactamente qué dato está duplicado para informarle al usuario
+                        if (dr["dniCliente"].ToString() == dni) return "DNI";
+                        if (dr["correoCliente"].ToString() == email) return "Correo electrónico";
+                        if (dr["telefonoCliente"].ToString() == telefono) return "Teléfono";
                     }
                 }
             }
-            return cliente;
+            return string.Empty; // Retorna vacío si no hay duplicados
         }
 
-        // Nuevo método para insertar los datos en las dos tablas relacionadas
         public void InsertarCliente(string dni, string nombre, string apellido, DateTime fechaNacimiento, string correo, string telefono, string pais, string localidad, string provincia, string calle, string altura)
         {
             using (SqlConnection con = Conexion.ObtenerConexion())
             {
                 con.Open();
-
-                // Usamos una transacción para asegurar que ambas tablas se guarden correctamente o ninguna
                 using (SqlTransaction tran = con.BeginTransaction())
                 {
                     try
                     {
-                        // 1. Insertar la Dirección y obtener el idDireccionCliente generado
                         string queryDireccion = @"INSERT INTO DireccionCliente (paisCliente, localidadCliente, provinciaCliente, calleCliente, altura) 
                                                   OUTPUT INSERTED.idDireccionCliente 
                                                   VALUES (@Pais, @Localidad, @Provincia, @Calle, @Altura)";
@@ -66,10 +53,8 @@ namespace The_Good_Taste.Datos
                         cmdDir.Parameters.AddWithValue("@Calle", calle);
                         cmdDir.Parameters.AddWithValue("@Altura", altura);
 
-                        // Ejecutar y obtener el ID
                         int idDireccion = (int)cmdDir.ExecuteScalar();
 
-                        // 2. Insertar el Cliente usando el idDireccionCliente que acabamos de obtener
                         string queryCliente = @"INSERT INTO Cliente (dniCliente, nombreCliente, apellidoCliente, fechaNaciminetoCliente, correoCliente, telefonoCliente, idDireccionCliente) 
                                                 VALUES (@Dni, @Nombre, @Apellido, @FechaNac, @Correo, @Telefono, @IdDireccion)";
 
@@ -82,15 +67,11 @@ namespace The_Good_Taste.Datos
                         cmdCli.Parameters.AddWithValue("@Telefono", telefono);
                         cmdCli.Parameters.AddWithValue("@IdDireccion", idDireccion);
 
-                        // Ejecutar inserción de cliente
                         cmdCli.ExecuteNonQuery();
-
-                        // Confirmar los cambios en la base de datos
                         tran.Commit();
                     }
                     catch (Exception)
                     {
-                        // Si ocurre cualquier error, deshacer todos los cambios de esta transacción
                         tran.Rollback();
                         throw;
                     }
