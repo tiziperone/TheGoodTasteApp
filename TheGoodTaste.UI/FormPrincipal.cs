@@ -71,7 +71,6 @@ namespace TheGoodTaste.UI
                     // Bloqueamos los módulos que no debe usar
                     DeshabilitarBoton(btnUsuarios);
                     DeshabilitarBoton(btnVentas);
-                   
                     DeshabilitarBoton(btnClientes);
 
                     // Reportes queda habilitado
@@ -80,7 +79,6 @@ namespace TheGoodTaste.UI
                 case RolUsuario.Vendedor:
                     // Bloqueamos Usuarios y Reportes
                     DeshabilitarBoton(btnUsuarios);
-                    DeshabilitarBoton(btnReportes);
                     DeshabilitarBoton(btnProductos);
                     // Productos, Clientes y Ventas quedan habilitados
                     break;
@@ -224,7 +222,7 @@ namespace TheGoodTaste.UI
 
         public void btnReportes_Click(object sender, EventArgs e)
         {
-            AbrirFormularioEnPanel(new FormReporteGerente(), (Button)sender);
+            AbrirFormularioEnPanel(new FormReporteGerente(_usuarioActual), (Button)sender);
         }
 
         public void btnSalir_Click(object sender, EventArgs e)
