@@ -288,7 +288,7 @@
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.RowHeadersWidth = 51;
             this.dataGridView1.RowTemplate.Height = 24;
-            this.dataGridView1.Size = new System.Drawing.Size(1446, 338);
+            this.dataGridView1.Size = new System.Drawing.Size(1169, 124);
             this.dataGridView1.TabIndex = 26;
             // 
             // radioButtonAct
@@ -351,7 +351,7 @@
             this.label13.AutoSize = true;
             this.label13.Location = new System.Drawing.Point(31, 316);
             this.label13.Name = "label13";
-            this.label13.Size = new System.Drawing.Size(120, 20);
+            this.label13.Size = new System.Drawing.Size(96, 16);
             this.label13.TabIndex = 34;
             this.label13.Text = "Buscar usuario";
             this.label13.Click += new System.EventHandler(this.label13_Click);
@@ -360,7 +360,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1515, 854);
+            this.ClientSize = new System.Drawing.Size(1238, 640);
             this.Controls.Add(this.label13);
             this.Controls.Add(this.textBoxBuscar);
             this.Controls.Add(this.label12);
