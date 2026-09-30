@@ -62,5 +62,20 @@ namespace TheGoodTaste.UI
                 txtPassword.Focus();
             }
         }
+
+        private void buttonSalirLogin_Click(object sender, EventArgs e)
+        {
+            DialogResult respuesta = MessageBox.Show(
+            "¿Está seguro que desea salir del sistema?",
+            "Salir de The Good Taste",
+            MessageBoxButtons.YesNo,
+            MessageBoxIcon.Question
+            );
+
+            if (respuesta == DialogResult.Yes)
+            {
+                Application.Exit(); // Cierra toda la aplicación definitivamente
+            }
+        }
     }
 }

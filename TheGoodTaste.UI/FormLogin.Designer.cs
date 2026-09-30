@@ -24,6 +24,7 @@
             this.labelPassword = new System.Windows.Forms.Label();
             this.btnVerPassword = new System.Windows.Forms.CheckBox();
             this.chkVerPassLogin = new System.Windows.Forms.CheckBox();
+            this.buttonSalirLogin = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // txtUsuario
@@ -35,8 +36,8 @@
             // 
             // txtPassword
             // 
-            this.txtPassword.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-            | System.Windows.Forms.AnchorStyles.Left)
+            this.txtPassword.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.txtPassword.Location = new System.Drawing.Point(324, 195);
             this.txtPassword.Name = "txtPassword";
@@ -56,8 +57,8 @@
             // 
             // labelUserName
             // 
-            this.labelUserName.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-            | System.Windows.Forms.AnchorStyles.Left)
+            this.labelUserName.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.labelUserName.AutoSize = true;
             this.labelUserName.Location = new System.Drawing.Point(233, 150);
@@ -68,8 +69,8 @@
             // 
             // labelPassword
             // 
-            this.labelPassword.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-            | System.Windows.Forms.AnchorStyles.Left)
+            this.labelPassword.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.labelPassword.AutoSize = true;
             this.labelPassword.Location = new System.Drawing.Point(233, 201);
@@ -92,8 +93,8 @@
             // 
             // chkVerPassLogin
             // 
-            this.chkVerPassLogin.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-            | System.Windows.Forms.AnchorStyles.Left)
+            this.chkVerPassLogin.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.chkVerPassLogin.Appearance = System.Windows.Forms.Appearance.Button;
             this.chkVerPassLogin.AutoSize = true;
@@ -106,11 +107,22 @@
             this.chkVerPassLogin.UseVisualStyleBackColor = true;
             this.chkVerPassLogin.CheckedChanged += new System.EventHandler(this.chkVerPassLogin_CheckedChanged);
             // 
+            // buttonSalirLogin
+            // 
+            this.buttonSalirLogin.Location = new System.Drawing.Point(618, 378);
+            this.buttonSalirLogin.Name = "buttonSalirLogin";
+            this.buttonSalirLogin.Size = new System.Drawing.Size(135, 42);
+            this.buttonSalirLogin.TabIndex = 6;
+            this.buttonSalirLogin.Text = "Salir";
+            this.buttonSalirLogin.UseVisualStyleBackColor = true;
+            this.buttonSalirLogin.Click += new System.EventHandler(this.buttonSalirLogin_Click);
+            // 
             // FormLogin
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.buttonSalirLogin);
             this.Controls.Add(this.chkVerPassLogin);
             this.Controls.Add(this.btnVerPassword);
             this.Controls.Add(this.labelPassword);
@@ -135,5 +147,6 @@
         private System.Windows.Forms.Label labelPassword;
         private System.Windows.Forms.CheckBox btnVerPassword;
         private System.Windows.Forms.CheckBox chkVerPassLogin;
+        private System.Windows.Forms.Button buttonSalirLogin;
     }
 }

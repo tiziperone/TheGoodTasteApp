@@ -204,7 +204,7 @@
             // 
             // pbLogoInicio
             // 
-            this.pbLogoInicio.BackColor = System.Drawing.SystemColors.ActiveCaptionText;
+            this.pbLogoInicio.BackColor = System.Drawing.Color.Black;
             this.pbLogoInicio.Dock = System.Windows.Forms.DockStyle.Fill;
             this.pbLogoInicio.Image = ((System.Drawing.Image)(resources.GetObject("pbLogoInicio.Image")));
             this.pbLogoInicio.Location = new System.Drawing.Point(0, 0);
@@ -219,7 +219,6 @@
             // 
             this.buttonCerrarSesion.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.buttonCerrarSesion.BackColor = System.Drawing.Color.Transparent;
-            this.buttonCerrarSesion.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("buttonCerrarSesion.BackgroundImage")));
             this.buttonCerrarSesion.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
             this.buttonCerrarSesion.FlatAppearance.BorderSize = 0;
             this.buttonCerrarSesion.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(130)))), ((int)(((byte)(40)))));
