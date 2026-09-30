@@ -83,7 +83,6 @@ namespace TheGoodTaste.UI
                                  !string.IsNullOrWhiteSpace(txtTelefono.Text);
         }
 
-        // ---------- EVENTOS VINCULADOS DESDE EL DISEÑADOR ----------
 
         private void btnGuardar_Click_1(object sender, EventArgs e)
         {
@@ -114,8 +113,6 @@ namespace TheGoodTaste.UI
         }
 
         private void btnLimpiar_Click_1(object sender, EventArgs e) => LimpiarCampos();
-
-        // -----------------------------------------------------------
 
         private void btnModificar_Click(object sender, EventArgs e)
         {
