@@ -162,7 +162,7 @@ namespace TheGoodTaste.UI
                     {
                         try
                         {
-                            _negocio.EliminarProducto(prod.Codigo);
+                            _negocio.EliminarProducto(prod);
                             CargarGrillaProductos();
                             LimpiarCampos();
                         }
@@ -318,6 +318,24 @@ namespace TheGoodTaste.UI
             dgvProductos.ClearSelection();
             ActualizarEstadoBotones();
             txtCodigo.Focus();
+        }
+
+        // 1. Solución para CS1503 en línea 165 (Pasar el código como string)
+        private void EliminarProductoSeleccionado(string codigo)
+        {
+            var prod = new Producto { Codigo = codigo };
+            _negocio.EliminarProducto(prod);
+        }
+
+        // 2. Solución para eventos faltantes de inactivos/activos del Diseñador (líneas 212 y 222)
+        private void buttonInactivos_Click(object sender, EventArgs e)
+        {
+            // Lógica para mostrar inactivos si la usan, o vacío para no romper la compilación
+        }
+
+        private void buttonActivos_Click(object sender, EventArgs e)
+        {
+            // Lógica para mostrar activos si la usan, o vacío para no romper la compilación
         }
     }
 }

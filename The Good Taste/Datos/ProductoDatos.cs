@@ -106,6 +106,33 @@ namespace The_Good_Taste.Datos
             }
         }
 
+        public static bool Actualizar(Producto prod)
+        {
+            string query = @"UPDATE Productos 
+                     SET Nombre = @Nombre, 
+                         Descripcion = @Descripcion, 
+                         Precio = @Precio, 
+                         Stock = @Stock, 
+                         StockMinimo = @StockMinimo, 
+                         IdCategoria = @IdCategoria
+                     WHERE Codigo = @Codigo AND DeleteAt IS NULL";
+
+            using (SqlConnection con = Conexion.ObtenerConexion())
+            {
+                SqlCommand cmd = new SqlCommand(query, con);
+                cmd.Parameters.AddWithValue("@Codigo", prod.Codigo);
+                cmd.Parameters.AddWithValue("@Nombre", prod.Nombre);
+                cmd.Parameters.AddWithValue("@Descripcion", (object)prod.Descripcion ?? DBNull.Value);
+                cmd.Parameters.AddWithValue("@Precio", prod.Precio);
+                cmd.Parameters.AddWithValue("@Stock", prod.Stock);
+                cmd.Parameters.AddWithValue("@StockMinimo", prod.StockMinimo);
+                cmd.Parameters.AddWithValue("@IdCategoria", prod.IdCategoria);
+
+                con.Open();
+                return cmd.ExecuteNonQuery() > 0;
+            }
+        }
+
         // Nuevo método para restaurar el producto
         public static bool Activar(string codigo)
         {
