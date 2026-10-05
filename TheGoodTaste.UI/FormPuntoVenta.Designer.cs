@@ -19,8 +19,6 @@
         {
             this.label1 = new System.Windows.Forms.Label();
             this.cboCliente = new System.Windows.Forms.ComboBox();
-            this.label2 = new System.Windows.Forms.Label();
-            this.cboTipoFactura = new System.Windows.Forms.ComboBox();
             this.label3 = new System.Windows.Forms.Label();
             this.dtpFechaVenta = new System.Windows.Forms.DateTimePicker();
             this.label4 = new System.Windows.Forms.Label();
@@ -61,27 +59,10 @@
             this.cboCliente.Size = new System.Drawing.Size(121, 24);
             this.cboCliente.TabIndex = 1;
             // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(34, 106);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(83, 16);
-            this.label2.TabIndex = 2;
-            this.label2.Text = "Tipo Factura";
-            // 
-            // cboTipoFactura
-            // 
-            this.cboTipoFactura.FormattingEnabled = true;
-            this.cboTipoFactura.Location = new System.Drawing.Point(149, 106);
-            this.cboTipoFactura.Name = "cboTipoFactura";
-            this.cboTipoFactura.Size = new System.Drawing.Size(121, 24);
-            this.cboTipoFactura.TabIndex = 3;
-            // 
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(34, 147);
+            this.label3.Location = new System.Drawing.Point(34, 119);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(45, 16);
             this.label3.TabIndex = 4;
@@ -90,7 +71,7 @@
             // dtpFechaVenta
             // 
             this.dtpFechaVenta.Format = System.Windows.Forms.DateTimePickerFormat.Short;
-            this.dtpFechaVenta.Location = new System.Drawing.Point(149, 147);
+            this.dtpFechaVenta.Location = new System.Drawing.Point(147, 114);
             this.dtpFechaVenta.Name = "dtpFechaVenta";
             this.dtpFechaVenta.Size = new System.Drawing.Size(121, 22);
             this.dtpFechaVenta.TabIndex = 6;
@@ -98,7 +79,7 @@
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(34, 203);
+            this.label4.Location = new System.Drawing.Point(34, 171);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(61, 16);
             this.label4.TabIndex = 7;
@@ -107,7 +88,7 @@
             // cboProducto
             // 
             this.cboProducto.FormattingEnabled = true;
-            this.cboProducto.Location = new System.Drawing.Point(148, 200);
+            this.cboProducto.Location = new System.Drawing.Point(147, 171);
             this.cboProducto.Name = "cboProducto";
             this.cboProducto.Size = new System.Drawing.Size(121, 24);
             this.cboProducto.TabIndex = 8;
@@ -115,7 +96,7 @@
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(37, 272);
+            this.label5.Location = new System.Drawing.Point(37, 255);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(46, 16);
             this.label5.TabIndex = 9;
@@ -123,7 +104,7 @@
             // 
             // txtPrecio
             // 
-            this.txtPrecio.Location = new System.Drawing.Point(149, 272);
+            this.txtPrecio.Location = new System.Drawing.Point(149, 252);
             this.txtPrecio.Name = "txtPrecio";
             this.txtPrecio.ReadOnly = true;
             this.txtPrecio.Size = new System.Drawing.Size(119, 22);
@@ -132,7 +113,7 @@
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(34, 240);
+            this.label6.Location = new System.Drawing.Point(37, 219);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(61, 16);
             this.label6.TabIndex = 11;
@@ -140,7 +121,7 @@
             // 
             // nudCantidad
             // 
-            this.nudCantidad.Location = new System.Drawing.Point(148, 238);
+            this.nudCantidad.Location = new System.Drawing.Point(148, 213);
             this.nudCantidad.Minimum = new decimal(new int[] {
             1,
             0,
@@ -168,8 +149,8 @@
             // dgvDetalles
             // 
             this.dgvDetalles.AllowUserToAddRows = false;
-            this.dgvDetalles.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-            | System.Windows.Forms.AnchorStyles.Left)
+            this.dgvDetalles.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.dgvDetalles.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
             this.dgvDetalles.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
@@ -183,7 +164,7 @@
             this.dgvDetalles.Name = "dgvDetalles";
             this.dgvDetalles.RowHeadersWidth = 51;
             this.dgvDetalles.RowTemplate.Height = 24;
-            this.dgvDetalles.Size = new System.Drawing.Size(320, 254);
+            this.dgvDetalles.Size = new System.Drawing.Size(561, 254);
             this.dgvDetalles.TabIndex = 14;
             // 
             // colIdProducto
@@ -259,7 +240,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(773, 441);
+            this.ClientSize = new System.Drawing.Size(1014, 441);
             this.Controls.Add(this.btnLimpiar);
             this.Controls.Add(this.btnGuardarVenta);
             this.Controls.Add(this.lblTotalMonto);
@@ -274,8 +255,6 @@
             this.Controls.Add(this.label4);
             this.Controls.Add(this.dtpFechaVenta);
             this.Controls.Add(this.label3);
-            this.Controls.Add(this.cboTipoFactura);
-            this.Controls.Add(this.label2);
             this.Controls.Add(this.cboCliente);
             this.Controls.Add(this.label1);
             this.Name = "FormPuntoVenta";
@@ -292,8 +271,6 @@
 
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.ComboBox cboCliente;
-        private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.ComboBox cboTipoFactura;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.DateTimePicker dtpFechaVenta;
         private System.Windows.Forms.Label label4;

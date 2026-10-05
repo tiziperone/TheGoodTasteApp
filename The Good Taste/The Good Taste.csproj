@@ -94,6 +94,7 @@
     <Compile Include="Entidades\Producto.cs" />
     <Compile Include="Entidades\UsuarioSistema.cs" />
     <Compile Include="Entidades\Venta.cs" />
+    <Compile Include="Entidades\VentaDetalle.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>

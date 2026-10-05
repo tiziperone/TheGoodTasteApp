@@ -35,8 +35,9 @@ namespace TheGoodTaste.UI
             txtPrecio.KeyPress += SoloDecimales_KeyPress;
             cboCliente.SelectedIndexChanged += Control_Modificado;
             cboProducto.SelectedIndexChanged += CboProducto_SelectedIndexChanged;
-            nudCantidad.ValueChanged += Control_Modificado;
-            txtPrecio.TextChanged += Control_Modificado;
+
+            nudCantidad.ValueChanged += ActualizarSubtotal_Modificado;
+            txtPrecio.TextChanged += ActualizarSubtotal_Modificado;
 
             btnAgregar.Click += btnAgregar_Click;
             btnGuardarVenta.Click += btnGuardarVenta_Click;
@@ -45,14 +46,13 @@ namespace TheGoodTaste.UI
 
         private void InicializarTablaDetalles()
         {
-            if (dgvDetalles.Columns.Count == 0)
-            {
-                dgvDetalles.Columns.Add("ID", "ID");
-                dgvDetalles.Columns.Add("Producto", "Producto");
-                dgvDetalles.Columns.Add("Precio", "Precio Unit.");
-                dgvDetalles.Columns.Add("Cantidad", "Cantidad");
-                dgvDetalles.Columns.Add("Subtotal", "Subtotal");
-            }
+            dgvDetalles.Columns.Clear();
+
+            dgvDetalles.Columns.Add("ID", "Código");
+            dgvDetalles.Columns.Add("Producto", "Producto");
+            dgvDetalles.Columns.Add("Precio", "Precio Unit.");
+            dgvDetalles.Columns.Add("Cantidad", "Cantidad");
+            dgvDetalles.Columns.Add("Subtotal", "Subtotal");
 
             dgvDetalles.AllowUserToAddRows = false;
             dgvDetalles.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
@@ -62,16 +62,14 @@ namespace TheGoodTaste.UI
         {
             try
             {
-                // 1. Obtener clientes activos pasando el booleano 'true'
                 var clientes = _clienteNegocio.ObtenerClientes(true);
                 if (cboCliente != null && clientes != null)
                 {
                     cboCliente.DataSource = clientes;
-                    cboCliente.DisplayMember = "NombreCompleto"; // Ajustar si en la entidad Cliente es Nombre o RazonSocial
+                    cboCliente.DisplayMember = "nombreCliente";
                     cboCliente.ValueMember = "dniCliente";
                 }
 
-                // 2. Obtener productos activos en lista
                 _listaProductos = _productoNegocio.ObtenerProductos();
                 if (cboProducto != null && _listaProductos != null)
                 {
@@ -101,7 +99,7 @@ namespace TheGoodTaste.UI
             {
                 txtPrecio.Clear();
             }
-            ActualizarEstadoBotones();
+            ActualizarSubtotal_Modificado(sender, e);
         }
 
         private void SoloDecimales_KeyPress(object sender, KeyPressEventArgs e)
@@ -113,9 +111,15 @@ namespace TheGoodTaste.UI
 
         private void Control_Modificado(object sender, EventArgs e) => ActualizarEstadoBotones();
 
+        private void ActualizarSubtotal_Modificado(object sender, EventArgs e)
+        {
+            ActualizarEstadoBotones();
+        }
+
         private void ActualizarEstadoBotones()
         {
-            bool precioValido = decimal.TryParse(txtPrecio.Text.Trim(), out decimal precio) && precio > 0;
+            // Corrección: Leer usando la cultura local para aceptar "7.000,00" sin errores
+            bool precioValido = decimal.TryParse(txtPrecio.Text.Trim(), NumberStyles.Any, CultureInfo.CurrentCulture, out decimal precio) && precio > 0;
             btnAgregar.Enabled = cboProducto.SelectedIndex != -1 && nudCantidad.Value > 0 && precioValido;
             btnGuardarVenta.Enabled = cboCliente.SelectedIndex != -1 && dgvDetalles.Rows.Count > 0;
             btnLimpiar.Enabled = cboCliente.SelectedIndex != -1 || cboProducto.SelectedIndex != -1 || !string.IsNullOrWhiteSpace(txtPrecio.Text) || dgvDetalles.Rows.Count > 0;
@@ -123,16 +127,21 @@ namespace TheGoodTaste.UI
 
         private void btnAgregar_Click(object sender, EventArgs e)
         {
+            btnAgregar.Enabled = false;
+
             if (cboProducto.SelectedIndex == -1 || cboProducto.SelectedValue == null)
             {
                 MessageBox.Show("Seleccione un producto válido.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                ActualizarEstadoBotones();
                 return;
             }
 
-            if (!decimal.TryParse(txtPrecio.Text.Trim(), out decimal precio) || precio <= 0)
+            // Corrección: Leer usando la cultura local para cálculo matemático
+            if (!decimal.TryParse(txtPrecio.Text.Trim(), NumberStyles.Any, CultureInfo.CurrentCulture, out decimal precio) || precio <= 0)
             {
                 MessageBox.Show("Ingrese un precio válido mayor a 0.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 txtPrecio.Focus();
+                ActualizarEstadoBotones();
                 return;
             }
 
@@ -140,7 +149,6 @@ namespace TheGoodTaste.UI
             string nombreProd = cboProducto.Text;
             int cantidad = (int)nudCantidad.Value;
 
-            // Agrupar por producto si ya fue agregado al DataGridView
             bool existe = false;
             foreach (DataGridViewRow row in dgvDetalles.Rows)
             {
@@ -180,8 +188,6 @@ namespace TheGoodTaste.UI
                 {
                     Fecha = dtpFechaVenta.Value,
                     IdCliente = cboCliente.SelectedValue != null ? Convert.ToInt32(cboCliente.SelectedValue) : 1,
-                    MetodoEnvio = "Local",
-                    DireccionEnvio = "Retiro en sucursal",
                     Total = CalcularTotalVenta(),
                     Detalles = new List<VentaDetalle>()
                 };
@@ -189,15 +195,18 @@ namespace TheGoodTaste.UI
                 foreach (DataGridViewRow row in dgvDetalles.Rows)
                 {
                     if (row.IsNewRow) continue;
+
+                    // Corrección: Extraer directamente con CurrentCulture porque la grilla ya está en "N2"
+                    decimal.TryParse(row.Cells["Precio"].Value.ToString(), NumberStyles.Any, CultureInfo.CurrentCulture, out decimal precioUnitario);
+
                     nuevaVenta.Detalles.Add(new VentaDetalle
                     {
-                        IdProducto = Convert.ToInt32(row.Cells["ID"].Value),
+                        Codigo = row.Cells["ID"].Value.ToString(),
                         Cantidad = Convert.ToInt32(row.Cells["Cantidad"].Value),
-                        PrecioUnitario = Convert.ToDecimal(row.Cells["Precio"].Value)
+                        PrecioUnitario = precioUnitario
                     });
                 }
 
-                // Llamada a la capa de Negocio
                 _ventaNegocio.RegistrarVenta(nuevaVenta);
                 MessageBox.Show("Venta registrada con éxito.", "Venta Exitosa", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 LimpiarTodo();
@@ -215,14 +224,26 @@ namespace TheGoodTaste.UI
             decimal total = 0;
             foreach (DataGridViewRow row in dgvDetalles.Rows)
             {
-                if (row.Cells["Subtotal"].Value != null && decimal.TryParse(row.Cells["Subtotal"].Value.ToString(), out decimal sub))
+                if (row.IsNewRow) continue;
+
+                if (row.Cells["Subtotal"].Value != null && decimal.TryParse(row.Cells["Subtotal"].Value.ToString(), NumberStyles.Any, CultureInfo.CurrentCulture, out decimal sub))
+                {
                     total += sub;
+                }
             }
 
             Control[] controles = Controls.Find("lblTotal", true);
             if (controles.Length > 0 && controles[0] is Label labelTotal)
             {
                 labelTotal.Text = total.ToString("N2");
+            }
+            else
+            {
+                Control[] altControles = Controls.Find("labelTotal", true);
+                if (altControles.Length > 0 && altControles[0] is Label altLabelTotal)
+                {
+                    altLabelTotal.Text = total.ToString("N2");
+                }
             }
 
             return total;
