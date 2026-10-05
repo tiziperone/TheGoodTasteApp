@@ -7,7 +7,7 @@ using The_Good_Taste.Entidades;
 
 namespace TheGoodTaste.UI
 {
-    public partial class FormProductos : Form //Clase que representa el formulario de gestión de productos
+    public partial class FormProductos : Form
     {
         private readonly ProductoNegocio _negocio = new ProductoNegocio();
 
@@ -28,11 +28,13 @@ namespace TheGoodTaste.UI
         private void ConfigurarEventos()
         {
             txtPrecio.KeyPress += SoloNumerosYDecimal_KeyPress;
+            textStockMin.KeyPress += SoloNumeros_KeyPress;
             txtCodigo.TextChanged += Control_Modificado;
             txtNombre.TextChanged += Control_Modificado;
             txtDescripcion.TextChanged += Control_Modificado;
             txtPrecio.TextChanged += Control_Modificado;
             nudStock.ValueChanged += Control_Modificado;
+            textStockMin.TextChanged += textStockMin_TextChanged;
             cboCategoria.SelectedIndexChanged += Control_Modificado;
             dgvProductos.SelectionChanged += DgvProductos_SelectionChanged;
         }
@@ -50,8 +52,8 @@ namespace TheGoodTaste.UI
             dgvProductos.DataSource = null;
             dgvProductos.DataSource = _negocio.ObtenerProductos();
 
-            if (dgvProductos.Columns["IdProducto"] != null) dgvProductos.Columns["IdProducto"].Visible = false;
-            if (dgvProductos.Columns["DeletedAt"] != null) dgvProductos.Columns["DeletedAt"].Visible = false;
+            if (dgvProductos.Columns["DeleteAt"] != null) dgvProductos.Columns["DeleteAt"].Visible = false;
+            if (dgvProductos.Columns["CreateAt"] != null) dgvProductos.Columns["CreateAt"].Visible = false;
             dgvProductos.ClearSelection();
         }
 
@@ -62,13 +64,24 @@ namespace TheGoodTaste.UI
             if (e.KeyChar == '.' || e.KeyChar == ',') { e.KeyChar = decSep; if (txtPrecio.Text.Contains(decSep.ToString())) e.Handled = true; }
         }
 
+        private void SoloNumeros_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (!char.IsDigit(e.KeyChar) && !char.IsControl(e.KeyChar)) { e.Handled = true; }
+        }
+
         private void Control_Modificado(object sender, EventArgs e) => ActualizarEstadoBotones();
+
+        private void textStockMin_TextChanged(object sender, EventArgs e)
+        {
+            ActualizarEstadoBotones();
+        }
+
         private void DgvProductos_SelectionChanged(object sender, EventArgs e) => btnEliminar.Enabled = dgvProductos.SelectedRows.Count > 0;
 
         private void ActualizarEstadoBotones()
         {
-            btnLimpiar.Enabled = !string.IsNullOrWhiteSpace(txtCodigo.Text) || !string.IsNullOrWhiteSpace(txtNombre.Text) || !string.IsNullOrWhiteSpace(txtDescripcion.Text) || !string.IsNullOrWhiteSpace(txtPrecio.Text) || nudStock.Value > 0;
-            btnGuardar.Enabled = !string.IsNullOrWhiteSpace(txtCodigo.Text) && !string.IsNullOrWhiteSpace(txtNombre.Text) && !string.IsNullOrWhiteSpace(txtPrecio.Text) && cboCategoria.SelectedIndex != -1;
+            btnLimpiar.Enabled = !string.IsNullOrWhiteSpace(txtCodigo.Text) || !string.IsNullOrWhiteSpace(txtNombre.Text) || !string.IsNullOrWhiteSpace(txtDescripcion.Text) || !string.IsNullOrWhiteSpace(txtPrecio.Text) || !string.IsNullOrWhiteSpace(textStockMin.Text) || nudStock.Value > 0;
+            btnGuardar.Enabled = !string.IsNullOrWhiteSpace(txtCodigo.Text) && !string.IsNullOrWhiteSpace(txtNombre.Text) && !string.IsNullOrWhiteSpace(txtPrecio.Text) && !string.IsNullOrWhiteSpace(textStockMin.Text) && cboCategoria.SelectedIndex != -1;
             btnEliminar.Enabled = dgvProductos.SelectedRows.Count > 0;
         }
 
@@ -78,8 +91,10 @@ namespace TheGoodTaste.UI
             {
                 string precioTexto = txtPrecio.Text.Trim().Replace(',', '.');
                 decimal.TryParse(precioTexto, NumberStyles.Any, CultureInfo.InvariantCulture, out decimal precio);
+                int.TryParse(textStockMin.Text.Trim(), out int stockMin);
 
-                _negocio.GuardarProducto(txtCodigo.Text.Trim(), txtNombre.Text.Trim(), txtDescripcion.Text.Trim(), precio, (int)nudStock.Value, (int)cboCategoria.SelectedValue);
+                _negocio.GuardarProducto(txtCodigo.Text.Trim(), txtNombre.Text.Trim(), txtDescripcion.Text.Trim(), precio, (int)nudStock.Value, stockMin, (int)cboCategoria.SelectedValue);
+
                 MessageBox.Show("Producto registrado con éxito.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 LimpiarCampos();
                 CargarGrillaProductos();
@@ -96,9 +111,16 @@ namespace TheGoodTaste.UI
             Producto productoSeleccionado = (Producto)dgvProductos.SelectedRows[0].DataBoundItem;
             if (MessageBox.Show($"¿Desea eliminar '{productoSeleccionado.Nombre}'?", "Confirmar Eliminación", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
             {
-                _negocio.EliminarProducto(productoSeleccionado);
-                CargarGrillaProductos();
-                LimpiarCampos();
+                try
+                {
+                    _negocio.EliminarProducto(productoSeleccionado);
+                    CargarGrillaProductos();
+                    LimpiarCampos();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message, "Error al eliminar", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
             }
         }
 
@@ -106,7 +128,7 @@ namespace TheGoodTaste.UI
 
         private void LimpiarCampos()
         {
-            txtCodigo.Clear(); txtNombre.Clear(); txtDescripcion.Clear(); txtPrecio.Clear(); nudStock.Value = 0;
+            txtCodigo.Clear(); txtNombre.Clear(); txtDescripcion.Clear(); txtPrecio.Clear(); textStockMin.Clear(); nudStock.Value = 0;
             if (cboCategoria.Items.Count > 0) cboCategoria.SelectedIndex = 0;
             dgvProductos.ClearSelection();
             ActualizarEstadoBotones();

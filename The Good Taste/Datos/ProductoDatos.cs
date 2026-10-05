@@ -11,9 +11,9 @@ namespace The_Good_Taste.Datos
         {
             List<Producto> lista = new List<Producto>();
 
-            string query = @"SELECT IdProducto, Codigo, Nombre, Descripcion, Precio, Stock, StockMinimo, IdCategoria 
+            string query = @"SELECT Codigo, Nombre, Descripcion, Precio, Stock, StockMinimo, IdCategoria 
                              FROM Productos 
-                             WHERE DeletedAt IS NULL";
+                             WHERE DeleteAt IS NULL";
 
             using (SqlConnection con = Conexion.ObtenerConexion())
             {
@@ -26,7 +26,6 @@ namespace The_Good_Taste.Datos
                     {
                         lista.Add(new Producto
                         {
-                            IdProducto = Convert.ToInt32(dr["IdProducto"]),
                             Codigo = dr["Codigo"].ToString(),
                             Nombre = dr["Nombre"].ToString(),
                             Descripcion = dr["Descripcion"] != DBNull.Value ? dr["Descripcion"].ToString() : string.Empty,
@@ -43,7 +42,7 @@ namespace The_Good_Taste.Datos
 
         public static bool Insertar(Producto prod)
         {
-            string query = @"INSERT INTO Productos (Codigo, Nombre, Descripcion, Precio, Stock, StockMinimo, IdCategoria, CreatedAt) 
+            string query = @"INSERT INTO Productos (Codigo, Nombre, Descripcion, Precio, Stock, StockMinimo, IdCategoria, CreateAt) 
                              VALUES (@Codigo, @Nombre, @Descripcion, @Precio, @Stock, @StockMinimo, @IdCategoria, GETDATE())";
 
             using (SqlConnection con = Conexion.ObtenerConexion())
@@ -62,14 +61,14 @@ namespace The_Good_Taste.Datos
             }
         }
 
-        public static bool Eliminar(int idProducto)
+        public static bool Eliminar(string codigo)
         {
-            string query = "UPDATE Productos SET DeletedAt = GETDATE() WHERE IdProducto = @IdProducto";
+            string query = "UPDATE Productos SET DeleteAt = GETDATE() WHERE Codigo = @Codigo";
 
             using (SqlConnection con = Conexion.ObtenerConexion())
             {
                 SqlCommand cmd = new SqlCommand(query, con);
-                cmd.Parameters.AddWithValue("@IdProducto", idProducto);
+                cmd.Parameters.AddWithValue("@Codigo", codigo);
 
                 con.Open();
                 return cmd.ExecuteNonQuery() > 0;

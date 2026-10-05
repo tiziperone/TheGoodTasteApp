@@ -2,51 +2,50 @@
 using System.Collections.Generic;
 using System.Linq;
 using The_Good_Taste.Entidades;
+using The_Good_Taste.Datos;
 
 namespace TheGoodTaste.Negocio
 {
-    public class ProductoNegocio//Clase que representa la lógica de negocio para la gestión de productos en el sistema
+    public class ProductoNegocio
     {
-        private static List<Producto> _listaProductosEnMemoria = new List<Producto>();
-        private static int _contadorId = 1;
-
-        public ProductoNegocio()
+        public List<Producto> ObtenerProductos()
         {
-            if (_listaProductosEnMemoria.Count == 0) CargarIniciales();
+            return ProductoDatos.ObtenerActivos();
         }
 
-        private void CargarIniciales()
+        public void GuardarProducto(string codigo, string nombre, string descripcion, decimal precio, int stock, int stockMinimo, int idCategoria)
         {
-            _listaProductosEnMemoria.Add(new Producto { IdProducto = _contadorId++, Codigo = "PROD01", Nombre = "Bondiola Artesanal", Descripcion = "Bondiola curada al vacío", Precio = 6500.00m, Stock = 12, StockMinimo = 5, IdCategoria = 2 });
-            _listaProductosEnMemoria.Add(new Producto { IdProducto = _contadorId++, Codigo = "PROD02", Nombre = "Ravioles Caseros", Descripcion = "Plancha de 24 unidades", Precio = 3800.00m, Stock = 20, StockMinimo = 5, IdCategoria = 1 });
-        }
+            if (string.IsNullOrWhiteSpace(codigo)) throw new Exception("El código es obligatorio.");
+            if (string.IsNullOrWhiteSpace(nombre)) throw new Exception("El nombre es obligatorio.");
+            if (precio <= 0) throw new Exception("Ingrese un precio válido mayor a 0.");
+            if (stock < 0) throw new Exception("El stock no puede ser negativo.");
+            if (stockMinimo < 0) throw new Exception("El stock mínimo no puede ser negativo.");
 
-        public List<Producto> ObtenerProductos() => _listaProductosEnMemoria.ToList();
-
-        public void GuardarProducto(string codigo, string nombre, string descripcion, decimal precio, int stock, int idCategoria)
-        {
-            if (precio <= 0)
-                throw new Exception("Ingrese un precio válido mayor a 0.");
-
-            if (_listaProductosEnMemoria.Any(p => p.Codigo.Equals(codigo, StringComparison.OrdinalIgnoreCase)))
+            var productosExistentes = ProductoDatos.ObtenerActivos();
+            if (productosExistentes.Any(p => p.Codigo.Equals(codigo, StringComparison.OrdinalIgnoreCase)))
                 throw new Exception("Ya existe un producto registrado con ese código.");
 
-            _listaProductosEnMemoria.Add(new Producto
+            Producto nuevoProducto = new Producto
             {
-                IdProducto = _contadorId++,
                 Codigo = codigo.ToUpper(),
                 Nombre = nombre,
                 Descripcion = descripcion,
                 Precio = precio,
                 Stock = stock,
-                StockMinimo = 5,
+                StockMinimo = stockMinimo,
                 IdCategoria = idCategoria
-            });
+            };
+
+            if (!ProductoDatos.Insertar(nuevoProducto))
+                throw new Exception("Ocurrió un error al guardar el producto en la base de datos.");
         }
 
         public void EliminarProducto(Producto producto)
         {
-            if (producto != null) _listaProductosEnMemoria.Remove(producto);
+            if (producto == null) throw new Exception("Debe seleccionar un producto válido.");
+
+            if (!ProductoDatos.Eliminar(producto.Codigo))
+                throw new Exception("Ocurrió un error al intentar eliminar el producto de la base de datos.");
         }
     }
 }
