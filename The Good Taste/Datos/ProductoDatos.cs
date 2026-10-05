@@ -133,7 +133,6 @@ namespace The_Good_Taste.Datos
             }
         }
 
-        // Nuevo método para restaurar el producto
         public static bool Activar(string codigo)
         {
             string query = "UPDATE Productos SET DeleteAt = NULL WHERE Codigo = @Codigo";

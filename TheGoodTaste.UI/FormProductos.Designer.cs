@@ -47,6 +47,8 @@
             this.textStockMin = new System.Windows.Forms.TextBox();
             this.buttonInactivos = new System.Windows.Forms.Button();
             this.buttonActivos = new System.Windows.Forms.Button();
+            this.textBoxBuscarProducto = new System.Windows.Forms.TextBox();
+            this.labelProduct = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.nudStock)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dgvProductos)).BeginInit();
             this.SuspendLayout();
@@ -221,11 +223,30 @@
             this.buttonActivos.UseVisualStyleBackColor = true;
             this.buttonActivos.Click += new System.EventHandler(this.buttonActivos_Click);
             // 
+            // textBoxBuscarProducto
+            // 
+            this.textBoxBuscarProducto.Location = new System.Drawing.Point(740, 414);
+            this.textBoxBuscarProducto.Name = "textBoxBuscarProducto";
+            this.textBoxBuscarProducto.Size = new System.Drawing.Size(171, 22);
+            this.textBoxBuscarProducto.TabIndex = 35;
+            this.textBoxBuscarProducto.TextChanged += new System.EventHandler(this.textBoxBuscarProducto_TextChanged);
+            // 
+            // labelProduct
+            // 
+            this.labelProduct.AutoSize = true;
+            this.labelProduct.Location = new System.Drawing.Point(672, 420);
+            this.labelProduct.Name = "labelProduct";
+            this.labelProduct.Size = new System.Drawing.Size(65, 20);
+            this.labelProduct.TabIndex = 36;
+            this.labelProduct.Text = "Buscar:";
+            // 
             // FormProductos
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1043, 528);
+            this.Controls.Add(this.labelProduct);
+            this.Controls.Add(this.textBoxBuscarProducto);
             this.Controls.Add(this.buttonActivos);
             this.Controls.Add(this.buttonInactivos);
             this.Controls.Add(this.textStockMin);
@@ -276,5 +297,7 @@
         private System.Windows.Forms.TextBox textStockMin;
         private System.Windows.Forms.Button buttonInactivos;
         private System.Windows.Forms.Button buttonActivos;
+        private System.Windows.Forms.TextBox textBoxBuscarProducto;
+        private System.Windows.Forms.Label labelProduct;
     }
 }

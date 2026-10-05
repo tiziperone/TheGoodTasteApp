@@ -76,7 +76,6 @@ namespace TheGoodTaste.Negocio
                 throw new Exception("Ocurrió un error al intentar eliminar el producto de la base de datos.");
         }
 
-        // Nuevo método para restaurar productos dados de baja
         public void ActivarProducto(Producto producto)
         {
             if (producto == null) throw new Exception("Debe seleccionar un producto válido.");

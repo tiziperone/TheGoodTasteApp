@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Windows.Forms;
 using TheGoodTaste.Negocio;
 using The_Good_Taste.Entidades;
@@ -14,8 +15,10 @@ namespace TheGoodTaste.UI
         private bool _esEdicion = false;
         private bool _viendoInactivos = false;
 
-        // Variable para guardar el estado original del producto y comparar cambios
         private Producto _productoOriginalEdicion = null;
+
+        // Caché en memoria para filtrar sin ir a la base de datos constantemente
+        private List<Producto> _productosActuales = new List<Producto>();
 
         public FormProductos()
         {
@@ -78,19 +81,48 @@ namespace TheGoodTaste.UI
             cboCategoria.ValueMember = "IdCategoria";
         }
 
+        // Se encarga EXCLUSIVAMENTE de traer los datos desde la BD a la memoria
         private void CargarGrillaProductos()
+        {
+            if (_viendoInactivos)
+            {
+                _productosActuales = _negocio.ObtenerProductosInactivos();
+            }
+            else
+            {
+                _productosActuales = _negocio.ObtenerProductos();
+            }
+
+            // Al recargar la grilla, aplicamos el filtro actual (o vacío si no hay nada escrito)
+            Control txtBuscar = Controls.Find("textBoxBuscarProducto", true).FirstOrDefault();
+            string filtroActual = txtBuscar != null ? txtBuscar.Text.Trim() : "";
+
+            FiltrarGrilla(filtroActual);
+        }
+
+        // Se encarga de mostrar la lista filtrada y armar las columnas
+        private void FiltrarGrilla(string filtro)
         {
             dgvProductos.DataSource = null;
             dgvProductos.Columns.Clear();
 
+            string f = filtro.ToLower();
+
+            // LINQ para filtrar la lista en memoria (Código, Nombre o Descripción)
+            var listaFiltrada = _productosActuales.Where(p =>
+                (p.Codigo != null && p.Codigo.ToLower().Contains(f)) ||
+                (p.Nombre != null && p.Nombre.ToLower().Contains(f)) ||
+                (p.Descripcion != null && p.Descripcion.ToLower().Contains(f))
+            ).ToList();
+
+            dgvProductos.DataSource = listaFiltrada;
+
             if (_viendoInactivos)
             {
-                dgvProductos.DataSource = _negocio.ObtenerProductosInactivos();
                 AgregarBotonActivarGrilla();
             }
             else
             {
-                dgvProductos.DataSource = _negocio.ObtenerProductos();
                 AgregarBotonesGrilla();
             }
 
@@ -143,7 +175,7 @@ namespace TheGoodTaste.UI
                 if (columnName == "Editar")
                 {
                     _esEdicion = true;
-                    _productoOriginalEdicion = prod; // Guardamos el estado original para comparar después
+                    _productoOriginalEdicion = prod;
 
                     txtCodigo.Text = prod.Codigo;
                     txtCodigo.Enabled = false;
@@ -158,13 +190,13 @@ namespace TheGoodTaste.UI
                 }
                 else if (columnName == "Baja")
                 {
-                    if (MessageBox.Show($"¿Desea eliminar '{prod.Nombre}'?", "Confirmar Eliminación", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                    if (MessageBox.Show($"¿Desea dar de baja '{prod.Nombre}'?", "Confirmar Eliminación", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
                     {
                         try
                         {
                             _negocio.EliminarProducto(prod);
-                            CargarGrillaProductos();
                             LimpiarCampos();
+                            CargarGrillaProductos(); // Refresca y aplica el filtro si quedó escrito
                         }
                         catch (Exception ex)
                         {
@@ -179,8 +211,8 @@ namespace TheGoodTaste.UI
                         try
                         {
                             _negocio.ActivarProducto(prod);
-                            CargarGrillaProductos();
                             MessageBox.Show("Producto reactivado con éxito.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                            CargarGrillaProductos();
                         }
                         catch (Exception ex)
                         {
@@ -242,7 +274,6 @@ namespace TheGoodTaste.UI
 
                 if (_esEdicion && _productoOriginalEdicion != null)
                 {
-                    // Lógica para detectar qué cambió exactamente
                     List<string> cambios = new List<string>();
 
                     if (txtNombre.Text.Trim() != _productoOriginalEdicion.Nombre)
@@ -262,7 +293,6 @@ namespace TheGoodTaste.UI
 
                     if ((int)cboCategoria.SelectedValue != _productoOriginalEdicion.IdCategoria)
                     {
-                        string nombreCatOriginal = ((Categoria)cboCategoria.Items[cboCategoria.FindStringExact(_productoOriginalEdicion.IdCategoria.ToString())]).NombreCategoria; // Intenta buscar por texto si falla asume ID
                         cambios.Add($"- Categoría ID: {_productoOriginalEdicion.IdCategoria} -> {cboCategoria.SelectedValue}");
                     }
 
@@ -273,7 +303,6 @@ namespace TheGoodTaste.UI
                         return;
                     }
 
-                    // Armar mensaje con los cambios detectados
                     string mensajeConfirmacion = "¿Desea guardar los siguientes cambios?\n\n" + string.Join("\n", cambios);
 
                     if (MessageBox.Show(mensajeConfirmacion, "Confirmar Modificación", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
@@ -287,7 +316,6 @@ namespace TheGoodTaste.UI
                 }
                 else
                 {
-                    // Lógica para registrar un producto nuevo
                     _negocio.GuardarProducto(txtCodigo.Text.Trim(), txtNombre.Text.Trim(), txtDescripcion.Text.Trim(), precio, (int)nudStock.Value, stockMin, (int)cboCategoria.SelectedValue);
                     MessageBox.Show("Producto registrado con éxito.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
@@ -320,22 +348,26 @@ namespace TheGoodTaste.UI
             txtCodigo.Focus();
         }
 
-        // 1. Solución para CS1503 en línea 165 (Pasar el código como string)
-        private void EliminarProductoSeleccionado(string codigo)
-        {
-            var prod = new Producto { Codigo = codigo };
-            _negocio.EliminarProducto(prod);
-        }
-
-        // 2. Solución para eventos faltantes de inactivos/activos del Diseñador (líneas 212 y 222)
-        private void buttonInactivos_Click(object sender, EventArgs e)
-        {
-            // Lógica para mostrar inactivos si la usan, o vacío para no romper la compilación
-        }
-
+        // EVENTOS DE LOS BOTONES DE FILTRO ESTADO 
         private void buttonActivos_Click(object sender, EventArgs e)
         {
-            // Lógica para mostrar activos si la usan, o vacío para no romper la compilación
+            _viendoInactivos = false;
+            CargarGrillaProductos();
+        }
+
+        private void buttonInactivos_Click(object sender, EventArgs e)
+        {
+            _viendoInactivos = true;
+            CargarGrillaProductos();
+        }
+
+        // EVENTO DEL BUSCADOR DE PRODUCTOS
+        private void textBoxBuscarProducto_TextChanged(object sender, EventArgs e)
+        {
+            if (sender is TextBox txt)
+            {
+                FiltrarGrilla(txt.Text.Trim());
+            }
         }
     }
 }
