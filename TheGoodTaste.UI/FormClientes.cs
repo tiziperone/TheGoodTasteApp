@@ -84,12 +84,6 @@ namespace TheGoodTaste.UI
             var dtp = ObtenerDateTimePicker();
             if (dtp != null) dtp.ValueChanged += Control_Modificado;
 
-            Control txtBuscar = Controls.Find("txtBuscar", true).FirstOrDefault() ?? Controls.Find("textBoxBuscar", true).FirstOrDefault();
-            if (txtBuscar is TextBox txtB)
-            {
-                txtB.TextChanged += (s, e) => FiltrarGrilla(txtB.Text.Trim());
-            }
-
             // BOTONES DE FILTRO ACTIVO/INACTIVO
             if (btnActivo != null) btnActivo.Click += (s, e) => { CargarGrillaClientes(true); };
             if (btnInactivo != null) btnInactivo.Click += (s, e) => { CargarGrillaClientes(false); };
@@ -230,11 +224,9 @@ namespace TheGoodTaste.UI
                 DataTable dt = _negocio.ObtenerClientes(verActivos);
                 dgvClientes.DataSource = dt;
 
-                // Limpiamos los botones generados anteriormente para no duplicarlos al cambiar de pestaña
                 if (dgvClientes.Columns.Contains("Modificar")) dgvClientes.Columns.Remove("Modificar");
                 if (dgvClientes.Columns.Contains("AccionEstado")) dgvClientes.Columns.Remove("AccionEstado");
 
-                // Solo agregamos el botón modificar si estamos en la lista de activos
                 if (verActivos)
                 {
                     var btnModificar = new DataGridViewButtonColumn
@@ -247,7 +239,6 @@ namespace TheGoodTaste.UI
                     dgvClientes.Columns.Insert(0, btnModificar);
                 }
 
-                // Agregamos un único botón de estado (Eliminar si vemos activos, Activar si vemos inactivos)
                 var btnEstado = new DataGridViewButtonColumn
                 {
                     Name = "AccionEstado",
@@ -267,6 +258,9 @@ namespace TheGoodTaste.UI
                 }
 
                 dgvClientes.ClearSelection();
+
+                // Limpiar el buscador visualmente al cambiar de estado
+                if (textBoxBuscarCliente != null) textBoxBuscarCliente.Clear();
             }
             catch (Exception ex)
             {
@@ -321,7 +315,6 @@ namespace TheGoodTaste.UI
 
         private void CargarClienteParaEdicion(DataGridViewRow fila)
         {
-            //  no se pueden modificar los inactivos
             if (!_verActivos)
             {
                 MessageBox.Show("No se pueden modificar datos de un cliente dado de baja.", "Acción no permitida", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -380,6 +373,7 @@ namespace TheGoodTaste.UI
                 dgvClientes.CommitEdit(DataGridViewDataErrorContexts.Commit);
         }
 
+        // FUNCIÓN DE FILTRADO EN MEMORIA
         private void FiltrarGrilla(string filtro)
         {
             if (dgvClientes.DataSource is DataTable dt)
@@ -418,5 +412,14 @@ namespace TheGoodTaste.UI
         private void btnLimpiar_Click(object sender, EventArgs e) => LimpiarCampos();
         private void SoloLetras_KeyPress(object sender, KeyPressEventArgs e) { if (!char.IsLetter(e.KeyChar) && !char.IsControl(e.KeyChar) && !char.IsWhiteSpace(e.KeyChar)) e.Handled = true; }
         private void SoloNumeros_KeyPress(object sender, KeyPressEventArgs e) { if (!char.IsDigit(e.KeyChar) && !char.IsControl(e.KeyChar)) e.Handled = true; }
+
+        // EVENTO DEL BUSCADOR VINCULADO CORRECTAMENTE
+        private void textBoxBuscarCliente_TextChanged(object sender, EventArgs e)
+        {
+            if (sender is TextBox txt)
+            {
+                FiltrarGrilla(txt.Text.Trim());
+            }
+        }
     }
 }

@@ -55,6 +55,8 @@
             this.textNroAltura = new System.Windows.Forms.TextBox();
             this.btnActivo = new System.Windows.Forms.Button();
             this.btnInactivo = new System.Windows.Forms.Button();
+            this.textBoxBuscarCliente = new System.Windows.Forms.TextBox();
+            this.labelBuscarClient = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.dgvClientes)).BeginInit();
             this.SuspendLayout();
             // 
@@ -208,7 +210,6 @@
             this.btnGuardar.TabIndex = 19;
             this.btnGuardar.Text = "Guardar";
             this.btnGuardar.UseVisualStyleBackColor = true;
-            
             // 
             // btnLimpiar
             // 
@@ -218,7 +219,6 @@
             this.btnLimpiar.TabIndex = 22;
             this.btnLimpiar.Text = "Limpiar";
             this.btnLimpiar.UseVisualStyleBackColor = true;
-            
             // 
             // label10
             // 
@@ -276,7 +276,6 @@
             this.btnActivo.TabIndex = 29;
             this.btnActivo.Text = "Activo";
             this.btnActivo.UseVisualStyleBackColor = true;
-            
             // 
             // btnInactivo
             // 
@@ -286,13 +285,31 @@
             this.btnInactivo.TabIndex = 30;
             this.btnInactivo.Text = "Inactivo";
             this.btnInactivo.UseVisualStyleBackColor = true;
-          
+            // 
+            // textBoxBuscarCliente
+            // 
+            this.textBoxBuscarCliente.Location = new System.Drawing.Point(649, 485);
+            this.textBoxBuscarCliente.Name = "textBoxBuscarCliente";
+            this.textBoxBuscarCliente.Size = new System.Drawing.Size(280, 22);
+            this.textBoxBuscarCliente.TabIndex = 34;
+            this.textBoxBuscarCliente.TextChanged += new System.EventHandler(this.textBoxBuscarCliente_TextChanged);
+            // 
+            // labelBuscarClient
+            // 
+            this.labelBuscarClient.AutoSize = true;
+            this.labelBuscarClient.Location = new System.Drawing.Point(563, 488);
+            this.labelBuscarClient.Name = "labelBuscarClient";
+            this.labelBuscarClient.Size = new System.Drawing.Size(65, 20);
+            this.labelBuscarClient.TabIndex = 35;
+            this.labelBuscarClient.Text = "Buscar:";
             // 
             // FormClientes
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1145, 749);
+            this.Controls.Add(this.labelBuscarClient);
+            this.Controls.Add(this.textBoxBuscarCliente);
             this.Controls.Add(this.btnInactivo);
             this.Controls.Add(this.btnActivo);
             this.Controls.Add(this.textNroAltura);
@@ -358,5 +375,7 @@
         private System.Windows.Forms.TextBox textNroAltura;
         private System.Windows.Forms.Button btnActivo;
         private System.Windows.Forms.Button btnInactivo;
+        private System.Windows.Forms.TextBox textBoxBuscarCliente;
+        private System.Windows.Forms.Label labelBuscarClient;
     }
 }

@@ -24,7 +24,6 @@ namespace TheGoodTaste.Negocio
             return filas.Length > 0 ? filas[0] : null;
         }
 
-        // Baja lógica
         public bool CambiarEstadoCliente(string dni, bool estadoActivo)
         {
             if (string.IsNullOrWhiteSpace(dni))

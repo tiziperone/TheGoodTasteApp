@@ -204,7 +204,6 @@ namespace The_Good_Taste.Datos
             }
         }
 
-        // MÉTODO DE BAJA LÓGICA (Actualizar Estado)
         public bool CambiarEstadoCliente(string dni, bool estadoActivo)
         {
             string query = "UPDATE Cliente SET Activo = @Estado WHERE dniCliente = @Dni";
