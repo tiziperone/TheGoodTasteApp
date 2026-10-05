@@ -16,10 +16,15 @@ namespace TheGoodTaste.UI
         private readonly ProductoNegocio _productoNegocio = new ProductoNegocio();
         private List<Producto> _listaProductos;
 
-        public FormPuntoVenta()
+        // Variable para guardar al vendedor que está usando la caja
+        private readonly int _dniVendedorActivo;
+
+        // Modificamos el constructor para que exija el DNI al abrirse
+        public FormPuntoVenta(int dniVendedor)
         {
             InitializeComponent();
             ConfigurarEventos();
+            _dniVendedorActivo = dniVendedor;
         }
 
         private void FormPuntoVenta_Load(object sender, EventArgs e)
@@ -47,13 +52,11 @@ namespace TheGoodTaste.UI
         private void InicializarTablaDetalles()
         {
             dgvDetalles.Columns.Clear();
-
             dgvDetalles.Columns.Add("ID", "Código");
             dgvDetalles.Columns.Add("Producto", "Producto");
             dgvDetalles.Columns.Add("Precio", "Precio Unit.");
             dgvDetalles.Columns.Add("Cantidad", "Cantidad");
             dgvDetalles.Columns.Add("Subtotal", "Subtotal");
-
             dgvDetalles.AllowUserToAddRows = false;
             dgvDetalles.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
         }
@@ -92,7 +95,7 @@ namespace TheGoodTaste.UI
                 var prod = _listaProductos.FirstOrDefault(p => p.Codigo == codigo);
                 if (prod != null)
                 {
-                    txtPrecio.Text = prod.Precio.ToString("N2");
+                    txtPrecio.Text = prod.Precio.ToString("0.00");
                 }
             }
             else
@@ -104,9 +107,21 @@ namespace TheGoodTaste.UI
 
         private void SoloDecimales_KeyPress(object sender, KeyPressEventArgs e)
         {
-            char decSep = CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator[0];
-            if (!char.IsDigit(e.KeyChar) && !char.IsControl(e.KeyChar) && e.KeyChar != '.' && e.KeyChar != ',') { e.Handled = true; return; }
-            if (e.KeyChar == '.' || e.KeyChar == ',') { e.KeyChar = decSep; if (txtPrecio.Text.Contains(decSep.ToString())) e.Handled = true; }
+            if (!char.IsDigit(e.KeyChar) && !char.IsControl(e.KeyChar) && e.KeyChar != ',' && e.KeyChar != '.')
+            {
+                e.Handled = true;
+                return;
+            }
+            if (e.KeyChar == '.') e.KeyChar = ',';
+            if (e.KeyChar == ',' && txtPrecio.Text.Contains(",")) e.Handled = true;
+        }
+
+        private decimal ConvertirADecimal(string texto)
+        {
+            if (string.IsNullOrWhiteSpace(texto)) return 0;
+            string textoLimpio = texto.Replace(".", "").Replace(",", ".");
+            decimal.TryParse(textoLimpio, NumberStyles.Any, CultureInfo.InvariantCulture, out decimal resultado);
+            return resultado;
         }
 
         private void Control_Modificado(object sender, EventArgs e) => ActualizarEstadoBotones();
@@ -118,9 +133,8 @@ namespace TheGoodTaste.UI
 
         private void ActualizarEstadoBotones()
         {
-            // Corrección: Leer usando la cultura local para aceptar "7.000,00" sin errores
-            bool precioValido = decimal.TryParse(txtPrecio.Text.Trim(), NumberStyles.Any, CultureInfo.CurrentCulture, out decimal precio) && precio > 0;
-            btnAgregar.Enabled = cboProducto.SelectedIndex != -1 && nudCantidad.Value > 0 && precioValido;
+            decimal precio = ConvertirADecimal(txtPrecio.Text);
+            btnAgregar.Enabled = cboProducto.SelectedIndex != -1 && nudCantidad.Value > 0 && precio > 0;
             btnGuardarVenta.Enabled = cboCliente.SelectedIndex != -1 && dgvDetalles.Rows.Count > 0;
             btnLimpiar.Enabled = cboCliente.SelectedIndex != -1 || cboProducto.SelectedIndex != -1 || !string.IsNullOrWhiteSpace(txtPrecio.Text) || dgvDetalles.Rows.Count > 0;
         }
@@ -136,8 +150,8 @@ namespace TheGoodTaste.UI
                 return;
             }
 
-            // Corrección: Leer usando la cultura local para cálculo matemático
-            if (!decimal.TryParse(txtPrecio.Text.Trim(), NumberStyles.Any, CultureInfo.CurrentCulture, out decimal precio) || precio <= 0)
+            decimal precio = ConvertirADecimal(txtPrecio.Text);
+            if (precio <= 0)
             {
                 MessageBox.Show("Ingrese un precio válido mayor a 0.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 txtPrecio.Focus();
@@ -188,6 +202,10 @@ namespace TheGoodTaste.UI
                 {
                     Fecha = dtpFechaVenta.Value,
                     IdCliente = cboCliente.SelectedValue != null ? Convert.ToInt32(cboCliente.SelectedValue) : 1,
+
+                    // USAMOS LA VARIABLE DE LA SESIÓN ACTIVA QUE NOS PASARON DESDE EL MENÚ
+                    DNIUsuario = _dniVendedorActivo,
+
                     Total = CalcularTotalVenta(),
                     Detalles = new List<VentaDetalle>()
                 };
@@ -196,8 +214,7 @@ namespace TheGoodTaste.UI
                 {
                     if (row.IsNewRow) continue;
 
-                    // Corrección: Extraer directamente con CurrentCulture porque la grilla ya está en "N2"
-                    decimal.TryParse(row.Cells["Precio"].Value.ToString(), NumberStyles.Any, CultureInfo.CurrentCulture, out decimal precioUnitario);
+                    decimal precioUnitario = ConvertirADecimal(row.Cells["Precio"].Value.ToString());
 
                     nuevaVenta.Detalles.Add(new VentaDetalle
                     {
@@ -226,10 +243,8 @@ namespace TheGoodTaste.UI
             {
                 if (row.IsNewRow) continue;
 
-                if (row.Cells["Subtotal"].Value != null && decimal.TryParse(row.Cells["Subtotal"].Value.ToString(), NumberStyles.Any, CultureInfo.CurrentCulture, out decimal sub))
-                {
-                    total += sub;
-                }
+                decimal sub = ConvertirADecimal(row.Cells["Subtotal"].Value?.ToString());
+                total += sub;
             }
 
             Control[] controles = Controls.Find("lblTotal", true);

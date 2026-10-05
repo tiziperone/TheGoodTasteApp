@@ -4,7 +4,7 @@ using System.Data;
 using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
 using TheGoodTaste.Negocio;
-using The_Good_Taste.Entidades; // Asegúrate de que aquí esté UsuarioSistema y RolUsuario
+using The_Good_Taste.Entidades;
 
 namespace TheGoodTaste.UI
 {
@@ -178,9 +178,9 @@ namespace TheGoodTaste.UI
 
             try
             {
-                // 1. Obtener datos (Corrección aplicada aquí)
+                // 1. Obtener datos (Usando DNI en lugar de IdUsuario para mantener consistencia con el sistema)
                 if (_usuarioActual.Rol == RolUsuario.Vendedor)
-                    dtResultados = negocio.GenerarReporteVendedor(reporteSeleccionado, _usuarioActual.IdUsuario);
+                    dtResultados = negocio.GenerarReporteVendedor(reporteSeleccionado, _usuarioActual.DNI);
                 else
                     dtResultados = negocio.GenerarReporteGerente(reporteSeleccionado);
 

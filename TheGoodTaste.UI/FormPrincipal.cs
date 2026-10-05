@@ -215,7 +215,10 @@ namespace TheGoodTaste.UI
 
         public void btnVentas_Click(object sender, EventArgs e)
         {
-            AbrirFormularioEnPanel(new FormPuntoVenta(), (Button)sender);
+            // Pasamos el DNI del usuario logueado. 
+            // Asegurate de cambiar "UsuarioAutenticado" por el nombre exacto de la variable 
+            // donde tenés guardado al usuario en tu formulario principal.
+            AbrirFormularioEnPanel(new FormPuntoVenta(_usuarioActual.DNI), (Button)sender);
         }
 
         public void btnUsuarios_Click(object sender, EventArgs e)

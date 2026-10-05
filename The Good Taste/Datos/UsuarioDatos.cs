@@ -35,7 +35,7 @@ namespace The_Good_Taste.Datos
                         {
                             return new UsuarioSistema
                             {
-                                IdUsuario = Convert.ToInt32(reader["DNI"]),
+                                DNI = Convert.ToInt32(reader["DNI"]),
                                 NombreUsuario = reader["Username"].ToString(),
                                 Rol = (RolUsuario)Convert.ToInt32(reader["IdRol"])
                             };
