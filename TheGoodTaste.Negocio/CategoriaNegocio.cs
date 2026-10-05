@@ -1,12 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using The_Good_Taste.Entidades;
+using The_Good_Taste.Datos;
 
 namespace TheGoodTaste.Negocio
 {
-    internal class CategoriaNegocio
+    public class CategoriaNegocio
     {
+        public List<Categoria> ObtenerCategorias()
+        {
+            return CategoriaDatos.ObtenerTodas();
+        }
     }
 }
