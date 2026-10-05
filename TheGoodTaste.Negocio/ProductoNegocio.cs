@@ -13,6 +13,11 @@ namespace TheGoodTaste.Negocio
             return ProductoDatos.ObtenerActivos();
         }
 
+        public List<Producto> ObtenerProductosInactivos()
+        {
+            return ProductoDatos.ObtenerInactivos();
+        }
+
         public void GuardarProducto(string codigo, string nombre, string descripcion, decimal precio, int stock, int stockMinimo, int idCategoria)
         {
             if (string.IsNullOrWhiteSpace(codigo)) throw new Exception("El código es obligatorio.");
@@ -69,6 +74,15 @@ namespace TheGoodTaste.Negocio
 
             if (!ProductoDatos.Eliminar(producto.Codigo))
                 throw new Exception("Ocurrió un error al intentar eliminar el producto de la base de datos.");
+        }
+
+        // Nuevo método para restaurar productos dados de baja
+        public void ActivarProducto(Producto producto)
+        {
+            if (producto == null) throw new Exception("Debe seleccionar un producto válido.");
+
+            if (!ProductoDatos.Activar(producto.Codigo))
+                throw new Exception("Ocurrió un error al intentar activar el producto en la base de datos.");
         }
     }
 }

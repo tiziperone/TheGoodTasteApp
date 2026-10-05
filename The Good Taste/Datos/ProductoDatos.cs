@@ -10,10 +10,41 @@ namespace The_Good_Taste.Datos
         public static List<Producto> ObtenerActivos()
         {
             List<Producto> lista = new List<Producto>();
-
             string query = @"SELECT Codigo, Nombre, Descripcion, Precio, Stock, StockMinimo, IdCategoria 
                              FROM Productos 
                              WHERE DeleteAt IS NULL";
+
+            using (SqlConnection con = Conexion.ObtenerConexion())
+            {
+                SqlCommand cmd = new SqlCommand(query, con);
+                con.Open();
+
+                using (SqlDataReader dr = cmd.ExecuteReader())
+                {
+                    while (dr.Read())
+                    {
+                        lista.Add(new Producto
+                        {
+                            Codigo = dr["Codigo"].ToString(),
+                            Nombre = dr["Nombre"].ToString(),
+                            Descripcion = dr["Descripcion"] != DBNull.Value ? dr["Descripcion"].ToString() : string.Empty,
+                            Precio = Convert.ToDecimal(dr["Precio"]),
+                            Stock = Convert.ToInt32(dr["Stock"]),
+                            StockMinimo = Convert.ToInt32(dr["StockMinimo"]),
+                            IdCategoria = Convert.ToInt32(dr["IdCategoria"])
+                        });
+                    }
+                }
+            }
+            return lista;
+        }
+
+        public static List<Producto> ObtenerInactivos()
+        {
+            List<Producto> lista = new List<Producto>();
+            string query = @"SELECT Codigo, Nombre, Descripcion, Precio, Stock, StockMinimo, IdCategoria 
+                             FROM Productos 
+                             WHERE DeleteAt IS NOT NULL";
 
             using (SqlConnection con = Conexion.ObtenerConexion())
             {
@@ -91,6 +122,21 @@ namespace The_Good_Taste.Datos
         public static bool Eliminar(string codigo)
         {
             string query = "UPDATE Productos SET DeleteAt = GETDATE() WHERE Codigo = @Codigo";
+
+            using (SqlConnection con = Conexion.ObtenerConexion())
+            {
+                SqlCommand cmd = new SqlCommand(query, con);
+                cmd.Parameters.AddWithValue("@Codigo", codigo);
+
+                con.Open();
+                return cmd.ExecuteNonQuery() > 0;
+            }
+        }
+
+        // Nuevo método para restaurar el producto
+        public static bool Activar(string codigo)
+        {
+            string query = "UPDATE Productos SET DeleteAt = NULL WHERE Codigo = @Codigo";
 
             using (SqlConnection con = Conexion.ObtenerConexion())
             {
