@@ -16,14 +16,16 @@ namespace TheGoodTaste.UI
         private readonly ProductoNegocio _productoNegocio = new ProductoNegocio();
         private List<Producto> _listaProductos;
 
+        private bool _cargandoCombo = false;
+
         // Variable para guardar al vendedor que está usando la caja
         private readonly int _dniVendedorActivo;
 
         // Modificamos el constructor para que exija el DNI al abrirse
+        // Modificamos el constructor para que exija el DNI al abrirse
         public FormPuntoVenta(int dniVendedor)
         {
             InitializeComponent();
-            ConfigurarEventos();
             _dniVendedorActivo = dniVendedor;
         }
 
@@ -35,19 +37,7 @@ namespace TheGoodTaste.UI
             LimpiarTodo();
         }
 
-        private void ConfigurarEventos()
-        {
-            txtPrecio.KeyPress += SoloDecimales_KeyPress;
-            cboCliente.SelectedIndexChanged += Control_Modificado;
-            cboProducto.SelectedIndexChanged += CboProducto_SelectedIndexChanged;
-
-            nudCantidad.ValueChanged += ActualizarSubtotal_Modificado;
-            txtPrecio.TextChanged += ActualizarSubtotal_Modificado;
-
-            btnAgregar.Click += btnAgregar_Click;
-            btnGuardarVenta.Click += btnGuardarVenta_Click;
-            btnLimpiar.Click += btnLimpiar_Click;
-        }
+   
 
         private void InicializarTablaDetalles()
         {
@@ -89,20 +79,22 @@ namespace TheGoodTaste.UI
 
         private void CboProducto_SelectedIndexChanged(object sender, EventArgs e)
         {
+            if (_cargandoCombo) return; // Si estamos limpiando o cargando, no hacer nada
+
             if (cboProducto.SelectedIndex != -1 && _listaProductos != null && cboProducto.SelectedValue != null)
             {
                 string codigo = cboProducto.SelectedValue.ToString();
                 var prod = _listaProductos.FirstOrDefault(p => p.Codigo == codigo);
                 if (prod != null)
                 {
-                    txtPrecio.Text = prod.Precio.ToString("0.00");
+                    txtPrecio.Text = prod.Precio.ToString("N2");
                 }
             }
             else
             {
                 txtPrecio.Clear();
             }
-            ActualizarSubtotal_Modificado(sender, e);
+            ActualizarEstadoBotones();
         }
 
         private void SoloDecimales_KeyPress(object sender, KeyPressEventArgs e)
@@ -141,21 +133,16 @@ namespace TheGoodTaste.UI
 
         private void btnAgregar_Click(object sender, EventArgs e)
         {
-            btnAgregar.Enabled = false;
-
+            // Si la llamada proviene de un evento fantasma o el combo está vacío, salir sin mostrar cartel
             if (cboProducto.SelectedIndex == -1 || cboProducto.SelectedValue == null)
             {
-                MessageBox.Show("Seleccione un producto válido.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                ActualizarEstadoBotones();
                 return;
             }
 
-            decimal precio = ConvertirADecimal(txtPrecio.Text);
-            if (precio <= 0)
+            if (!decimal.TryParse(txtPrecio.Text.Trim(), out decimal precio) || precio <= 0)
             {
                 MessageBox.Show("Ingrese un precio válido mayor a 0.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 txtPrecio.Focus();
-                ActualizarEstadoBotones();
                 return;
             }
 
@@ -163,6 +150,7 @@ namespace TheGoodTaste.UI
             string nombreProd = cboProducto.Text;
             int cantidad = (int)nudCantidad.Value;
 
+            // Agrupar por producto si ya existe en la grilla
             bool existe = false;
             foreach (DataGridViewRow row in dgvDetalles.Rows)
             {
@@ -186,9 +174,12 @@ namespace TheGoodTaste.UI
                 dgvDetalles.Rows.Add(codigoProd, nombreProd, precio.ToString("N2"), cantidad, subtotal.ToString("N2"));
             }
 
+            // Desactivar eventos al resetear los campos de selección
+            _cargandoCombo = true;
             cboProducto.SelectedIndex = -1;
             nudCantidad.Value = 1;
             txtPrecio.Clear();
+            _cargandoCombo = false;
 
             CalcularTotalVenta();
             ActualizarEstadoBotones();

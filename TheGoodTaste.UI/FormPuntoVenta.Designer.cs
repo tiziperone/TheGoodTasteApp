@@ -92,6 +92,7 @@
             this.cboProducto.Name = "cboProducto";
             this.cboProducto.Size = new System.Drawing.Size(121, 24);
             this.cboProducto.TabIndex = 8;
+            this.cboProducto.SelectedIndexChanged += new System.EventHandler(this.CboProducto_SelectedIndexChanged);
             // 
             // label5
             // 
