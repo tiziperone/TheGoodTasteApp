@@ -40,7 +40,7 @@ namespace TheGoodTaste.UI
             txtDescripcion.TextChanged += Control_Modificado;
             txtPrecio.TextChanged += Control_Modificado;
             nudStock.ValueChanged += Control_Modificado;
-            textStockMin.TextChanged += textStockMin_TextChanged;
+            textStockMin.TextChanged += Control_Modificado;
             cboCategoria.SelectedIndexChanged += Control_Modificado;
 
             // Navegación con flechas Arriba/Abajo
@@ -167,7 +167,6 @@ namespace TheGoodTaste.UI
         }
 
         private void Control_Modificado(object sender, EventArgs e) => ActualizarEstadoBotones();
-        private void textStockMin_TextChanged(object sender, EventArgs e) => ActualizarEstadoBotones();
 
         private void ActualizarEstadoBotones()
         {
@@ -221,6 +220,18 @@ namespace TheGoodTaste.UI
             dgvProductos.ClearSelection();
             ActualizarEstadoBotones();
             txtCodigo.Focus();
+        }
+
+        
+
+        private void buttonInactivos_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void buttonActivos_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }
