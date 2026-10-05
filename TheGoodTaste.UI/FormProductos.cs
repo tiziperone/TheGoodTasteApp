@@ -141,7 +141,7 @@ namespace TheGoodTaste.UI
                     {
                         try
                         {
-                            _negocio.EliminarProducto(prod);
+                            _negocio.EliminarProducto(prod.Codigo);
                             CargarGrillaProductos();
                             LimpiarCampos();
                         }
@@ -221,6 +221,35 @@ namespace TheGoodTaste.UI
             dgvProductos.ClearSelection();
             ActualizarEstadoBotones();
             txtCodigo.Focus();
+        }
+
+        private void btnEliminar_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                if (dgvProductos.CurrentRow == null)
+                {
+                    MessageBox.Show("Seleccione un producto de la lista para eliminar.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
+                string codigo = dgvProductos.CurrentRow.Cells["Codigo"].Value?.ToString();
+
+                var respuesta = MessageBox.Show($"¿Está seguro de que desea eliminar el producto con código {codigo}?",
+                                                "Confirmar eliminación", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+
+                if (respuesta == DialogResult.Yes)
+                {
+                    _negocio.EliminarProducto(codigo);
+                    MessageBox.Show("Producto eliminado correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    LimpiarCampos();
+                    CargarGrillaProductos();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
     }
 }

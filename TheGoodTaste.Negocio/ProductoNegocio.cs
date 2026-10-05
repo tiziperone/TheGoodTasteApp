@@ -27,9 +27,9 @@ namespace TheGoodTaste.Negocio
 
             Producto nuevoProducto = new Producto
             {
-                Codigo = codigo.ToUpper(),
-                Nombre = nombre,
-                Descripcion = descripcion,
+                Codigo = codigo.Trim().ToUpper(),
+                Nombre = nombre.Trim(),
+                Descripcion = descripcion?.Trim(),
                 Precio = precio,
                 Stock = stock,
                 StockMinimo = stockMinimo,
@@ -40,11 +40,34 @@ namespace TheGoodTaste.Negocio
                 throw new Exception("Ocurrió un error al guardar el producto en la base de datos.");
         }
 
-        public void EliminarProducto(Producto producto)
+        public void ModificarProducto(string codigo, string nombre, string descripcion, decimal precio, int stock, int stockMinimo, int idCategoria)
         {
-            if (producto == null) throw new Exception("Debe seleccionar un producto válido.");
+            if (string.IsNullOrWhiteSpace(codigo)) throw new Exception("El código es obligatorio.");
+            if (string.IsNullOrWhiteSpace(nombre)) throw new Exception("El nombre es obligatorio.");
+            if (precio <= 0) throw new Exception("Ingrese un precio válido mayor a 0.");
+            if (stock < 0) throw new Exception("El stock no puede ser negativo.");
+            if (stockMinimo < 0) throw new Exception("El stock mínimo no puede ser negativo.");
 
-            if (!ProductoDatos.Eliminar(producto.Codigo))
+            Producto prod = new Producto
+            {
+                Codigo = codigo.Trim().ToUpper(),
+                Nombre = nombre.Trim(),
+                Descripcion = descripcion?.Trim(),
+                Precio = precio,
+                Stock = stock,
+                StockMinimo = stockMinimo,
+                IdCategoria = idCategoria
+            };
+
+            if (!ProductoDatos.Actualizar(prod))
+                throw new Exception("Ocurrió un error al actualizar el producto en la base de datos.");
+        }
+
+        public void EliminarProducto(string codigo)
+        {
+            if (string.IsNullOrWhiteSpace(codigo)) throw new Exception("Debe seleccionar un producto válido.");
+
+            if (!ProductoDatos.Eliminar(codigo))
                 throw new Exception("Ocurrió un error al intentar eliminar el producto de la base de datos.");
         }
     }
