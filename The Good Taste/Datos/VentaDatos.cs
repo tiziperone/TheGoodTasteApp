@@ -23,17 +23,34 @@ namespace The_Good_Taste.Datos
                     SqlCommand cmdVenta = new SqlCommand(queryVenta, con, transaccion);
                     cmdVenta.Parameters.AddWithValue("@Fecha", venta.FechaVenta);
                     cmdVenta.Parameters.AddWithValue("@IdCliente", venta.DniCliente);
-                    cmdVenta.Parameters.AddWithValue("@DNIUsuario", venta.DNIUsuario); // Este DNI debe existir en tu BD
+                    cmdVenta.Parameters.AddWithValue("@DNIUsuario", venta.DNIUsuario);
                     cmdVenta.Parameters.AddWithValue("@Total", venta.TotalVenta);
 
                     int idVentaGenerado = Convert.ToInt32(cmdVenta.ExecuteScalar());
 
                     foreach (var item in venta.Detalles)
                     {
-                        // Nombres exactos de tu DER: Tabla VentaDetalle, usando Codigo como string
+                        // 1. DESCONTAR STOCK CON CONDICIÓN DE CONCURRENCIA
+                        // El 'AND Stock >= @Cantidad' evita la condición de carrera
+                        string queryStock = @"UPDATE Productos 
+                                              SET Stock = Stock - @Cantidad 
+                                              WHERE Codigo = @Codigo AND Stock >= @Cantidad;";
+
+                        SqlCommand cmdStock = new SqlCommand(queryStock, con, transaccion);
+                        cmdStock.Parameters.AddWithValue("@Codigo", item.Codigo);
+                        cmdStock.Parameters.AddWithValue("@Cantidad", item.Cantidad);
+
+                        int filasAfectadas = cmdStock.ExecuteNonQuery();
+
+                        // Si devuelve 0, sólo lanzamos la excepción sin hacer Rollback acá
+                        if (filasAfectadas == 0)
+                        {
+                            throw new Exception($"El producto con código '{item.Codigo}' ya no cuenta con suficiente stock debido a una venta simultánea.");
+                        }
+
+                        // 2. REGISTRAR DETALLE DE VENTA
                         string queryDetalle = @"INSERT INTO VentaDetalle (idVenta, Codigo, cantidad, precioUnitario) 
-                                                VALUES (@IdVenta, @Codigo, @Cantidad, @PrecioUnitario);
-                                                UPDATE Productos SET Stock = Stock - @Cantidad WHERE Codigo = @Codigo;";
+                                                VALUES (@IdVenta, @Codigo, @Cantidad, @PrecioUnitario);";
 
                         SqlCommand cmdDetalle = new SqlCommand(queryDetalle, con, transaccion);
                         cmdDetalle.Parameters.AddWithValue("@IdVenta", idVentaGenerado);
@@ -49,7 +66,11 @@ namespace The_Good_Taste.Datos
                 }
                 catch
                 {
-                    transaccion.Rollback();
+                    // El Rollback se centraliza una sola vez acá para cancelar todo de forma segura
+                    if (transaccion != null && transaccion.Connection != null)
+                    {
+                        transaccion.Rollback();
+                    }
                     throw;
                 }
             }

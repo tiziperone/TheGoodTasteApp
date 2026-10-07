@@ -27,6 +27,8 @@ namespace TheGoodTaste.UI
         private bool _bloquearEventos = false;
         private readonly int _dniVendedorActivo;
 
+        private readonly UsuarioNegocio _usuarioNegocio = new UsuarioNegocio();
+
         public FormPuntoVenta(int dniVendedor)
         {
             InitializeComponent();
@@ -65,7 +67,22 @@ namespace TheGoodTaste.UI
             Control[] controles = Controls.Find("lblVendedor", true);
             if (controles.Length > 0 && controles[0] is Label lblVendedor)
             {
-                lblVendedor.Text = $"Cajero DNI: {_dniVendedorActivo}";
+                // Como _dniVendedorActivo ya es int, se lo pasamos directo
+                DataRow rowUsuario = _usuarioNegocio.ObtenerUsuarioPorDNI(_dniVendedorActivo);
+
+                if (rowUsuario != null)
+                {
+                    string nombre = rowUsuario["Nombre"].ToString();
+                    string apellido = rowUsuario["Apellido"].ToString();
+
+                    // Muestra: Cajero: Pedro Obregon | DNI: 45456143
+                    lblVendedor.Text = $"Cajero: {nombre} {apellido} | DNI: {_dniVendedorActivo}";
+                }
+                else
+                {
+                    // Fallback si no encuentra la fila en la BD
+                    lblVendedor.Text = $"Cajero DNI: {_dniVendedorActivo}";
+                }
             }
         }
 
@@ -290,27 +307,55 @@ namespace TheGoodTaste.UI
             }
 
             int cantidad = (int)nudCantidad.Value;
+            if (cantidad <= 0)
+            {
+                MessageBox.Show("Ingrese una cantidad mayor a 0.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
             string codigoProd = _productoSeleccionado.Codigo;
             string nombreProd = _productoSeleccionado.Nombre;
 
-            bool existe = false;
+            // 1. Determinar la cantidad total acumulada (si ya estaba cargado en la grilla + lo nuevo)
+            int cantidadExistenteEnGrilla = 0;
+            DataGridViewRow filaExistente = null;
+
             foreach (DataGridViewRow row in dgvDetalles.Rows)
             {
                 if (row.Cells["ID"].Value?.ToString() == codigoProd)
                 {
-                    int cantExistente = Convert.ToInt32(row.Cells["Cantidad"].Value);
-                    int nuevaCant = cantExistente + cantidad;
-                    decimal nuevoSubtotal = nuevaCant * precio;
-
-                    row.Cells["Precio"].Value = precio.ToString("N2");
-                    row.Cells["Cantidad"].Value = nuevaCant;
-                    row.Cells["Subtotal"].Value = nuevoSubtotal.ToString("N2");
-                    existe = true;
+                    cantidadExistenteEnGrilla = Convert.ToInt32(row.Cells["Cantidad"].Value);
+                    filaExistente = row;
                     break;
                 }
             }
 
-            if (!existe)
+            int cantidadTotalAVender = cantidadExistenteEnGrilla + cantidad;
+
+            // 2. Validación de Stock Disponible en Capa de Negocio
+            if (cantidadTotalAVender > _productoSeleccionado.Stock)
+            {
+                MessageBox.Show($"Stock insuficiente. Quedan {_productoSeleccionado.Stock} unidades disponibles en stock " +
+                                $"(ya agregó {cantidadExistenteEnGrilla} a la grilla).",
+                                "Stock Insuficiente", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            // 3. Alerta de Stock Mínimo mediante la Capa de Negocio
+            if (_productoNegocio.ValidarStockMinimo(_productoSeleccionado, cantidadTotalAVender, out string mensajeAlerta))
+            {
+                MessageBox.Show(mensajeAlerta, "Alerta de Stock Mínimo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+
+            // 4. Agregar o actualizar en el DataGridView
+            if (filaExistente != null)
+            {
+                decimal nuevoSubtotal = cantidadTotalAVender * precio;
+                filaExistente.Cells["Precio"].Value = precio.ToString("N2");
+                filaExistente.Cells["Cantidad"].Value = cantidadTotalAVender;
+                filaExistente.Cells["Subtotal"].Value = nuevoSubtotal.ToString("N2");
+            }
+            else
             {
                 decimal subtotal = precio * cantidad;
                 dgvDetalles.Rows.Add(codigoProd, nombreProd, precio.ToString("N2"), cantidad, subtotal.ToString("N2"));
@@ -562,6 +607,34 @@ namespace TheGoodTaste.UI
             // Evento vacío de Designer
         }
 
+        private void AgregarProductoAGrilla(Producto producto, int cantidadSolicitada)
+        {
+            // 1. Validar que no supere el stock disponible actual
+            if (cantidadSolicitada > producto.Stock)
+            {
+                MessageBox.Show($"Stock insuficiente. Solo quedan {producto.Stock} unidades de '{producto.Nombre}'.",
+                                "Stock Insuficiente", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            // 2. Alerta preventiva si el stock restante caerá por debajo del stock mínimo (ejemplo: stockMinimo = 5)
+            int stockRestante = producto.Stock - cantidadSolicitada;
+            int stockMinimoPermitido = producto.StockMinimo; // O un valor fijo como 5 si no está en la BD
+
+            if (stockRestante <= stockMinimoPermitido)
+            {
+                MessageBox.Show($"¡Atención! Al vender este producto, el stock restante ({stockRestante}) quedará igual o por debajo del stock mínimo ({stockMinimoPermitido}).",
+                                "Alerta de Stock Mínimo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+
+            // ... Agregar a la grilla y actualizar totales ...
+        }
+
         #endregion
+
+        private void lblVendedor_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }
