@@ -136,6 +136,7 @@ namespace TheGoodTaste.UI
                     break;
 
                 case RolUsuario.Vendedor:
+                    DeshabilitarBoton(btnProductos); // Bloquea el acceso al catálogo/gestión de productos
                     DeshabilitarBoton(btnUsuarios);
                     DeshabilitarBoton(btnReportes);
                     break;
@@ -217,7 +218,7 @@ namespace TheGoodTaste.UI
 
             formularioHijo.TopLevel = false;
             formularioHijo.FormBorderStyle = FormBorderStyle.None;
-            formularioHijo.Dock = DockStyle.Fill; 
+            formularioHijo.Dock = DockStyle.Fill;
 
             formularioHijo.FormClosed += (s, args) =>
             {

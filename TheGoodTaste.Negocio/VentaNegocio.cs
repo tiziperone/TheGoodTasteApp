@@ -9,6 +9,13 @@ namespace TheGoodTaste.Negocio
     {
         private readonly ClienteDatos _clienteDatos = new ClienteDatos();
 
+        // --- CORRECCIÓN: Método agregado para consultar el stock en tiempo real ---
+        public int ObtenerStockActual(string codigo)
+        {
+            return VentaDatos.ObtenerStockActual(codigo);
+        }
+        // --------------------------------------------------------------------------
+
         public void RegistrarVenta(Venta nuevaVenta)
         {
             // 1. Validar que la venta no esté vacía ni sin productos

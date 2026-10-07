@@ -6,6 +6,24 @@ namespace The_Good_Taste.Datos
 {
     public class VentaDatos
     {
+        // --- CORRECCIÓN: Método agregado para leer el stock directo de la BD ---
+        public static int ObtenerStockActual(string codigo)
+        {
+            using (SqlConnection con = Conexion.ObtenerConexion())
+            {
+                con.Open();
+                string query = "SELECT Stock FROM Productos WHERE Codigo = @Codigo";
+                SqlCommand cmd = new SqlCommand(query, con);
+                cmd.Parameters.AddWithValue("@Codigo", codigo);
+
+                object result = cmd.ExecuteScalar();
+
+                // Retorna el stock actual, o 0 si por alguna razón no encuentra el registro
+                return (result != null && result != DBNull.Value) ? Convert.ToInt32(result) : 0;
+            }
+        }
+        // -----------------------------------------------------------------------
+
         public static bool RegistrarVenta(Venta venta)
         {
             using (SqlConnection con = Conexion.ObtenerConexion())

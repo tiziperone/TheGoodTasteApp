@@ -67,20 +67,16 @@ namespace TheGoodTaste.UI
             Control[] controles = Controls.Find("lblVendedor", true);
             if (controles.Length > 0 && controles[0] is Label lblVendedor)
             {
-                // Como _dniVendedorActivo ya es int, se lo pasamos directo
                 DataRow rowUsuario = _usuarioNegocio.ObtenerUsuarioPorDNI(_dniVendedorActivo);
 
                 if (rowUsuario != null)
                 {
                     string nombre = rowUsuario["Nombre"].ToString();
                     string apellido = rowUsuario["Apellido"].ToString();
-
-                    // Muestra: Cajero: Pedro Obregon | DNI: 45456143
                     lblVendedor.Text = $"Cajero: {nombre} {apellido} | DNI: {_dniVendedorActivo}";
                 }
                 else
                 {
-                    // Fallback si no encuentra la fila en la BD
                     lblVendedor.Text = $"Cajero DNI: {_dniVendedorActivo}";
                 }
             }
@@ -138,7 +134,6 @@ namespace TheGoodTaste.UI
 
                 foreach (var p in _listaProductos)
                 {
-                    // Permite buscar tipeando directamente el nombre o el código
                     colProds.Add(p.Nombre);
                     colProds.Add($"{p.Codigo} - {p.Nombre}");
                 }
@@ -189,7 +184,6 @@ namespace TheGoodTaste.UI
                 return;
             }
 
-            // Búsqueda por Nombre exacto, Nombre parcial, Formato "Código - Nombre" o Código exacto
             _productoSeleccionado = _listaProductos.FirstOrDefault(p =>
                 p.Nombre.Equals(texto, StringComparison.OrdinalIgnoreCase) ||
                 $"{p.Codigo} - {p.Nombre}".Equals(texto, StringComparison.OrdinalIgnoreCase) ||
@@ -199,7 +193,6 @@ namespace TheGoodTaste.UI
             if (_productoSeleccionado != null)
             {
                 _bloquearEventos = true;
-                // Muestra Nombre (Código) en el campo
                 txtProd.Text = _productoSeleccionado.Nombre;
                 txtPrecio.Text = _productoSeleccionado.Precio.ToString("N2");
                 _bloquearEventos = false;
@@ -315,6 +308,11 @@ namespace TheGoodTaste.UI
 
             string codigoProd = _productoSeleccionado.Codigo;
             string nombreProd = _productoSeleccionado.Nombre;
+
+            // --- CORRECCIÓN: Consultar el stock real en la BD en este milisegundo ---
+            int stockReal = _ventaNegocio.ObtenerStockActual(codigoProd);
+            _productoSeleccionado.Stock = stockReal; // Actualizamos la memoria local
+            // ------------------------------------------------------------------------
 
             // 1. Determinar la cantidad total acumulada (si ya estaba cargado en la grilla + lo nuevo)
             int cantidadExistenteEnGrilla = 0;
@@ -471,7 +469,7 @@ namespace TheGoodTaste.UI
                 using (StreamWriter writer = new StreamWriter(rutaCompleta))
                 {
                     writer.WriteLine("==========================================");
-                    writer.WriteLine("           THE GOOD TASTE POS             ");
+                    writer.WriteLine("            THE GOOD TASTE POS            ");
                     writer.WriteLine("==========================================");
                     writer.WriteLine($"Fecha: {venta.FechaVenta:dd/MM/yyyy HH:mm:ss}");
                     writer.WriteLine($"Cliente ID/DNI: {venta.DniCliente}");
@@ -493,7 +491,7 @@ namespace TheGoodTaste.UI
                     writer.WriteLine("------------------------------------------");
                     writer.WriteLine($"TOTAL: ${venta.TotalVenta:N2}");
                     writer.WriteLine("==========================================");
-                    writer.WriteLine("      ¡Gracias por su compra!             ");
+                    writer.WriteLine("       ¡Gracias por su compra!            ");
                 }
 
                 return rutaCompleta;
