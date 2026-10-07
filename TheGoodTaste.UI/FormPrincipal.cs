@@ -138,7 +138,7 @@ namespace TheGoodTaste.UI
                 case RolUsuario.Vendedor:
                     DeshabilitarBoton(btnProductos); // Bloquea el acceso al catálogo/gestión de productos
                     DeshabilitarBoton(btnUsuarios);
-                    DeshabilitarBoton(btnReportes);
+                    
                     break;
             }
         }
