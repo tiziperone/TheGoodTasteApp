@@ -94,6 +94,7 @@
     <Compile Include="Entidades\DireccionCliente.cs" />
     <Compile Include="Entidades\Localidad.cs" />
     <Compile Include="Entidades\Producto.cs" />
+    <Compile Include="Entidades\TipoPago.cs" />
     <Compile Include="Entidades\UsuarioSistema.cs" />
     <Compile Include="Entidades\Venta.cs" />
     <Compile Include="Entidades\VentaDetalle.cs" />
