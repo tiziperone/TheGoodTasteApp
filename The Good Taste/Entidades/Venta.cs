@@ -5,13 +5,14 @@ namespace The_Good_Taste.Entidades
 {
     public class Venta
     {
-        public int IdVenta { get; set; }
-        public DateTime Fecha { get; set; }
-        public int IdCliente { get; set; } // Representa el dniCliente
-        public int DNIUsuario { get; set; } // El usuario que cobra la venta
-        public decimal Total { get; set; }
+        public int IdVenta { get; set; } // PK
+        public DateTime FechaVenta { get; set; }
+        public decimal TotalVenta { get; set; }
 
-        // Relaciones
+        public int DNIUsuario { get; set; } // FK a Usuarios
+        public string DniCliente { get; set; } // FK a Cliente (mismo tipo que la PK de Cliente)
+
+        // Relaciones en memoria (C#)
         public Cliente Cliente { get; set; }
         public List<VentaDetalle> Detalles { get; set; } = new List<VentaDetalle>();
     }

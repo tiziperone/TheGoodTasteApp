@@ -36,8 +36,9 @@ namespace The_Good_Taste.Datos
                             return new UsuarioSistema
                             {
                                 DNI = Convert.ToInt32(reader["DNI"]),
-                                NombreUsuario = reader["Username"].ToString(),
-                                Rol = (RolUsuario)Convert.ToInt32(reader["IdRol"])
+                                Username = reader["Username"].ToString(),
+                                // Ahora solo se convierte a int, sin cast explícito a enum
+                                IdRol = Convert.ToInt32(reader["IdRol"])
                             };
                         }
                     }

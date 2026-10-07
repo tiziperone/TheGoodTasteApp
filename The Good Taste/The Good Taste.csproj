@@ -91,6 +91,8 @@
     <Compile Include="Datos\VentaDatos.cs" />
     <Compile Include="Entidades\Categoria.cs" />
     <Compile Include="Entidades\Cliente.cs" />
+    <Compile Include="Entidades\DireccionCliente.cs" />
+    <Compile Include="Entidades\Localidad.cs" />
     <Compile Include="Entidades\Producto.cs" />
     <Compile Include="Entidades\UsuarioSistema.cs" />
     <Compile Include="Entidades\Venta.cs" />

@@ -22,7 +22,6 @@ namespace TheGoodTaste.UI
         private readonly int _dniVendedorActivo;
 
         // Modificamos el constructor para que exija el DNI al abrirse
-        // Modificamos el constructor para que exija el DNI al abrirse
         public FormPuntoVenta(int dniVendedor)
         {
             InitializeComponent();
@@ -36,8 +35,6 @@ namespace TheGoodTaste.UI
             CargarCombos();
             LimpiarTodo();
         }
-
-   
 
         private void InicializarTablaDetalles()
         {
@@ -191,13 +188,14 @@ namespace TheGoodTaste.UI
             {
                 Venta nuevaVenta = new Venta
                 {
-                    Fecha = dtpFechaVenta.Value,
-                    IdCliente = cboCliente.SelectedValue != null ? Convert.ToInt32(cboCliente.SelectedValue) : 1,
+                    FechaVenta = dtpFechaVenta.Value,
+                    // CORRECCIÓN APLICADA AQUÍ: Se convierte el DNI del cliente a string y el fallback es "1"
+                    DniCliente = cboCliente.SelectedValue != null ? cboCliente.SelectedValue.ToString() : "1",
 
                     // USAMOS LA VARIABLE DE LA SESIÓN ACTIVA QUE NOS PASARON DESDE EL MENÚ
                     DNIUsuario = _dniVendedorActivo,
 
-                    Total = CalcularTotalVenta(),
+                    TotalVenta = CalcularTotalVenta(),
                     Detalles = new List<VentaDetalle>()
                 };
 

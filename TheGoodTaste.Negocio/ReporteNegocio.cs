@@ -29,6 +29,12 @@ namespace TheGoodTaste.Negocio
             return _datos.ObtenerTopProductosMasVendidos(desde, hasta);
         }
 
+        // NUEVO MÉTODO PARA TOP CLIENTES
+        public DataTable GenerarTopClientes(DateTime desde, DateTime hasta)
+        {
+            return _datos.ObtenerTopClientes(desde, hasta);
+        }
+
         // Métodos de Vendedor (Solo lo que él vendió)
         public DataTable GenerarMisVentas(int dniVendedor, DateTime desde, DateTime hasta)
         {

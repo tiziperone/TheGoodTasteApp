@@ -11,7 +11,7 @@ namespace TheGoodTaste.Negocio
             if (nuevaVenta.Detalles == null || nuevaVenta.Detalles.Count == 0)
                 throw new Exception("Debe agregar al menos un producto a la venta.");
 
-            if (nuevaVenta.Total <= 0)
+            if (nuevaVenta.TotalVenta <= 0)
                 throw new Exception("El total de la venta debe ser mayor a 0.");
 
             if (!VentaDatos.RegistrarVenta(nuevaVenta))

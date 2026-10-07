@@ -21,10 +21,10 @@ namespace The_Good_Taste.Datos
                                           SELECT SCOPE_IDENTITY();";
 
                     SqlCommand cmdVenta = new SqlCommand(queryVenta, con, transaccion);
-                    cmdVenta.Parameters.AddWithValue("@Fecha", venta.Fecha);
-                    cmdVenta.Parameters.AddWithValue("@IdCliente", venta.IdCliente);
+                    cmdVenta.Parameters.AddWithValue("@Fecha", venta.FechaVenta);
+                    cmdVenta.Parameters.AddWithValue("@IdCliente", venta.DniCliente);
                     cmdVenta.Parameters.AddWithValue("@DNIUsuario", venta.DNIUsuario); // Este DNI debe existir en tu BD
-                    cmdVenta.Parameters.AddWithValue("@Total", venta.Total);
+                    cmdVenta.Parameters.AddWithValue("@Total", venta.TotalVenta);
 
                     int idVentaGenerado = Convert.ToInt32(cmdVenta.ExecuteScalar());
 
