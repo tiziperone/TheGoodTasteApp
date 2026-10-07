@@ -228,7 +228,7 @@ namespace TheGoodTaste.UI
 
         public void btnReportes_Click(object sender, EventArgs e)
         {
-            AbrirFormularioEnPanel(new FormReporte(_usuarioActual), (Button)sender);
+            AbrirFormularioEnPanel(new FormReportes(_usuarioActual), (Button)sender);
         }
 
         public void btnSalir_Click(object sender, EventArgs e)

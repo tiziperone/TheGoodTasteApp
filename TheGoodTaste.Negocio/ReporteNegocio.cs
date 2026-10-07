@@ -1,4 +1,5 @@
-﻿using System.Data;
+﻿using System;
+using System.Data;
 using The_Good_Taste.Datos;
 
 namespace TheGoodTaste.Negocio
@@ -7,34 +8,31 @@ namespace TheGoodTaste.Negocio
     {
         private readonly ReporteDatos _datos = new ReporteDatos();
 
-        public DataTable GenerarReporteGerente(string tipoReporte)
+        // Métodos de Gerente
+        public DataTable GenerarRecaudacionGlobal(DateTime desde, DateTime hasta)
         {
-            switch (tipoReporte)
-            {
-                case "Recaudación Global":
-                    return _datos.ObtenerRecaudacionGlobal();
-                case "Ventas por Vendedor":
-                    return _datos.ObtenerVentasPorVendedor();
-                case "Top Productos Más Vendidos":
-                    return _datos.ObtenerTopProductosMasVendidos();
-                default:
-                    return new DataTable();
-            }
+            return _datos.ObtenerRecaudacionGlobal(desde, hasta);
         }
 
-        public DataTable GenerarReporteVendedor(string tipoReporte, int dniVendedor)
+        public DataTable GenerarVentasGenerales(DateTime desde, DateTime hasta)
         {
-            switch (tipoReporte)
-            {
-                case "Mis Ventas por Período":
-                    return _datos.ObtenerMisVentasPorPeriodo(dniVendedor);
-                case "Mis Productos Más Vendidos":
-                    return _datos.ObtenerMisProductosMasVendidos(dniVendedor);
-                case "Mis Ventas por Categoría":
-                    return _datos.ObtenerMisVentasPorCategoria(dniVendedor);
-                default:
-                    return new DataTable();
-            }
+            return _datos.ObtenerVentasGenerales(desde, hasta);
+        }
+
+        public DataTable GenerarVentasPorVendedor(DateTime desde, DateTime hasta, string nombreVendedor)
+        {
+            return _datos.ObtenerVentasPorVendedor(desde, hasta, nombreVendedor);
+        }
+
+        public DataTable GenerarTopProductos(DateTime desde, DateTime hasta)
+        {
+            return _datos.ObtenerTopProductosMasVendidos(desde, hasta);
+        }
+
+        // Métodos de Vendedor (Solo lo que él vendió)
+        public DataTable GenerarMisVentas(int dniVendedor, DateTime desde, DateTime hasta)
+        {
+            return _datos.ObtenerMisVentasPorPeriodo(dniVendedor, desde, hasta);
         }
     }
 }

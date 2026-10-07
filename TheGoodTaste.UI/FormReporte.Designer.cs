@@ -1,6 +1,6 @@
 ﻿namespace TheGoodTaste.UI
 {
-    partial class FormReporte //Clase que representa el formulario de reportes para el gerente
+    partial class FormReportes
     {
         /// <summary>
         /// Required designer variable.
@@ -56,8 +56,8 @@
             // 
             // panelReportes
             // 
-            this.panelReportes.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
+            this.panelReportes.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.panelReportes.AutoSize = true;
             this.panelReportes.Controls.Add(this.panelVentasVendedor);
@@ -183,8 +183,8 @@
             // 
             // panelClientes
             // 
-            this.panelClientes.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
+            this.panelClientes.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.panelClientes.Controls.Add(this.listaClientes);
             this.panelClientes.Location = new System.Drawing.Point(707, 73);
@@ -195,8 +195,8 @@
             // listaClientes
             // 
             this.listaClientes.AllowUserToAddRows = false;
-            this.listaClientes.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
+            this.listaClientes.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.listaClientes.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
             this.listaClientes.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
@@ -208,11 +208,12 @@
             this.listaClientes.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.listaClientes.Size = new System.Drawing.Size(521, 462);
             this.listaClientes.TabIndex = 0;
+            this.listaClientes.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.listaClientes_CellContentClick);
             // 
             // label2
             // 
-            this.label2.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
+            this.label2.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.label2.AutoSize = true;
             this.label2.Location = new System.Drawing.Point(704, 54);
@@ -237,8 +238,9 @@
             this.chart1.Size = new System.Drawing.Size(543, 242);
             this.chart1.TabIndex = 3;
             this.chart1.Text = "chart1";
+            this.chart1.Click += new System.EventHandler(this.chart1_Click);
             // 
-            // FormReporteGerente
+            // FormReporte
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -247,9 +249,9 @@
             this.Controls.Add(this.panelClientes);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.panelReportes);
-            this.Name = "FormReporteGerente";
+            this.Name = "FormReporte";
             this.Text = "FormReporteGerente";
-            this.Load += new System.EventHandler(this.FormReporteGerente_Load);
+            this.Load += new System.EventHandler(this.FormReporte_Load);
             this.panelReportes.ResumeLayout(false);
             this.panelReportes.PerformLayout();
             this.panelVentasVendedor.ResumeLayout(false);

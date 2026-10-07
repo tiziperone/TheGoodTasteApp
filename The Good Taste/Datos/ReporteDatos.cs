@@ -6,85 +6,79 @@ namespace The_Good_Taste.Datos
 {
     public class ReporteDatos
     {
-
-        public DataTable ObtenerRecaudacionGlobal()
+        public DataTable ObtenerRecaudacionGlobal(DateTime desde, DateTime hasta)
         {
-            // Agrupa por fecha de venta
             string query = @"SELECT CAST(fechaVenta AS DATE) AS Fecha, SUM(totalVenta) AS Recaudacion 
                              FROM Venta 
+                             WHERE fechaVenta BETWEEN @Desde AND @Hasta
                              GROUP BY CAST(fechaVenta AS DATE) 
                              ORDER BY Fecha";
-            return EjecutarConsulta(query);
+            return EjecutarConsulta(query, desde, hasta);
         }
 
-        public DataTable ObtenerVentasPorVendedor()
+        public DataTable ObtenerVentasGenerales(DateTime desde, DateTime hasta)
         {
-            // Cruza Venta con Usuarios por el DNIUsuario
+            string query = @"SELECT CAST(fechaVenta AS DATE) AS Fecha, COUNT(idVenta) AS CantidadVentas, SUM(totalVenta) AS Total
+                             FROM Venta 
+                             WHERE fechaVenta BETWEEN @Desde AND @Hasta
+                             GROUP BY CAST(fechaVenta AS DATE) 
+                             ORDER BY Fecha";
+            return EjecutarConsulta(query, desde, hasta);
+        }
+
+        public DataTable ObtenerVentasPorVendedor(DateTime desde, DateTime hasta, string nombreVendedor)
+        {
             string query = @"SELECT u.Nombre + ' ' + u.Apellido AS Vendedor, SUM(v.totalVenta) AS TotalVendido 
                              FROM Venta v 
                              INNER JOIN Usuarios u ON v.DNIUsuario = u.DNI 
-                             GROUP BY u.Nombre, u.Apellido 
-                             ORDER BY TotalVendido DESC";
-            return EjecutarConsulta(query);
+                             WHERE v.fechaVenta BETWEEN @Desde AND @Hasta ";
+
+            if (!string.IsNullOrEmpty(nombreVendedor))
+                query += " AND (u.Nombre LIKE '%' + @NombreBuscado + '%' OR u.Apellido LIKE '%' + @NombreBuscado + '%') ";
+
+            query += " GROUP BY u.Nombre, u.Apellido ORDER BY TotalVendido DESC";
+
+            return EjecutarConsulta(query, desde, hasta, null, nombreVendedor);
         }
 
-        public DataTable ObtenerTopProductosMasVendidos()
+        public DataTable ObtenerTopProductosMasVendidos(DateTime desde, DateTime hasta)
         {
-            // Cruza VentaDetalle con Productos para obtener el Nombre del producto
             string query = @"SELECT TOP 5 p.Nombre AS Producto, SUM(vd.cantidad) AS CantidadVendida 
                              FROM VentaDetalle vd 
+                             INNER JOIN Venta v ON vd.idVenta = v.idVenta
                              INNER JOIN Productos p ON vd.Codigo = p.Codigo 
+                             WHERE v.fechaVenta BETWEEN @Desde AND @Hasta
                              GROUP BY p.Nombre 
                              ORDER BY CantidadVendida DESC";
-            return EjecutarConsulta(query);
+            return EjecutarConsulta(query, desde, hasta);
         }
 
-        public DataTable ObtenerMisVentasPorPeriodo(int dniVendedor)
+        // EL ÚNICO REPORTE DEL VENDEDOR: Solo su propia recaudación
+        public DataTable ObtenerMisVentasPorPeriodo(int dniVendedor, DateTime desde, DateTime hasta)
         {
             string query = @"SELECT CAST(fechaVenta AS DATE) AS Fecha, SUM(totalVenta) AS Recaudacion 
                              FROM Venta 
                              WHERE DNIUsuario = @Dni 
+                             AND fechaVenta BETWEEN @Desde AND @Hasta
                              GROUP BY CAST(fechaVenta AS DATE) 
                              ORDER BY Fecha";
-            return EjecutarConsulta(query, dniVendedor);
+            return EjecutarConsulta(query, desde, hasta, dniVendedor);
         }
 
-        public DataTable ObtenerMisProductosMasVendidos(int dniVendedor)
-        {
-            string query = @"SELECT TOP 5 p.Nombre AS Producto, SUM(vd.cantidad) AS Cantidad 
-                             FROM VentaDetalle vd 
-                             INNER JOIN Venta v ON vd.idVenta = v.idVenta 
-                             INNER JOIN Productos p ON vd.Codigo = p.Codigo 
-                             WHERE v.DNIUsuario = @Dni 
-                             GROUP BY p.Nombre 
-                             ORDER BY Cantidad DESC";
-            return EjecutarConsulta(query, dniVendedor);
-        }
-
-        public DataTable ObtenerMisVentasPorCategoria(int dniVendedor)
-        {
-            // Cruza hasta Categorias para un gráfico de dona
-            string query = @"SELECT c.nombreCategoria AS Categoria, SUM(vd.cantidad * vd.precioUnitario) AS Recaudacion 
-                             FROM VentaDetalle vd 
-                             INNER JOIN Venta v ON vd.idVenta = v.idVenta 
-                             INNER JOIN Productos p ON vd.Codigo = p.Codigo 
-                             INNER JOIN Categoria c ON p.IdCategoria = c.idCategoria 
-                             WHERE v.DNIUsuario = @Dni 
-                             GROUP BY c.nombreCategoria 
-                             ORDER BY Recaudacion DESC";
-            return EjecutarConsulta(query, dniVendedor);
-        }
-
-        private DataTable EjecutarConsulta(string query, int? dni = null)
+        private DataTable EjecutarConsulta(string query, DateTime desde, DateTime hasta, int? dni = null, string nombreBuscado = null)
         {
             DataTable dt = new DataTable();
             using (SqlConnection con = Conexion.ObtenerConexion())
             {
                 SqlCommand cmd = new SqlCommand(query, con);
+                cmd.Parameters.AddWithValue("@Desde", desde);
+                cmd.Parameters.AddWithValue("@Hasta", hasta);
+
                 if (dni.HasValue)
-                {
                     cmd.Parameters.AddWithValue("@Dni", dni.Value);
-                }
+
+                if (!string.IsNullOrEmpty(nombreBuscado))
+                    cmd.Parameters.AddWithValue("@NombreBuscado", nombreBuscado);
 
                 SqlDataAdapter da = new SqlDataAdapter(cmd);
                 da.Fill(dt);
