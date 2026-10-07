@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics;
+using System.Drawing;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using TheGoodTaste.Negocio;
@@ -14,30 +17,34 @@ namespace TheGoodTaste.UI
         private readonly VentaNegocio _ventaNegocio = new VentaNegocio();
         private readonly ClienteNegocio _clienteNegocio = new ClienteNegocio();
         private readonly ProductoNegocio _productoNegocio = new ProductoNegocio();
-        private List<Producto> _listaProductos;
 
-        private bool _cargandoCombo = false;
+        private List<Producto> _listaProductos = new List<Producto>();
+        private DataTable _tablaClientes = new DataTable();
 
-        // Variable para guardar al vendedor que está usando la caja
+        private Producto _productoSeleccionado = null;
+        private DataRow _clienteSeleccionado = null;
+
+        private bool _bloquearEventos = false;
         private readonly int _dniVendedorActivo;
 
-        // Modificamos el constructor para que exija el DNI al abrirse
-        // Modificamos el constructor para que exija el DNI al abrirse
         public FormPuntoVenta(int dniVendedor)
         {
             InitializeComponent();
             _dniVendedorActivo = dniVendedor;
+            this.KeyPreview = true;
+            this.KeyDown += FormPuntoVenta_KeyDown;
         }
 
         private void FormPuntoVenta_Load(object sender, EventArgs e)
         {
             TemaVisual.AplicarEstilo(this);
             InicializarTablaDetalles();
-            CargarCombos();
+            CargarDatosIniciales();
+            MostrarInfoVendedor();
             LimpiarTodo();
         }
 
-   
+        #region --- CONFIGURACIÓN E INICIALIZACIÓN ---
 
         private void InicializarTablaDetalles()
         {
@@ -47,110 +54,245 @@ namespace TheGoodTaste.UI
             dgvDetalles.Columns.Add("Precio", "Precio Unit.");
             dgvDetalles.Columns.Add("Cantidad", "Cantidad");
             dgvDetalles.Columns.Add("Subtotal", "Subtotal");
+
             dgvDetalles.AllowUserToAddRows = false;
             dgvDetalles.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            dgvDetalles.MultiSelect = false;
         }
 
-        private void CargarCombos()
+        private void MostrarInfoVendedor()
+        {
+            Control[] controles = Controls.Find("lblVendedor", true);
+            if (controles.Length > 0 && controles[0] is Label lblVendedor)
+            {
+                lblVendedor.Text = $"Cajero DNI: {_dniVendedorActivo}";
+            }
+        }
+
+        private void CargarDatosIniciales()
         {
             try
             {
-                var clientes = _clienteNegocio.ObtenerClientes(true);
-                if (cboCliente != null && clientes != null)
-                {
-                    cboCliente.DataSource = clientes;
-                    cboCliente.DisplayMember = "nombreCliente";
-                    cboCliente.ValueMember = "dniCliente";
-                }
+                _tablaClientes = _clienteNegocio.ObtenerClientes(true) ?? new DataTable();
+                _listaProductos = _productoNegocio.ObtenerProductos() ?? new List<Producto>();
 
-                _listaProductos = _productoNegocio.ObtenerProductos();
-                if (cboProducto != null && _listaProductos != null)
-                {
-                    cboProducto.DataSource = _listaProductos;
-                    cboProducto.DisplayMember = "Nombre";
-                    cboProducto.ValueMember = "Codigo";
-                }
+                ConfigurarBuscadoresAutocompletado();
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error al cargar combos: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Error al cargar datos: " + ex.Message, "Error de Carga", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
-        private void CboProducto_SelectedIndexChanged(object sender, EventArgs e)
+        private void ConfigurarBuscadoresAutocompletado()
         {
-            if (_cargandoCombo) return; // Si estamos limpiando o cargando, no hacer nada
-
-            if (cboProducto.SelectedIndex != -1 && _listaProductos != null && cboProducto.SelectedValue != null)
+            // --- BUSCADOR CLIENTES (por DNI y por Nombre) ---
+            Control[] ctrlCliente = Controls.Find("txtBuscarCliente", true);
+            if (ctrlCliente.Length > 0 && ctrlCliente[0] is TextBox txtCliente)
             {
-                string codigo = cboProducto.SelectedValue.ToString();
-                var prod = _listaProductos.FirstOrDefault(p => p.Codigo == codigo);
-                if (prod != null)
+                txtCliente.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
+                txtCliente.AutoCompleteSource = AutoCompleteSource.CustomSource;
+                AutoCompleteStringCollection colClientes = new AutoCompleteStringCollection();
+
+                foreach (DataRow row in _tablaClientes.Rows)
                 {
-                    txtPrecio.Text = prod.Precio.ToString("N2");
+                    string dni = row["dniCliente"].ToString();
+                    string nombre = row["nombreCliente"].ToString();
+                    colClientes.Add($"{dni} - {nombre}");
+                    colClientes.Add(nombre);
                 }
+
+                txtCliente.AutoCompleteCustomSource = colClientes;
+
+                txtCliente.KeyDown -= txtBuscarCliente_KeyDown;
+                txtCliente.Leave -= txtBuscarCliente_Leave;
+
+                txtCliente.KeyDown += txtBuscarCliente_KeyDown;
+                txtCliente.Leave += txtBuscarCliente_Leave;
+            }
+
+            // --- BUSCADOR PRODUCTOS (por Nombre y por ID/Código) ---
+            Control[] ctrlProd = Controls.Find("txtBuscarProducto", true);
+            if (ctrlProd.Length > 0 && ctrlProd[0] is TextBox txtProd)
+            {
+                txtProd.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
+                txtProd.AutoCompleteSource = AutoCompleteSource.CustomSource;
+                AutoCompleteStringCollection colProds = new AutoCompleteStringCollection();
+
+                foreach (var p in _listaProductos)
+                {
+                    // Permite buscar tipeando directamente el nombre o el código
+                    colProds.Add(p.Nombre);
+                    colProds.Add($"{p.Codigo} - {p.Nombre}");
+                }
+
+                txtProd.AutoCompleteCustomSource = colProds;
+
+                txtProd.KeyDown -= txtBuscarProducto_KeyDown;
+                txtProd.Leave -= txtBuscarProducto_Leave;
+
+                txtProd.KeyDown += txtBuscarProducto_KeyDown;
+                txtProd.Leave += txtBuscarProducto_Leave;
+            }
+        }
+
+        #endregion
+
+        #region --- LÓGICA DE BÚSQUEDA Y AUTOCOMPLETADO ---
+
+        private void txtBuscarProducto_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                ProcesarSeleccionProducto();
+                e.Handled = true;
+                e.SuppressKeyPress = true;
+            }
+        }
+
+        private void txtBuscarProducto_Leave(object sender, EventArgs e)
+        {
+            ProcesarSeleccionProducto();
+        }
+
+        private void ProcesarSeleccionProducto()
+        {
+            if (_bloquearEventos) return;
+
+            Control[] ctrlProd = Controls.Find("txtBuscarProducto", true);
+            if (ctrlProd.Length == 0 || !(ctrlProd[0] is TextBox txtProd)) return;
+
+            string texto = txtProd.Text.Trim();
+
+            if (string.IsNullOrWhiteSpace(texto))
+            {
+                _productoSeleccionado = null;
+                txtPrecio.Clear();
+                ActualizarEstadoBotones();
+                return;
+            }
+
+            // Búsqueda por Nombre exacto, Nombre parcial, Formato "Código - Nombre" o Código exacto
+            _productoSeleccionado = _listaProductos.FirstOrDefault(p =>
+                p.Nombre.Equals(texto, StringComparison.OrdinalIgnoreCase) ||
+                $"{p.Codigo} - {p.Nombre}".Equals(texto, StringComparison.OrdinalIgnoreCase) ||
+                p.Nombre.IndexOf(texto, StringComparison.OrdinalIgnoreCase) >= 0 ||
+                p.Codigo.Equals(texto, StringComparison.OrdinalIgnoreCase));
+
+            if (_productoSeleccionado != null)
+            {
+                _bloquearEventos = true;
+                // Muestra Nombre (Código) en el campo
+                txtProd.Text = _productoSeleccionado.Nombre;
+                txtPrecio.Text = _productoSeleccionado.Precio.ToString("N2");
+                _bloquearEventos = false;
+
+                nudCantidad.Focus();
             }
             else
             {
                 txtPrecio.Clear();
             }
+
             ActualizarEstadoBotones();
         }
 
-        private void SoloDecimales_KeyPress(object sender, KeyPressEventArgs e)
+        private void txtBuscarCliente_KeyDown(object sender, KeyEventArgs e)
         {
-            if (!char.IsDigit(e.KeyChar) && !char.IsControl(e.KeyChar) && e.KeyChar != ',' && e.KeyChar != '.')
+            if (e.KeyCode == Keys.Enter)
             {
+                ProcesarSeleccionCliente();
                 e.Handled = true;
+                e.SuppressKeyPress = true;
+            }
+        }
+
+        private void txtBuscarCliente_Leave(object sender, EventArgs e)
+        {
+            ProcesarSeleccionCliente();
+        }
+
+        private void ProcesarSeleccionCliente()
+        {
+            if (_bloquearEventos) return;
+
+            Control[] ctrlCliente = Controls.Find("txtBuscarCliente", true);
+            if (ctrlCliente.Length == 0 || !(ctrlCliente[0] is TextBox txtCliente)) return;
+
+            string texto = txtCliente.Text.Trim();
+
+            if (string.IsNullOrWhiteSpace(texto))
+            {
+                _clienteSeleccionado = null;
+                ActualizarInfoClientePanel(null);
+                ActualizarEstadoBotones();
                 return;
             }
-            if (e.KeyChar == '.') e.KeyChar = ',';
-            if (e.KeyChar == ',' && txtPrecio.Text.Contains(",")) e.Handled = true;
-        }
 
-        private decimal ConvertirADecimal(string texto)
-        {
-            if (string.IsNullOrWhiteSpace(texto)) return 0;
-            string textoLimpio = texto.Replace(".", "").Replace(",", ".");
-            decimal.TryParse(textoLimpio, NumberStyles.Any, CultureInfo.InvariantCulture, out decimal resultado);
-            return resultado;
-        }
+            _clienteSeleccionado = _tablaClientes.AsEnumerable().FirstOrDefault(row =>
+                row["dniCliente"].ToString().Equals(texto, StringComparison.OrdinalIgnoreCase) ||
+                row["nombreCliente"].ToString().Equals(texto, StringComparison.OrdinalIgnoreCase) ||
+                $"{row["dniCliente"]} - {row["nombreCliente"]}".Equals(texto, StringComparison.OrdinalIgnoreCase));
 
-        private void Control_Modificado(object sender, EventArgs e) => ActualizarEstadoBotones();
+            if (_clienteSeleccionado != null)
+            {
+                _bloquearEventos = true;
+                txtCliente.Text = $"{_clienteSeleccionado["dniCliente"]} - {_clienteSeleccionado["nombreCliente"]}";
+                _bloquearEventos = false;
+            }
 
-        private void ActualizarSubtotal_Modificado(object sender, EventArgs e)
-        {
+            ActualizarInfoClientePanel(_clienteSeleccionado);
             ActualizarEstadoBotones();
         }
 
-        private void ActualizarEstadoBotones()
+        private void ActualizarInfoClientePanel(DataRow cliente)
         {
-            decimal precio = ConvertirADecimal(txtPrecio.Text);
-            btnAgregar.Enabled = cboProducto.SelectedIndex != -1 && nudCantidad.Value > 0 && precio > 0;
-            btnGuardarVenta.Enabled = cboCliente.SelectedIndex != -1 && dgvDetalles.Rows.Count > 0;
-            btnLimpiar.Enabled = cboCliente.SelectedIndex != -1 || cboProducto.SelectedIndex != -1 || !string.IsNullOrWhiteSpace(txtPrecio.Text) || dgvDetalles.Rows.Count > 0;
+            Control[] lblInfo = Controls.Find("lblInfoCliente", true);
+            if (lblInfo.Length > 0 && lblInfo[0] is Label label)
+            {
+                if (cliente != null)
+                {
+                    string nombre = cliente["nombreCliente"].ToString();
+                    string dni = cliente["dniCliente"].ToString();
+                    string tel = cliente.Table.Columns.Contains("telefonoCliente") ? cliente["telefonoCliente"].ToString() : "-";
+
+                    label.Text = $"Cliente: {nombre} | DNI: {dni} | Tel: {tel}";
+                    label.ForeColor = Color.Green;
+                }
+                else
+                {
+                    label.Text = "Cliente no seleccionado (se usará Consumidor Final)";
+                    label.ForeColor = Color.DarkGray;
+                }
+            }
         }
+
+        #endregion
+
+        #region --- OPERACIONES DE VENTA Y DETALLES ---
 
         private void btnAgregar_Click(object sender, EventArgs e)
         {
-            // Si la llamada proviene de un evento fantasma o el combo está vacío, salir sin mostrar cartel
-            if (cboProducto.SelectedIndex == -1 || cboProducto.SelectedValue == null)
+            ProcesarSeleccionProducto();
+
+            if (_productoSeleccionado == null)
             {
+                MessageBox.Show("Seleccione o busque un producto válido.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
-            if (!decimal.TryParse(txtPrecio.Text.Trim(), out decimal precio) || precio <= 0)
+            decimal precio = ConvertirADecimal(txtPrecio.Text);
+            if (precio <= 0)
             {
                 MessageBox.Show("Ingrese un precio válido mayor a 0.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 txtPrecio.Focus();
                 return;
             }
 
-            string codigoProd = cboProducto.SelectedValue.ToString();
-            string nombreProd = cboProducto.Text;
             int cantidad = (int)nudCantidad.Value;
+            string codigoProd = _productoSeleccionado.Codigo;
+            string nombreProd = _productoSeleccionado.Nombre;
 
-            // Agrupar por producto si ya existe en la grilla
             bool existe = false;
             foreach (DataGridViewRow row in dgvDetalles.Rows)
             {
@@ -174,29 +316,57 @@ namespace TheGoodTaste.UI
                 dgvDetalles.Rows.Add(codigoProd, nombreProd, precio.ToString("N2"), cantidad, subtotal.ToString("N2"));
             }
 
-            // Desactivar eventos al resetear los campos de selección
-            _cargandoCombo = true;
-            cboProducto.SelectedIndex = -1;
-            nudCantidad.Value = 1;
-            txtPrecio.Clear();
-            _cargandoCombo = false;
-
+            LimpiarSeleccionProducto();
             CalcularTotalVenta();
             ActualizarEstadoBotones();
         }
 
+        private decimal CalcularTotalVenta()
+        {
+            decimal total = 0;
+            foreach (DataGridViewRow row in dgvDetalles.Rows)
+            {
+                if (row.IsNewRow) continue;
+                decimal sub = ConvertirADecimal(row.Cells["Subtotal"].Value?.ToString());
+                total += sub;
+            }
+
+            string totalFormateado = total.ToString("N2");
+
+            Control[] ctrls = Controls.Find("lblTotalMonto", true);
+            if (ctrls.Length > 0 && ctrls[0] is Label labelTotal)
+            {
+                labelTotal.Text = totalFormateado;
+            }
+            else
+            {
+                try
+                {
+                    lblTotalMonto.Text = totalFormateado;
+                }
+                catch { }
+            }
+
+            return total;
+        }
+
         private void btnGuardarVenta_Click(object sender, EventArgs e)
         {
+            if (dgvDetalles.Rows.Count == 0)
+            {
+                MessageBox.Show("Debe agregar al menos un producto a la lista de venta.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
             try
             {
+                int idCliente = _clienteSeleccionado != null ? Convert.ToInt32(_clienteSeleccionado["dniCliente"]) : 1;
+
                 Venta nuevaVenta = new Venta
                 {
                     Fecha = dtpFechaVenta.Value,
-                    IdCliente = cboCliente.SelectedValue != null ? Convert.ToInt32(cboCliente.SelectedValue) : 1,
-
-                    // USAMOS LA VARIABLE DE LA SESIÓN ACTIVA QUE NOS PASARON DESDE EL MENÚ
+                    IdCliente = idCliente,
                     DNIUsuario = _dniVendedorActivo,
-
                     Total = CalcularTotalVenta(),
                     Detalles = new List<VentaDetalle>()
                 };
@@ -205,67 +375,193 @@ namespace TheGoodTaste.UI
                 {
                     if (row.IsNewRow) continue;
 
-                    decimal precioUnitario = ConvertirADecimal(row.Cells["Precio"].Value.ToString());
-
                     nuevaVenta.Detalles.Add(new VentaDetalle
                     {
                         Codigo = row.Cells["ID"].Value.ToString(),
                         Cantidad = Convert.ToInt32(row.Cells["Cantidad"].Value),
-                        PrecioUnitario = precioUnitario
+                        PrecioUnitario = ConvertirADecimal(row.Cells["Precio"].Value.ToString())
                     });
                 }
 
                 _ventaNegocio.RegistrarVenta(nuevaVenta);
-                MessageBox.Show("Venta registrada con éxito.", "Venta Exitosa", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                string rutaTicket = GenerarTicketPDF(nuevaVenta);
+
+                MessageBox.Show("Venta registrada con éxito.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                if (!string.IsNullOrEmpty(rutaTicket) && File.Exists(rutaTicket))
+                {
+                    Process.Start(new ProcessStartInfo
+                    {
+                        FileName = rutaTicket,
+                        UseShellExecute = true
+                    });
+                }
+
                 LimpiarTodo();
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show(ex.Message, "Error al Procesar Venta", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
 
-        private void btnLimpiar_Click(object sender, EventArgs e) => LimpiarTodo();
+        #endregion
 
-        private decimal CalcularTotalVenta()
+        #region --- GENERACIÓN DE TICKET ---
+
+        private string GenerarTicketPDF(Venta venta)
         {
-            decimal total = 0;
-            foreach (DataGridViewRow row in dgvDetalles.Rows)
+            try
             {
-                if (row.IsNewRow) continue;
-
-                decimal sub = ConvertirADecimal(row.Cells["Subtotal"].Value?.ToString());
-                total += sub;
-            }
-
-            Control[] controles = Controls.Find("lblTotal", true);
-            if (controles.Length > 0 && controles[0] is Label labelTotal)
-            {
-                labelTotal.Text = total.ToString("N2");
-            }
-            else
-            {
-                Control[] altControles = Controls.Find("labelTotal", true);
-                if (altControles.Length > 0 && altControles[0] is Label altLabelTotal)
+                string carpetaTickets = Path.Combine(Application.StartupPath, "Tickets");
+                if (!Directory.Exists(carpetaTickets))
                 {
-                    altLabelTotal.Text = total.ToString("N2");
+                    Directory.CreateDirectory(carpetaTickets);
                 }
+
+                string nombreArchivo = $"Ticket_Venta_{DateTime.Now:yyyyMMdd_HHmmss}.txt";
+                string rutaCompleta = Path.Combine(carpetaTickets, nombreArchivo);
+
+                using (StreamWriter writer = new StreamWriter(rutaCompleta))
+                {
+                    writer.WriteLine("==========================================");
+                    writer.WriteLine("           THE GOOD TASTE POS             ");
+                    writer.WriteLine("==========================================");
+                    writer.WriteLine($"Fecha: {venta.Fecha:dd/MM/yyyy HH:mm:ss}");
+                    writer.WriteLine($"Cliente ID/DNI: {venta.IdCliente}");
+                    writer.WriteLine($"Vendedor DNI: {venta.DNIUsuario}");
+                    writer.WriteLine("------------------------------------------");
+                    writer.WriteLine(string.Format("{0,-20} {1,5} {2,12}", "Producto", "Cant", "Subtotal"));
+                    writer.WriteLine("------------------------------------------");
+
+                    foreach (var det in venta.Detalles)
+                    {
+                        var prod = _listaProductos.FirstOrDefault(p => p.Codigo == det.Codigo);
+                        string nombre = prod != null ? prod.Nombre : det.Codigo;
+                        if (nombre.Length > 19) nombre = nombre.Substring(0, 19);
+
+                        decimal subtotal = det.Cantidad * det.PrecioUnitario;
+                        writer.WriteLine(string.Format("{0,-20} {1,5} {2,12:N2}", nombre, det.Cantidad, subtotal));
+                    }
+
+                    writer.WriteLine("------------------------------------------");
+                    writer.WriteLine($"TOTAL: ${venta.Total:N2}");
+                    writer.WriteLine("==========================================");
+                    writer.WriteLine("      ¡Gracias por su compra!             ");
+                }
+
+                return rutaCompleta;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Venta guardada pero hubo un problema con el comprobante: " + ex.Message, "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return null;
+            }
+        }
+
+        #endregion
+
+        #region --- EVENTOS AUXILIARES Y TECLAS ---
+
+        private void FormPuntoVenta_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.F5)
+            {
+                btnGuardarVenta.PerformClick();
+                e.Handled = true;
+            }
+            else if (e.KeyCode == Keys.F12)
+            {
+                btnLimpiar.PerformClick();
+                e.Handled = true;
+            }
+            else if (e.KeyCode == Keys.Delete && dgvDetalles.Focused && dgvDetalles.CurrentRow != null)
+            {
+                dgvDetalles.Rows.Remove(dgvDetalles.CurrentRow);
+                CalcularTotalVenta();
+                ActualizarEstadoBotones();
+                e.Handled = true;
+            }
+        }
+
+        private void LimpiarSeleccionProducto()
+        {
+            _bloquearEventos = true;
+
+            Control[] ctrlProd = Controls.Find("txtBuscarProducto", true);
+            if (ctrlProd.Length > 0 && ctrlProd[0] is TextBox txtProd)
+            {
+                txtProd.Clear();
+                txtProd.Focus();
             }
 
-            return total;
+            _productoSeleccionado = null;
+            nudCantidad.Value = 1;
+            txtPrecio.Clear();
+
+            _bloquearEventos = false;
         }
 
         private void LimpiarTodo()
         {
-            if (cboCliente != null) cboCliente.SelectedIndex = -1;
+            _bloquearEventos = true;
+
+            Control[] ctrlCliente = Controls.Find("txtBuscarCliente", true);
+            if (ctrlCliente.Length > 0 && ctrlCliente[0] is TextBox txtCliente)
+            {
+                txtCliente.Clear();
+            }
+
+            _clienteSeleccionado = null;
+            ActualizarInfoClientePanel(null);
+
             if (dtpFechaVenta != null) dtpFechaVenta.Value = DateTime.Today;
-            if (cboProducto != null) cboProducto.SelectedIndex = -1;
-            if (nudCantidad != null) nudCantidad.Value = 1;
-            if (txtPrecio != null) txtPrecio.Clear();
 
             dgvDetalles.Rows.Clear();
+            LimpiarSeleccionProducto();
+
+            _bloquearEventos = false;
+
             CalcularTotalVenta();
             ActualizarEstadoBotones();
         }
+
+        private void btnLimpiar_Click(object sender, EventArgs e) => LimpiarTodo();
+
+        private void SoloDecimales_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (!char.IsDigit(e.KeyChar) && !char.IsControl(e.KeyChar) && e.KeyChar != ',' && e.KeyChar != '.')
+            {
+                e.Handled = true;
+                return;
+            }
+            if (e.KeyChar == '.') e.KeyChar = ',';
+            if (e.KeyChar == ',' && txtPrecio.Text.Contains(",")) e.Handled = true;
+        }
+
+        private decimal ConvertirADecimal(string texto)
+        {
+            if (string.IsNullOrWhiteSpace(texto)) return 0;
+            string textoLimpio = texto.Replace("$", "").Trim();
+            textoLimpio = textoLimpio.Replace(".", "").Replace(",", ".");
+            decimal.TryParse(textoLimpio, NumberStyles.Any, CultureInfo.InvariantCulture, out decimal resultado);
+            return resultado;
+        }
+
+        private void ActualizarEstadoBotones()
+        {
+            decimal precio = ConvertirADecimal(txtPrecio.Text);
+            btnAgregar.Enabled = _productoSeleccionado != null && nudCantidad.Value > 0 && precio > 0;
+            btnGuardarVenta.Enabled = dgvDetalles.Rows.Count > 0;
+            btnLimpiar.Enabled = _clienteSeleccionado != null || _productoSeleccionado != null || dgvDetalles.Rows.Count > 0;
+        }
+
+        private void lblTotalMonto_Click(object sender, EventArgs e)
+        {
+            // Evento vacío de Designer
+        }
+
+        #endregion
     }
 }

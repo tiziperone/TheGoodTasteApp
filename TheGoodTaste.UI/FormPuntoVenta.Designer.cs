@@ -17,12 +17,10 @@
 
         private void InitializeComponent()
         {
-            this.label1 = new System.Windows.Forms.Label();
-            this.cboCliente = new System.Windows.Forms.ComboBox();
+            this.lblInfoCliente = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.dtpFechaVenta = new System.Windows.Forms.DateTimePicker();
-            this.label4 = new System.Windows.Forms.Label();
-            this.cboProducto = new System.Windows.Forms.ComboBox();
+            this.lblProductos = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
             this.txtPrecio = new System.Windows.Forms.TextBox();
             this.label6 = new System.Windows.Forms.Label();
@@ -38,31 +36,27 @@
             this.lblTotalMonto = new System.Windows.Forms.Label();
             this.btnGuardarVenta = new System.Windows.Forms.Button();
             this.btnLimpiar = new System.Windows.Forms.Button();
+            this.txtBuscarCliente = new System.Windows.Forms.TextBox();
+            this.lblVendedor = new System.Windows.Forms.Label();
+            this.txtBuscarProducto = new System.Windows.Forms.TextBox();
+            this.label1 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.nudCantidad)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dgvDetalles)).BeginInit();
             this.SuspendLayout();
             // 
-            // label1
+            // lblInfoCliente
             // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(34, 60);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(48, 16);
-            this.label1.TabIndex = 0;
-            this.label1.Text = "Cliente";
-            // 
-            // cboCliente
-            // 
-            this.cboCliente.FormattingEnabled = true;
-            this.cboCliente.Location = new System.Drawing.Point(149, 60);
-            this.cboCliente.Name = "cboCliente";
-            this.cboCliente.Size = new System.Drawing.Size(121, 24);
-            this.cboCliente.TabIndex = 1;
+            this.lblInfoCliente.AutoSize = true;
+            this.lblInfoCliente.Location = new System.Drawing.Point(37, 106);
+            this.lblInfoCliente.Name = "lblInfoCliente";
+            this.lblInfoCliente.Size = new System.Drawing.Size(48, 16);
+            this.lblInfoCliente.TabIndex = 0;
+            this.lblInfoCliente.Text = "Cliente";
             // 
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(34, 119);
+            this.label3.Location = new System.Drawing.Point(34, 152);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(45, 16);
             this.label3.TabIndex = 4;
@@ -71,33 +65,24 @@
             // dtpFechaVenta
             // 
             this.dtpFechaVenta.Format = System.Windows.Forms.DateTimePickerFormat.Short;
-            this.dtpFechaVenta.Location = new System.Drawing.Point(147, 114);
+            this.dtpFechaVenta.Location = new System.Drawing.Point(147, 147);
             this.dtpFechaVenta.Name = "dtpFechaVenta";
-            this.dtpFechaVenta.Size = new System.Drawing.Size(121, 22);
+            this.dtpFechaVenta.Size = new System.Drawing.Size(171, 22);
             this.dtpFechaVenta.TabIndex = 6;
             // 
-            // label4
+            // lblProductos
             // 
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(34, 171);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(61, 16);
-            this.label4.TabIndex = 7;
-            this.label4.Text = "Producto";
-            // 
-            // cboProducto
-            // 
-            this.cboProducto.FormattingEnabled = true;
-            this.cboProducto.Location = new System.Drawing.Point(147, 171);
-            this.cboProducto.Name = "cboProducto";
-            this.cboProducto.Size = new System.Drawing.Size(121, 24);
-            this.cboProducto.TabIndex = 8;
-            this.cboProducto.SelectedIndexChanged += new System.EventHandler(this.CboProducto_SelectedIndexChanged);
+            this.lblProductos.AutoSize = true;
+            this.lblProductos.Location = new System.Drawing.Point(34, 198);
+            this.lblProductos.Name = "lblProductos";
+            this.lblProductos.Size = new System.Drawing.Size(61, 16);
+            this.lblProductos.TabIndex = 7;
+            this.lblProductos.Text = "Producto";
             // 
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(37, 255);
+            this.label5.Location = new System.Drawing.Point(37, 288);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(46, 16);
             this.label5.TabIndex = 9;
@@ -105,16 +90,16 @@
             // 
             // txtPrecio
             // 
-            this.txtPrecio.Location = new System.Drawing.Point(149, 252);
+            this.txtPrecio.Location = new System.Drawing.Point(149, 282);
             this.txtPrecio.Name = "txtPrecio";
             this.txtPrecio.ReadOnly = true;
-            this.txtPrecio.Size = new System.Drawing.Size(119, 22);
+            this.txtPrecio.Size = new System.Drawing.Size(169, 22);
             this.txtPrecio.TabIndex = 10;
             // 
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(37, 219);
+            this.label6.Location = new System.Drawing.Point(37, 246);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(61, 16);
             this.label6.TabIndex = 11;
@@ -122,14 +107,14 @@
             // 
             // nudCantidad
             // 
-            this.nudCantidad.Location = new System.Drawing.Point(148, 213);
+            this.nudCantidad.Location = new System.Drawing.Point(148, 240);
             this.nudCantidad.Minimum = new decimal(new int[] {
             1,
             0,
             0,
             0});
             this.nudCantidad.Name = "nudCantidad";
-            this.nudCantidad.Size = new System.Drawing.Size(120, 22);
+            this.nudCantidad.Size = new System.Drawing.Size(170, 22);
             this.nudCantidad.TabIndex = 12;
             this.nudCantidad.Value = new decimal(new int[] {
             1,
@@ -215,6 +200,7 @@
             this.lblTotalMonto.Size = new System.Drawing.Size(31, 16);
             this.lblTotalMonto.TabIndex = 16;
             this.lblTotalMonto.Text = "0.00";
+            this.lblTotalMonto.Click += new System.EventHandler(this.lblTotalMonto_Click);
             // 
             // btnGuardarVenta
             // 
@@ -237,11 +223,45 @@
             this.btnLimpiar.UseVisualStyleBackColor = true;
             this.btnLimpiar.Click += new System.EventHandler(this.btnLimpiar_Click);
             // 
+            // txtBuscarCliente
+            // 
+            this.txtBuscarCliente.Location = new System.Drawing.Point(40, 64);
+            this.txtBuscarCliente.Name = "txtBuscarCliente";
+            this.txtBuscarCliente.Size = new System.Drawing.Size(278, 22);
+            this.txtBuscarCliente.TabIndex = 19;
+            // 
+            // lblVendedor
+            // 
+            this.lblVendedor.AutoSize = true;
+            this.lblVendedor.Location = new System.Drawing.Point(37, 9);
+            this.lblVendedor.Name = "lblVendedor";
+            this.lblVendedor.Size = new System.Drawing.Size(70, 16);
+            this.lblVendedor.TabIndex = 0;
+            this.lblVendedor.Text = "Vendedor:";
+            // 
+            // txtBuscarProducto
+            // 
+            this.txtBuscarProducto.Location = new System.Drawing.Point(149, 192);
+            this.txtBuscarProducto.Name = "txtBuscarProducto";
+            this.txtBuscarProducto.Size = new System.Drawing.Size(169, 22);
+            this.txtBuscarProducto.TabIndex = 20;
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(37, 45);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(148, 16);
+            this.label1.TabIndex = 0;
+            this.label1.Text = "Ingresar DNI del Cliente";
+            // 
             // FormPuntoVenta
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1014, 441);
+            this.Controls.Add(this.txtBuscarProducto);
+            this.Controls.Add(this.txtBuscarCliente);
             this.Controls.Add(this.btnLimpiar);
             this.Controls.Add(this.btnGuardarVenta);
             this.Controls.Add(this.lblTotalMonto);
@@ -252,12 +272,12 @@
             this.Controls.Add(this.label6);
             this.Controls.Add(this.txtPrecio);
             this.Controls.Add(this.label5);
-            this.Controls.Add(this.cboProducto);
-            this.Controls.Add(this.label4);
+            this.Controls.Add(this.lblProductos);
             this.Controls.Add(this.dtpFechaVenta);
             this.Controls.Add(this.label3);
-            this.Controls.Add(this.cboCliente);
+            this.Controls.Add(this.lblVendedor);
             this.Controls.Add(this.label1);
+            this.Controls.Add(this.lblInfoCliente);
             this.Name = "FormPuntoVenta";
             this.Text = "PuntoVenta";
             this.Load += new System.EventHandler(this.FormPuntoVenta_Load);
@@ -270,12 +290,10 @@
 
         #endregion
 
-        private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.ComboBox cboCliente;
+        private System.Windows.Forms.Label lblInfoCliente;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.DateTimePicker dtpFechaVenta;
-        private System.Windows.Forms.Label label4;
-        private System.Windows.Forms.ComboBox cboProducto;
+        private System.Windows.Forms.Label lblProductos;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.TextBox txtPrecio;
         private System.Windows.Forms.Label label6;
@@ -291,5 +309,9 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn colPrecio;
         private System.Windows.Forms.DataGridViewTextBoxColumn colCantidad;
         private System.Windows.Forms.DataGridViewTextBoxColumn colSubtotal;
+        private System.Windows.Forms.TextBox txtBuscarCliente;
+        private System.Windows.Forms.Label lblVendedor;
+        private System.Windows.Forms.TextBox txtBuscarProducto;
+        private System.Windows.Forms.Label label1;
     }
 }
