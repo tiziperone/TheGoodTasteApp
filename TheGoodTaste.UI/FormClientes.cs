@@ -413,13 +413,17 @@ namespace TheGoodTaste.UI
         private void SoloLetras_KeyPress(object sender, KeyPressEventArgs e) { if (!char.IsLetter(e.KeyChar) && !char.IsControl(e.KeyChar) && !char.IsWhiteSpace(e.KeyChar)) e.Handled = true; }
         private void SoloNumeros_KeyPress(object sender, KeyPressEventArgs e) { if (!char.IsDigit(e.KeyChar) && !char.IsControl(e.KeyChar)) e.Handled = true; }
 
-        // EVENTO DEL BUSCADOR VINCULADO CORRECTAMENTE
         private void textBoxBuscarCliente_TextChanged(object sender, EventArgs e)
         {
             if (sender is TextBox txt)
             {
                 FiltrarGrilla(txt.Text.Trim());
             }
+        }
+
+        private void label6_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }

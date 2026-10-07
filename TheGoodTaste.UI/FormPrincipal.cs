@@ -187,7 +187,6 @@ namespace TheGoodTaste.UI
                     }
                     else
                     {
-                        // CLAVE: Ahora el color vuelve al de la barra en lugar del tono claro anterior
                         btn.BackColor = ColorBarraSuperior;
                         btn.ForeColor = Color.White;
                     }
@@ -218,7 +217,7 @@ namespace TheGoodTaste.UI
 
             formularioHijo.TopLevel = false;
             formularioHijo.FormBorderStyle = FormBorderStyle.None;
-            formularioHijo.Dock = DockStyle.Fill;
+            // Se quitó el DockStyle.Fill de aquí
 
             formularioHijo.FormClosed += (s, args) =>
             {
@@ -235,7 +234,12 @@ namespace TheGoodTaste.UI
             this.panelContenedor.Tag = formularioHijo;
             formularioHijo.BringToFront();
             formularioHijo.ResumeLayout(true);
+
+            // SOLUCIÓN AL ERROR: 
+            // 1. Mostrar el formulario primero para que dibuje el DataGridView
             formularioHijo.Show();
+            // 2. Acoplar al panel después de mostrar
+            formularioHijo.Dock = DockStyle.Fill;
         }
 
         public void btnProductos_Click(object sender, EventArgs e) => AbrirFormularioEnPanel(new FormProductos(), (Button)sender);
