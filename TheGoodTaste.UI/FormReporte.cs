@@ -26,8 +26,11 @@ namespace TheGoodTaste.UI
         {
             TemaVisual.AplicarEstilo(this);
 
-            // Limpiar los datos dummy por defecto del diseñador
-            chart1.Series[0].Points.Clear();
+            // Limpiar datos dummy del diseñador
+            if (chart1.Series.Count > 0)
+            {
+                chart1.Series[0].Points.Clear();
+            }
             chart1.Titles.Clear();
             listaClientes.DataSource = null;
 
@@ -46,11 +49,11 @@ namespace TheGoodTaste.UI
             {
                 this.Text = $"Mis Reportes - Vendedor: {_usuarioActual.NombreUsuario}";
 
-                // Ocultar métricas sensibles del negocio
+                // Ocultar métricas del negocio ajenas al vendedor
                 botonRecaudacion.Visible = false;
                 botonProductoVendido.Visible = false;
 
-                // Ocultar sección completa de consulta a otros vendedores
+                // Ocultar buscador de otros empleados
                 panelVentasVendedor.Visible = false;
 
                 botonVentas.Text = "Mis Ventas";
@@ -61,7 +64,7 @@ namespace TheGoodTaste.UI
             }
         }
 
-        private void RenderizarGrafico(DataTable dt, string titulo, SeriesChartType tipoGrafico)
+        private void RenderizarGrafico(DataTable dt, string titulo, SeriesChartType tipoGrafico, bool mostrarAlertaVacio = true)
         {
             listaClientes.DataSource = dt;
 
@@ -81,7 +84,11 @@ namespace TheGoodTaste.UI
             {
                 chart1.Series[0].Points.Clear();
                 chart1.Titles.Clear();
-                MessageBox.Show("No se encontraron registros en el período seleccionado.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                if (mostrarAlertaVacio)
+                {
+                    MessageBox.Show("No se encontraron registros en el período seleccionado.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
             }
         }
 
@@ -96,7 +103,6 @@ namespace TheGoodTaste.UI
             DataTable dt;
             if (_usuarioActual != null && _usuarioActual.Rol == RolUsuario.Vendedor)
             {
-                // Solo ventas asociadas al DNI del vendedor logueado
                 dt = negocio.GenerarMisVentas(_usuarioActual.DNI, desde, hasta);
                 RenderizarGrafico(dt, "Mis Ventas por Día", SeriesChartType.Column);
             }
@@ -129,23 +135,33 @@ namespace TheGoodTaste.UI
 
         private void botonVentasVendedor_Click(object sender, EventArgs e)
         {
+            EjecutarBusquedaVendedor(true);
+        }
+
+        private void textBoxBuscarVendedor_TextChanged(object sender, EventArgs e)
+        {
+            // Busca en vivo sin mostrar alertas emergentes si no hay coincidencia inmediata
+            EjecutarBusquedaVendedor(false);
+        }
+
+        private void EjecutarBusquedaVendedor(bool mostrarAlerta)
+        {
             ReporteNegocio negocio = new ReporteNegocio();
             DateTime desde = fechaDesde.Value.Date;
             DateTime hasta = fechaHasta.Value.Date.AddDays(1).AddSeconds(-1);
             string vendedorFiltro = textBoxBuscarVendedor.Text.Trim();
 
             DataTable dt = negocio.GenerarVentasPorVendedor(desde, hasta, vendedorFiltro);
-            RenderizarGrafico(dt, "Ventas por Vendedor", SeriesChartType.Doughnut);
+            RenderizarGrafico(dt, "Ventas por Vendedor", SeriesChartType.Doughnut, mostrarAlerta);
         }
 
-        // --- EVENTOS VINCULADOS EN EL DESIGNER (Evitan errores de compilación CS1061) ---
+        // --- EVENTOS VINCULADOS EN EL DESIGNER ---
         private void FormReporte_Load(object sender, EventArgs e) => FormReportes_Load(sender, e);
         private void tituloDesde_Click(object sender, EventArgs e) { }
         private void label1_Click(object sender, EventArgs e) { }
         private void fechaDesde_ValueChanged(object sender, EventArgs e) { }
         private void fechaHasta_ValueChanged(object sender, EventArgs e) { }
         private void tituloVendedor_Click(object sender, EventArgs e) { }
-        private void textBoxBuscarVendedor_TextChanged(object sender, EventArgs e) { }
         private void panelVentasVendedor_Paint(object sender, PaintEventArgs e) { }
         private void panelReportes_Paint(object sender, PaintEventArgs e) { }
         private void listaClientes_CellContentClick(object sender, DataGridViewCellEventArgs e) { }
