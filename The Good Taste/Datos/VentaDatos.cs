@@ -42,11 +42,10 @@ namespace The_Good_Taste.Datos
 
                         int filasAfectadas = cmdStock.ExecuteNonQuery();
 
-                        // Si devuelve 0, significa que otro cajero vendió el producto un instante antes
+                        // Si devuelve 0, sólo lanzamos la excepción sin hacer Rollback acá
                         if (filasAfectadas == 0)
                         {
-                            transaccion.Rollback();
-                            throw new Exception($"Conflicto de concurrencia: El producto código '{item.Codigo}' se quedó sin stock suficiente.");
+                            throw new Exception($"El producto con código '{item.Codigo}' ya no cuenta con suficiente stock debido a una venta simultánea.");
                         }
 
                         // 2. REGISTRAR DETALLE DE VENTA
@@ -67,7 +66,11 @@ namespace The_Good_Taste.Datos
                 }
                 catch
                 {
-                    transaccion.Rollback();
+                    // El Rollback se centraliza una sola vez acá para cancelar todo de forma segura
+                    if (transaccion != null && transaccion.Connection != null)
+                    {
+                        transaccion.Rollback();
+                    }
                     throw;
                 }
             }
