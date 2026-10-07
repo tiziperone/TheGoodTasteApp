@@ -57,8 +57,6 @@ namespace TheGoodTaste.UI
             dgvDetalles.Columns.Add("Precio", "Precio Unit.");
             dgvDetalles.Columns.Add("Cantidad", "Cantidad");
             dgvDetalles.Columns.Add("Subtotal", "Subtotal");
-
-            // --- NUEVAS COLUMNAS EN LA GRILLA ---
             dgvDetalles.Columns.Add("IdPago", "IdPago");
             dgvDetalles.Columns["IdPago"].Visible = false; // Se oculta porque es dato interno
             dgvDetalles.Columns.Add("TipoPago", "Forma de Pago");
@@ -325,8 +323,6 @@ namespace TheGoodTaste.UI
 
             int cantidadExistenteEnGrilla = 0;
             DataGridViewRow filaExistente = null;
-
-            // Busca si ya existe el producto con el MISMO método de pago para sumarlo
             foreach (DataGridViewRow row in dgvDetalles.Rows)
             {
                 if (row.Cells["ID"].Value?.ToString() == codigoProd && Convert.ToInt32(row.Cells["IdPago"].Value) == idPago)
@@ -337,7 +333,6 @@ namespace TheGoodTaste.UI
                 }
             }
 
-            // Validar stock total acumulado en grilla de ese producto (incluso si está con otros pagos)
             int cantidadTotalMismoProductoEnGrilla = 0;
             foreach (DataGridViewRow row in dgvDetalles.Rows)
             {
@@ -361,7 +356,6 @@ namespace TheGoodTaste.UI
                 MessageBox.Show(mensajeAlerta, "Alerta de Stock Mínimo", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
 
-            // Agregar o sumar
             if (filaExistente != null)
             {
                 decimal nuevoSubtotal = (cantidadExistenteEnGrilla + cantidad) * precio;
@@ -415,9 +409,12 @@ namespace TheGoodTaste.UI
             {
                 int DniCliente = _clienteSeleccionado != null ? Convert.ToInt32(_clienteSeleccionado["dniCliente"]) : 1;
 
+                // Combinamos la fecha del DateTimePicker con la hora actual exacta del sistema para que no quede en 00:00:00
+                DateTime fechaConHoraActual = dtpFechaVenta.Value.Date + DateTime.Now.TimeOfDay;
+
                 Venta nuevaVenta = new Venta
                 {
-                    FechaVenta = dtpFechaVenta.Value,
+                    FechaVenta = fechaConHoraActual,
                     DniCliente = DniCliente.ToString(),
                     DNIUsuario = _dniVendedorActivo,
                     TotalVenta = CalcularTotalVenta(),
@@ -489,23 +486,23 @@ namespace TheGoodTaste.UI
                     writer.WriteLine($"Vendedor DNI: {venta.DNIUsuario}");
                     writer.WriteLine("--------------------------------------------------");
 
-                    // Modificamos las cabeceras para hacer espacio al pago
-                    writer.WriteLine(string.Format("{0,-18} {1,-13} {2,5} {3,10}", "Producto", "Pago", "Cant", "Subtotal"));
+                    // Columnas ensanchadas para que "Transferencia" no se corte
+                    writer.WriteLine(string.Format("{0,-15} {1,-16} {2,5} {3,10}", "Producto", "Pago", "Cant", "Subtotal"));
                     writer.WriteLine("--------------------------------------------------");
 
                     foreach (var det in venta.Detalles)
                     {
                         var prod = _listaProductos.FirstOrDefault(p => p.Codigo == det.Codigo);
                         string nombre = prod != null ? prod.Nombre : det.Codigo;
-                        if (nombre.Length > 17) nombre = nombre.Substring(0, 17);
+                        if (nombre.Length > 14) nombre = nombre.Substring(0, 14);
 
                         string pagoStr = det.NombreTipoPago;
                         if (string.IsNullOrEmpty(pagoStr)) pagoStr = "S/D";
-                        if (pagoStr.Length > 12) pagoStr = pagoStr.Substring(0, 12);
+                        if (pagoStr.Length > 15) pagoStr = pagoStr.Substring(0, 15);
 
                         decimal subtotal = det.Cantidad * det.PrecioUnitario;
 
-                        writer.WriteLine(string.Format("{0,-18} {1,-13} {2,5} {3,10:N2}", nombre, pagoStr, det.Cantidad, subtotal));
+                        writer.WriteLine(string.Format("{0,-15} {1,-16} {2,5} {3,10:N2}", nombre, pagoStr, det.Cantidad, subtotal));
                     }
 
                     writer.WriteLine("--------------------------------------------------");
