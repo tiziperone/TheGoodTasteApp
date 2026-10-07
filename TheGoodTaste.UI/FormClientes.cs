@@ -4,6 +4,7 @@ using System.Data;
 using System.Linq;
 using System.Windows.Forms;
 using TheGoodTaste.Negocio;
+using System.Globalization;
 
 namespace TheGoodTaste.UI
 {
@@ -149,9 +150,12 @@ namespace TheGoodTaste.UI
                 string apellido = txtApellido.Text.Trim();
                 string email = txtEmail.Text.Trim();
                 string telefono = txtTelefono.Text.Trim();
-                string pais = textPais?.Text.Trim() ?? "";
+                string pais = textPais?.Text.Trim() ?? "Argentina";
                 string provincia = txtProvincia?.Text.Trim() ?? "";
-                string localidad = textLocalidad?.Text.Trim() ?? "";
+
+                // --- FORMATEAR LOCALIDAD CON MAYÚSCULA INICIAL ---
+                string localidad = FormatearTextoTipoTitulo(textLocalidad?.Text);
+
                 string calle = txtCalle?.Text.Trim() ?? "";
                 string altura = textNroAltura?.Text.Trim() ?? "";
                 var dtp = ObtenerDateTimePicker();
@@ -223,6 +227,9 @@ namespace TheGoodTaste.UI
                 _verActivos = verActivos;
                 DataTable dt = _negocio.ObtenerClientes(verActivos);
                 dgvClientes.DataSource = dt;
+
+                // LLAMAMOS AL AUTOCOMPLETADO
+                ConfigurarAutocompletadoLocalidad();
 
                 if (dgvClientes.Columns.Contains("Modificar")) dgvClientes.Columns.Remove("Modificar");
                 if (dgvClientes.Columns.Contains("AccionEstado")) dgvClientes.Columns.Remove("AccionEstado");
@@ -431,5 +438,42 @@ namespace TheGoodTaste.UI
         {
 
         }
+
+        private string FormatearTextoTipoTitulo(string texto)
+        {
+            if (string.IsNullOrWhiteSpace(texto)) return "";
+
+            // Convierte todo a minúsculas y luego la primera letra de cada palabra a mayúscula
+            TextInfo textInfo = CultureInfo.CurrentCulture.TextInfo;
+            return textInfo.ToTitleCase(texto.Trim().ToLower());
+        }
+
+        private void ConfigurarAutocompletadoLocalidad()
+        {
+            if (textLocalidad == null) return;
+
+            // Habilitar autocompletado en el TextBox
+            textLocalidad.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
+            textLocalidad.AutoCompleteSource = AutoCompleteSource.CustomSource;
+
+            AutoCompleteStringCollection listaLocalidades = new AutoCompleteStringCollection();
+
+            // Extraer localidades únicas del DataTable actual de clientes
+            if (dgvClientes.DataSource is DataTable dt && dt.Columns.Contains("localidadCliente"))
+            {
+                var localidadesUnicas = dt.AsEnumerable()
+                    .Where(row => row["localidadCliente"] != DBNull.Value && !string.IsNullOrWhiteSpace(row["localidadCliente"].ToString()))
+                    .Select(row => row["localidadCliente"].ToString().Trim())
+                    .Distinct(StringComparer.OrdinalIgnoreCase);
+
+                foreach (string loc in localidadesUnicas)
+                {
+                    listaLocalidades.Add(loc);
+                }
+            }
+
+            textLocalidad.AutoCompleteCustomSource = listaLocalidades;
+        }
+
     }
 }
