@@ -151,9 +151,10 @@ namespace TheGoodTaste.UI
                 string email = txtEmail.Text.Trim();
                 string telefono = txtTelefono.Text.Trim();
                 string pais = textPais?.Text.Trim() ?? "Argentina";
-                string provincia = txtProvincia?.Text.Trim() ?? "";
+                
 
                 // --- FORMATEAR LOCALIDAD CON MAYÚSCULA INICIAL ---
+                string provincia = FormatearTextoTipoTitulo(txtProvincia?.Text);
                 string localidad = FormatearTextoTipoTitulo(textLocalidad?.Text);
 
                 string calle = txtCalle?.Text.Trim() ?? "";
@@ -229,7 +230,7 @@ namespace TheGoodTaste.UI
                 dgvClientes.DataSource = dt;
 
                 // LLAMAMOS AL AUTOCOMPLETADO
-                ConfigurarAutocompletadoLocalidad();
+                ConfigurarAutocompletados();
 
                 if (dgvClientes.Columns.Contains("Modificar")) dgvClientes.Columns.Remove("Modificar");
                 if (dgvClientes.Columns.Contains("AccionEstado")) dgvClientes.Columns.Remove("AccionEstado");
@@ -448,31 +449,50 @@ namespace TheGoodTaste.UI
             return textInfo.ToTitleCase(texto.Trim().ToLower());
         }
 
-        private void ConfigurarAutocompletadoLocalidad()
+        private void ConfigurarAutocompletados()
         {
-            if (textLocalidad == null) return;
-
-            // Habilitar autocompletado en el TextBox
-            textLocalidad.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
-            textLocalidad.AutoCompleteSource = AutoCompleteSource.CustomSource;
-
-            AutoCompleteStringCollection listaLocalidades = new AutoCompleteStringCollection();
-
-            // Extraer localidades únicas del DataTable actual de clientes
-            if (dgvClientes.DataSource is DataTable dt && dt.Columns.Contains("localidadCliente"))
+            if (dgvClientes.DataSource is DataTable dt)
             {
-                var localidadesUnicas = dt.AsEnumerable()
-                    .Where(row => row["localidadCliente"] != DBNull.Value && !string.IsNullOrWhiteSpace(row["localidadCliente"].ToString()))
-                    .Select(row => row["localidadCliente"].ToString().Trim())
-                    .Distinct(StringComparer.OrdinalIgnoreCase);
-
-                foreach (string loc in localidadesUnicas)
+                // --- AUTOCOMPLETADO LOCALIDAD ---
+                if (textLocalidad != null && dt.Columns.Contains("localidadCliente"))
                 {
-                    listaLocalidades.Add(loc);
+                    textLocalidad.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
+                    textLocalidad.AutoCompleteSource = AutoCompleteSource.CustomSource;
+
+                    AutoCompleteStringCollection listaLocalidades = new AutoCompleteStringCollection();
+                    var localidadesUnicas = dt.AsEnumerable()
+                        .Where(row => row["localidadCliente"] != DBNull.Value && !string.IsNullOrWhiteSpace(row["localidadCliente"].ToString()))
+                        .Select(row => row["localidadCliente"].ToString().Trim())
+                        .Distinct(StringComparer.OrdinalIgnoreCase);
+
+                    foreach (string loc in localidadesUnicas)
+                    {
+                        listaLocalidades.Add(loc);
+                    }
+
+                    textLocalidad.AutoCompleteCustomSource = listaLocalidades;
+                }
+
+                // --- AUTOCOMPLETADO PROVINCIA ---
+                if (txtProvincia != null && dt.Columns.Contains("provinciaCliente"))
+                {
+                    txtProvincia.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
+                    txtProvincia.AutoCompleteSource = AutoCompleteSource.CustomSource;
+
+                    AutoCompleteStringCollection listaProvincias = new AutoCompleteStringCollection();
+                    var provinciasUnicas = dt.AsEnumerable()
+                        .Where(row => row["provinciaCliente"] != DBNull.Value && !string.IsNullOrWhiteSpace(row["provinciaCliente"].ToString()))
+                        .Select(row => row["provinciaCliente"].ToString().Trim())
+                        .Distinct(StringComparer.OrdinalIgnoreCase);
+
+                    foreach (string prov in provinciasUnicas)
+                    {
+                        listaProvincias.Add(prov);
+                    }
+
+                    txtProvincia.AutoCompleteCustomSource = listaProvincias;
                 }
             }
-
-            textLocalidad.AutoCompleteCustomSource = listaLocalidades;
         }
 
     }
