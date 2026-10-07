@@ -27,6 +27,8 @@ namespace TheGoodTaste.UI
         private bool _bloquearEventos = false;
         private readonly int _dniVendedorActivo;
 
+        private readonly UsuarioNegocio _usuarioNegocio = new UsuarioNegocio();
+
         public FormPuntoVenta(int dniVendedor)
         {
             InitializeComponent();
@@ -65,7 +67,22 @@ namespace TheGoodTaste.UI
             Control[] controles = Controls.Find("lblVendedor", true);
             if (controles.Length > 0 && controles[0] is Label lblVendedor)
             {
-                lblVendedor.Text = $"Cajero: {_dniVendedorActivo}";
+                // Como _dniVendedorActivo ya es int, se lo pasamos directo
+                DataRow rowUsuario = _usuarioNegocio.ObtenerUsuarioPorDNI(_dniVendedorActivo);
+
+                if (rowUsuario != null)
+                {
+                    string nombre = rowUsuario["Nombre"].ToString();
+                    string apellido = rowUsuario["Apellido"].ToString();
+
+                    // Muestra: Cajero: Pedro Obregon | DNI: 45456143
+                    lblVendedor.Text = $"Cajero: {nombre} {apellido} | DNI: {_dniVendedorActivo}";
+                }
+                else
+                {
+                    // Fallback si no encuentra la fila en la BD
+                    lblVendedor.Text = $"Cajero DNI: {_dniVendedorActivo}";
+                }
             }
         }
 
