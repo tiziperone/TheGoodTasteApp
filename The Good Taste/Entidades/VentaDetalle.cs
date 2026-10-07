@@ -2,15 +2,12 @@
 {
     public class VentaDetalle
     {
-        public int IdDetalle { get; set; } // PK
+        public int IdDetalle { get; set; }
+        public string Codigo { get; set; }
         public int Cantidad { get; set; }
         public decimal PrecioUnitario { get; set; }
 
-        public int IdVenta { get; set; } // FK
-        public string Codigo { get; set; } // FK a Producto
-
-        // Relaciones y cálculos
-        public Producto Producto { get; set; }
-        public decimal Subtotal => Cantidad * PrecioUnitario;
+        public int IdTipoPago { get; set; }
+        public string NombreTipoPago { get; set; } 
     }
 }

@@ -17,8 +17,6 @@ namespace TheGoodTaste.UI
         private readonly VentaNegocio _ventaNegocio = new VentaNegocio();
         private readonly ClienteNegocio _clienteNegocio = new ClienteNegocio();
         private readonly ProductoNegocio _productoNegocio = new ProductoNegocio();
-
-        // --- NUEVO: Instancia del negocio de Tipos de Pago ---
         private readonly TipoPagoNegocio _tipoPagoNegocio = new TipoPagoNegocio();
 
         private List<Producto> _listaProductos = new List<Producto>();
@@ -60,6 +58,11 @@ namespace TheGoodTaste.UI
             dgvDetalles.Columns.Add("Cantidad", "Cantidad");
             dgvDetalles.Columns.Add("Subtotal", "Subtotal");
 
+            // --- NUEVAS COLUMNAS EN LA GRILLA ---
+            dgvDetalles.Columns.Add("IdPago", "IdPago");
+            dgvDetalles.Columns["IdPago"].Visible = false; // Se oculta porque es dato interno
+            dgvDetalles.Columns.Add("TipoPago", "Forma de Pago");
+
             dgvDetalles.AllowUserToAddRows = false;
             dgvDetalles.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             dgvDetalles.MultiSelect = false;
@@ -92,15 +95,13 @@ namespace TheGoodTaste.UI
                 _tablaClientes = _clienteNegocio.ObtenerClientes(true) ?? new DataTable();
                 _listaProductos = _productoNegocio.ObtenerProductos() ?? new List<Producto>();
 
-                // --- NUEVO: Cargar los tipos de pago al ComboBox ---
                 List<TipoPago> tipos = _tipoPagoNegocio.ObtenerTiposPago();
                 cboTipoPago.DataSource = tipos;
-                cboTipoPago.DisplayMember = "NombreTipoPago"; // Lo que el usuario ve
-                cboTipoPago.ValueMember = "IdTipoPago";        // El ID oculto (1, 2, 3...)
+                cboTipoPago.DisplayMember = "NombreTipoPago";
+                cboTipoPago.ValueMember = "IdTipoPago";
 
                 if (cboTipoPago.Items.Count > 0)
-                    cboTipoPago.SelectedIndex = 0; // Seleccionar el primero por defecto
-                // ----------------------------------------------------
+                    cboTipoPago.SelectedIndex = 0;
 
                 ConfigurarBuscadoresAutocompletado();
             }
@@ -307,8 +308,17 @@ namespace TheGoodTaste.UI
                 return;
             }
 
+            // Validar que se haya seleccionado pago
+            if (cboTipoPago.SelectedValue == null)
+            {
+                MessageBox.Show("Seleccione un Tipo de Pago antes de agregar el producto.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
             string codigoProd = _productoSeleccionado.Codigo;
             string nombreProd = _productoSeleccionado.Nombre;
+            int idPago = Convert.ToInt32(cboTipoPago.SelectedValue);
+            string nombrePago = cboTipoPago.Text;
 
             int stockReal = _ventaNegocio.ObtenerStockActual(codigoProd);
             _productoSeleccionado.Stock = stockReal;
@@ -316,9 +326,10 @@ namespace TheGoodTaste.UI
             int cantidadExistenteEnGrilla = 0;
             DataGridViewRow filaExistente = null;
 
+            // Busca si ya existe el producto con el MISMO método de pago para sumarlo
             foreach (DataGridViewRow row in dgvDetalles.Rows)
             {
-                if (row.Cells["ID"].Value?.ToString() == codigoProd)
+                if (row.Cells["ID"].Value?.ToString() == codigoProd && Convert.ToInt32(row.Cells["IdPago"].Value) == idPago)
                 {
                     cantidadExistenteEnGrilla = Convert.ToInt32(row.Cells["Cantidad"].Value);
                     filaExistente = row;
@@ -326,32 +337,42 @@ namespace TheGoodTaste.UI
                 }
             }
 
-            int cantidadTotalAVender = cantidadExistenteEnGrilla + cantidad;
-
-            if (cantidadTotalAVender > _productoSeleccionado.Stock)
+            // Validar stock total acumulado en grilla de ese producto (incluso si está con otros pagos)
+            int cantidadTotalMismoProductoEnGrilla = 0;
+            foreach (DataGridViewRow row in dgvDetalles.Rows)
             {
-                MessageBox.Show($"Stock insuficiente. Quedan {_productoSeleccionado.Stock} unidades disponibles en stock " +
-                                $"(ya agregó {cantidadExistenteEnGrilla} a la grilla).",
+                if (row.Cells["ID"].Value?.ToString() == codigoProd)
+                {
+                    cantidadTotalMismoProductoEnGrilla += Convert.ToInt32(row.Cells["Cantidad"].Value);
+                }
+            }
+
+            int cantidadTotalAValidarStock = cantidadTotalMismoProductoEnGrilla + cantidad;
+
+            if (cantidadTotalAValidarStock > _productoSeleccionado.Stock)
+            {
+                MessageBox.Show($"Stock insuficiente. Quedan {_productoSeleccionado.Stock} unidades disponibles en stock.",
                                 "Stock Insuficiente", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
-            if (_productoNegocio.ValidarStockMinimo(_productoSeleccionado, cantidadTotalAVender, out string mensajeAlerta))
+            if (_productoNegocio.ValidarStockMinimo(_productoSeleccionado, cantidadTotalAValidarStock, out string mensajeAlerta))
             {
                 MessageBox.Show(mensajeAlerta, "Alerta de Stock Mínimo", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
 
+            // Agregar o sumar
             if (filaExistente != null)
             {
-                decimal nuevoSubtotal = cantidadTotalAVender * precio;
+                decimal nuevoSubtotal = (cantidadExistenteEnGrilla + cantidad) * precio;
                 filaExistente.Cells["Precio"].Value = precio.ToString("N2");
-                filaExistente.Cells["Cantidad"].Value = cantidadTotalAVender;
+                filaExistente.Cells["Cantidad"].Value = cantidadExistenteEnGrilla + cantidad;
                 filaExistente.Cells["Subtotal"].Value = nuevoSubtotal.ToString("N2");
             }
             else
             {
                 decimal subtotal = precio * cantidad;
-                dgvDetalles.Rows.Add(codigoProd, nombreProd, precio.ToString("N2"), cantidad, subtotal.ToString("N2"));
+                dgvDetalles.Rows.Add(codigoProd, nombreProd, precio.ToString("N2"), cantidad, subtotal.ToString("N2"), idPago, nombrePago);
             }
 
             LimpiarSeleccionProducto();
@@ -390,14 +411,6 @@ namespace TheGoodTaste.UI
                 return;
             }
 
-            // --- NUEVO: Validar que hayan seleccionado un tipo de pago ---
-            if (cboTipoPago.SelectedValue == null)
-            {
-                MessageBox.Show("Por favor, seleccione un Tipo de Pago.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-            // -------------------------------------------------------------
-
             try
             {
                 int DniCliente = _clienteSeleccionado != null ? Convert.ToInt32(_clienteSeleccionado["dniCliente"]) : 1;
@@ -407,11 +420,11 @@ namespace TheGoodTaste.UI
                     FechaVenta = dtpFechaVenta.Value,
                     DniCliente = DniCliente.ToString(),
                     DNIUsuario = _dniVendedorActivo,
-                    IdTipoPago = Convert.ToInt32(cboTipoPago.SelectedValue), // ASIGNAR FK
                     TotalVenta = CalcularTotalVenta(),
                     Detalles = new List<VentaDetalle>()
                 };
 
+                // Asigna el pago leyendo la grilla línea por línea
                 foreach (DataGridViewRow row in dgvDetalles.Rows)
                 {
                     if (row.IsNewRow) continue;
@@ -420,7 +433,9 @@ namespace TheGoodTaste.UI
                     {
                         Codigo = row.Cells["ID"].Value.ToString(),
                         Cantidad = Convert.ToInt32(row.Cells["Cantidad"].Value),
-                        PrecioUnitario = ConvertirADecimal(row.Cells["Precio"].Value.ToString())
+                        PrecioUnitario = ConvertirADecimal(row.Cells["Precio"].Value.ToString()),
+                        IdTipoPago = Convert.ToInt32(row.Cells["IdPago"].Value),
+                        NombreTipoPago = row.Cells["TipoPago"].Value.ToString()
                     });
                 }
 
@@ -466,36 +481,37 @@ namespace TheGoodTaste.UI
 
                 using (StreamWriter writer = new StreamWriter(rutaCompleta))
                 {
-                    writer.WriteLine("==========================================");
-                    writer.WriteLine("            THE GOOD TASTE POS            ");
-                    writer.WriteLine("==========================================");
+                    writer.WriteLine("==================================================");
+                    writer.WriteLine("                THE GOOD TASTE POS                ");
+                    writer.WriteLine("==================================================");
                     writer.WriteLine($"Fecha: {venta.FechaVenta:dd/MM/yyyy HH:mm:ss}");
                     writer.WriteLine($"Cliente ID/DNI: {venta.DniCliente}");
                     writer.WriteLine($"Vendedor DNI: {venta.DNIUsuario}");
+                    writer.WriteLine("--------------------------------------------------");
 
-                    // --- NUEVO: Extraer nombre del pago del ComboBox para el ticket ---
-                    string metodoPago = cboTipoPago.Text;
-                    writer.WriteLine($"Forma de Pago: {metodoPago}");
-                    // ------------------------------------------------------------------
-
-                    writer.WriteLine("------------------------------------------");
-                    writer.WriteLine(string.Format("{0,-20} {1,5} {2,12}", "Producto", "Cant", "Subtotal"));
-                    writer.WriteLine("------------------------------------------");
+                    // Modificamos las cabeceras para hacer espacio al pago
+                    writer.WriteLine(string.Format("{0,-18} {1,-13} {2,5} {3,10}", "Producto", "Pago", "Cant", "Subtotal"));
+                    writer.WriteLine("--------------------------------------------------");
 
                     foreach (var det in venta.Detalles)
                     {
                         var prod = _listaProductos.FirstOrDefault(p => p.Codigo == det.Codigo);
                         string nombre = prod != null ? prod.Nombre : det.Codigo;
-                        if (nombre.Length > 19) nombre = nombre.Substring(0, 19);
+                        if (nombre.Length > 17) nombre = nombre.Substring(0, 17);
+
+                        string pagoStr = det.NombreTipoPago;
+                        if (string.IsNullOrEmpty(pagoStr)) pagoStr = "S/D";
+                        if (pagoStr.Length > 12) pagoStr = pagoStr.Substring(0, 12);
 
                         decimal subtotal = det.Cantidad * det.PrecioUnitario;
-                        writer.WriteLine(string.Format("{0,-20} {1,5} {2,12:N2}", nombre, det.Cantidad, subtotal));
+
+                        writer.WriteLine(string.Format("{0,-18} {1,-13} {2,5} {3,10:N2}", nombre, pagoStr, det.Cantidad, subtotal));
                     }
 
-                    writer.WriteLine("------------------------------------------");
+                    writer.WriteLine("--------------------------------------------------");
                     writer.WriteLine($"TOTAL: ${venta.TotalVenta:N2}");
-                    writer.WriteLine("==========================================");
-                    writer.WriteLine("       ¡Gracias por su compra!            ");
+                    writer.WriteLine("==================================================");
+                    writer.WriteLine("             ¡Gracias por su compra!              ");
                 }
 
                 return rutaCompleta;
@@ -564,7 +580,6 @@ namespace TheGoodTaste.UI
             dgvDetalles.Rows.Clear();
             LimpiarSeleccionProducto();
 
-            // Volver a seleccionar el primer tipo de pago al limpiar
             if (cboTipoPago.Items.Count > 0) cboTipoPago.SelectedIndex = 0;
 
             _bloquearEventos = false;

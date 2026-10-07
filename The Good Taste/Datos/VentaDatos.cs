@@ -30,9 +30,9 @@ namespace The_Good_Taste.Datos
 
                 try
                 {
-                    // --- CORRECCIÓN: Se agregó idTipoPago en el INSERT y en los VALUES ---
-                    string queryVenta = @"INSERT INTO Venta (fechaVenta, dniCliente, DNIUsuario, totalVenta, idTipoPago) 
-                                          VALUES (@Fecha, @IdCliente, @DNIUsuario, @Total, @IdTipoPago);
+                    // Se remueve idTipoPago de la tabla Venta general
+                    string queryVenta = @"INSERT INTO Venta (fechaVenta, dniCliente, DNIUsuario, totalVenta) 
+                                          VALUES (@Fecha, @IdCliente, @DNIUsuario, @Total);
                                           SELECT SCOPE_IDENTITY();";
 
                     SqlCommand cmdVenta = new SqlCommand(queryVenta, con, transaccion);
@@ -40,9 +40,6 @@ namespace The_Good_Taste.Datos
                     cmdVenta.Parameters.AddWithValue("@IdCliente", venta.DniCliente);
                     cmdVenta.Parameters.AddWithValue("@DNIUsuario", venta.DNIUsuario);
                     cmdVenta.Parameters.AddWithValue("@Total", venta.TotalVenta);
-
-                    // --- CORRECCIÓN: Se agrega el parámetro con el valor que viene de la UI ---
-                    cmdVenta.Parameters.AddWithValue("@IdTipoPago", venta.IdTipoPago);
 
                     int idVentaGenerado = Convert.ToInt32(cmdVenta.ExecuteScalar());
 
@@ -63,14 +60,18 @@ namespace The_Good_Taste.Datos
                             throw new Exception($"El producto con código '{item.Codigo}' ya no cuenta con suficiente stock debido a una venta simultánea.");
                         }
 
-                        string queryDetalle = @"INSERT INTO VentaDetalle (idVenta, Codigo, cantidad, precioUnitario) 
-                                                VALUES (@IdVenta, @Codigo, @Cantidad, @PrecioUnitario);";
+                        // Se agrega idTipoPago al detalle
+                        string queryDetalle = @"INSERT INTO VentaDetalle (idVenta, Codigo, cantidad, precioUnitario, idTipoPago) 
+                                                VALUES (@IdVenta, @Codigo, @Cantidad, @PrecioUnitario, @IdTipoPago);";
 
                         SqlCommand cmdDetalle = new SqlCommand(queryDetalle, con, transaccion);
                         cmdDetalle.Parameters.AddWithValue("@IdVenta", idVentaGenerado);
                         cmdDetalle.Parameters.AddWithValue("@Codigo", item.Codigo);
                         cmdDetalle.Parameters.AddWithValue("@Cantidad", item.Cantidad);
                         cmdDetalle.Parameters.AddWithValue("@PrecioUnitario", item.PrecioUnitario);
+
+                        // Se asigna el valor capturado de la grilla
+                        cmdDetalle.Parameters.AddWithValue("@IdTipoPago", item.IdTipoPago);
 
                         cmdDetalle.ExecuteNonQuery();
                     }
