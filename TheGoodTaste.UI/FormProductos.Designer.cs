@@ -69,21 +69,22 @@
             // 
             // txtDescripcion
             // 
-            this.txtDescripcion.Location = new System.Drawing.Point(195, 160);
+            this.txtDescripcion.Location = new System.Drawing.Point(50, 185);
+            this.txtDescripcion.Multiline = true;
             this.txtDescripcion.Name = "txtDescripcion";
-            this.txtDescripcion.Size = new System.Drawing.Size(121, 22);
+            this.txtDescripcion.Size = new System.Drawing.Size(266, 125);
             this.txtDescripcion.TabIndex = 2;
             // 
             // txtPrecio
             // 
-            this.txtPrecio.Location = new System.Drawing.Point(195, 207);
+            this.txtPrecio.Location = new System.Drawing.Point(195, 338);
             this.txtPrecio.Name = "txtPrecio";
             this.txtPrecio.Size = new System.Drawing.Size(121, 22);
             this.txtPrecio.TabIndex = 3;
             // 
             // nudStock
             // 
-            this.nudStock.Location = new System.Drawing.Point(196, 299);
+            this.nudStock.Location = new System.Drawing.Point(196, 430);
             this.nudStock.Name = "nudStock";
             this.nudStock.Size = new System.Drawing.Size(120, 22);
             this.nudStock.TabIndex = 4;
@@ -92,7 +93,7 @@
             // 
             this.cboCategoria.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cboCategoria.FormattingEnabled = true;
-            this.cboCategoria.Location = new System.Drawing.Point(195, 250);
+            this.cboCategoria.Location = new System.Drawing.Point(195, 381);
             this.cboCategoria.Name = "cboCategoria";
             this.cboCategoria.Size = new System.Drawing.Size(121, 24);
             this.cboCategoria.TabIndex = 5;
@@ -127,7 +128,7 @@
             // LPrecio
             // 
             this.LPrecio.AutoSize = true;
-            this.LPrecio.Location = new System.Drawing.Point(47, 213);
+            this.LPrecio.Location = new System.Drawing.Point(47, 344);
             this.LPrecio.Name = "LPrecio";
             this.LPrecio.Size = new System.Drawing.Size(46, 16);
             this.LPrecio.TabIndex = 9;
@@ -137,7 +138,7 @@
             // LNroCategoria
             // 
             this.LNroCategoria.AutoSize = true;
-            this.LNroCategoria.Location = new System.Drawing.Point(47, 258);
+            this.LNroCategoria.Location = new System.Drawing.Point(47, 389);
             this.LNroCategoria.Name = "LNroCategoria";
             this.LNroCategoria.Size = new System.Drawing.Size(66, 16);
             this.LNroCategoria.TabIndex = 10;
@@ -146,7 +147,7 @@
             // LStock
             // 
             this.LStock.AutoSize = true;
-            this.LStock.Location = new System.Drawing.Point(47, 305);
+            this.LStock.Location = new System.Drawing.Point(47, 436);
             this.LStock.Name = "LStock";
             this.LStock.Size = new System.Drawing.Size(41, 16);
             this.LStock.TabIndex = 11;
@@ -170,7 +171,7 @@
             // 
             // btnGuardar
             // 
-            this.btnGuardar.Location = new System.Drawing.Point(34, 413);
+            this.btnGuardar.Location = new System.Drawing.Point(34, 544);
             this.btnGuardar.Name = "btnGuardar";
             this.btnGuardar.Size = new System.Drawing.Size(92, 23);
             this.btnGuardar.TabIndex = 13;
@@ -180,7 +181,7 @@
             // 
             // btnLimpiar
             // 
-            this.btnLimpiar.Location = new System.Drawing.Point(154, 413);
+            this.btnLimpiar.Location = new System.Drawing.Point(154, 544);
             this.btnLimpiar.Name = "btnLimpiar";
             this.btnLimpiar.Size = new System.Drawing.Size(75, 23);
             this.btnLimpiar.TabIndex = 16;
@@ -191,7 +192,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(47, 356);
+            this.label1.Location = new System.Drawing.Point(47, 487);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(62, 16);
             this.label1.TabIndex = 17;
@@ -199,7 +200,7 @@
             // 
             // textStockMin
             // 
-            this.textStockMin.Location = new System.Drawing.Point(195, 350);
+            this.textStockMin.Location = new System.Drawing.Point(195, 481);
             this.textStockMin.Name = "textStockMin";
             this.textStockMin.Size = new System.Drawing.Size(121, 22);
             this.textStockMin.TabIndex = 18;
