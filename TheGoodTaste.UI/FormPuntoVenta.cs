@@ -27,8 +27,12 @@ namespace TheGoodTaste.UI
 
         private bool _bloquearEventos = false;
         private readonly int _dniVendedorActivo;
-
         private readonly UsuarioNegocio _usuarioNegocio = new UsuarioNegocio();
+
+        // Variables para guardar los datos del cobro en efectivo y mostrarlos en el ticket
+        private decimal _efectivoRecibidoTicket = 0;
+        private decimal _vueltoTicket = 0;
+        private bool _huboPagoEfectivo = false;
 
         public FormPuntoVenta(int dniVendedor)
         {
@@ -58,7 +62,7 @@ namespace TheGoodTaste.UI
             dgvDetalles.Columns.Add("Cantidad", "Cantidad");
             dgvDetalles.Columns.Add("Subtotal", "Subtotal");
             dgvDetalles.Columns.Add("IdPago", "IdPago");
-            dgvDetalles.Columns["IdPago"].Visible = false; // Se oculta porque es dato interno
+            dgvDetalles.Columns["IdPago"].Visible = false;
             dgvDetalles.Columns.Add("TipoPago", "Forma de Pago");
 
             dgvDetalles.AllowUserToAddRows = false;
@@ -306,7 +310,6 @@ namespace TheGoodTaste.UI
                 return;
             }
 
-            // Validar que se haya seleccionado pago
             if (cboTipoPago.SelectedValue == null)
             {
                 MessageBox.Show("Seleccione un Tipo de Pago antes de agregar el producto.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -407,9 +410,40 @@ namespace TheGoodTaste.UI
 
             try
             {
-                int DniCliente = _clienteSeleccionado != null ? Convert.ToInt32(_clienteSeleccionado["dniCliente"]) : 1;
+                // Reiniciamos valores de vuelto
+                _huboPagoEfectivo = false;
+                _efectivoRecibidoTicket = 0;
+                _vueltoTicket = 0;
 
-                // Combinamos la fecha del DateTimePicker con la hora actual exacta del sistema para que no quede en 00:00:00
+                decimal totalEfectivo = 0;
+                foreach (DataGridViewRow row in dgvDetalles.Rows)
+                {
+                    if (row.IsNewRow) continue;
+                    int idPago = Convert.ToInt32(row.Cells["IdPago"].Value);
+
+                    if (idPago == 1) // ID 1 = Efectivo
+                    {
+                        totalEfectivo += ConvertirADecimal(row.Cells["Subtotal"].Value?.ToString());
+                    }
+                }
+
+                if (totalEfectivo > 0)
+                {
+                    using (FormCobroEfectivo formCobro = new FormCobroEfectivo(totalEfectivo))
+                    {
+                        if (formCobro.ShowDialog() != DialogResult.OK || !formCobro.Confirmado)
+                        {
+                            return;
+                        }
+
+                        // Guardamos los datos para imprimirlos en el ticket
+                        _huboPagoEfectivo = true;
+                        _efectivoRecibidoTicket = formCobro.DineroIngresado;
+                        _vueltoTicket = formCobro.VueltoCalculado;
+                    }
+                }
+
+                int DniCliente = _clienteSeleccionado != null ? Convert.ToInt32(_clienteSeleccionado["dniCliente"]) : 1;
                 DateTime fechaConHoraActual = dtpFechaVenta.Value.Date + DateTime.Now.TimeOfDay;
 
                 Venta nuevaVenta = new Venta
@@ -421,7 +455,6 @@ namespace TheGoodTaste.UI
                     Detalles = new List<VentaDetalle>()
                 };
 
-                // Asigna el pago leyendo la grilla línea por línea
                 foreach (DataGridViewRow row in dgvDetalles.Rows)
                 {
                     if (row.IsNewRow) continue;
@@ -486,7 +519,6 @@ namespace TheGoodTaste.UI
                     writer.WriteLine($"Vendedor DNI: {venta.DNIUsuario}");
                     writer.WriteLine("--------------------------------------------------");
 
-                    // Columnas ensanchadas para que "Transferencia" no se corte
                     writer.WriteLine(string.Format("{0,-15} {1,-16} {2,5} {3,10}", "Producto", "Pago", "Cant", "Subtotal"));
                     writer.WriteLine("--------------------------------------------------");
 
@@ -507,6 +539,14 @@ namespace TheGoodTaste.UI
 
                     writer.WriteLine("--------------------------------------------------");
                     writer.WriteLine($"TOTAL: ${venta.TotalVenta:N2}");
+
+                    // Si hubo pago en efectivo, añadimos la sección de dinero recibido y vuelto al ticket
+                    if (_huboPagoEfectivo)
+                    {
+                        writer.WriteLine($"Efectivo Recibido: ${_efectivoRecibidoTicket:N2}");
+                        writer.WriteLine($"Vuelto: ${_vueltoTicket:N2}");
+                    }
+
                     writer.WriteLine("==================================================");
                     writer.WriteLine("             ¡Gracias por su compra!              ");
                 }

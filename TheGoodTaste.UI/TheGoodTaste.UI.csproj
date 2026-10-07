@@ -53,6 +53,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="FormCobroEfectivo.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormCobroEfectivo.Designer.cs">
+      <DependentUpon>FormCobroEfectivo.cs</DependentUpon>
+    </Compile>
     <Compile Include="FormReporte.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -100,6 +106,9 @@
     <Compile Include="TemaVisual.cs" />
     <EmbeddedResource Include="FormClientes.resx">
       <DependentUpon>FormClientes.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FormCobroEfectivo.resx">
+      <DependentUpon>FormCobroEfectivo.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="FormLogin.resx">
       <DependentUpon>FormLogin.cs</DependentUpon>
