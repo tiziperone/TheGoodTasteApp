@@ -61,24 +61,21 @@
             // 
             // panelContenedor
             // 
-            this.panelContenedor.Controls.Add(this.label2);
-            this.panelContenedor.Controls.Add(this.label1);
             this.panelContenedor.Controls.Add(this.panelSuperior);
             this.panelContenedor.Controls.Add(this.pbLogoInicio);
             this.panelContenedor.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panelContenedor.Location = new System.Drawing.Point(0, 0);
             this.panelContenedor.Name = "panelContenedor";
-            this.panelContenedor.Size = new System.Drawing.Size(1219, 673);
+            this.panelContenedor.Size = new System.Drawing.Size(1215, 673);
             this.panelContenedor.TabIndex = 1;
             this.panelContenedor.Paint += new System.Windows.Forms.PaintEventHandler(this.panelContenedor_Paint);
             // 
             // label2
             // 
-            this.label2.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.label2.AutoSize = true;
             this.label2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(64)))), ((int)(((byte)(0)))));
             this.label2.ForeColor = System.Drawing.Color.WhiteSmoke;
-            this.label2.Location = new System.Drawing.Point(258, 93);
+            this.label2.Location = new System.Drawing.Point(213, 75);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(81, 16);
             this.label2.TabIndex = 3;
@@ -88,11 +85,10 @@
             // 
             // label1
             // 
-            this.label1.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.label1.AutoSize = true;
             this.label1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(64)))), ((int)(((byte)(0)))));
             this.label1.ForeColor = System.Drawing.Color.WhiteSmoke;
-            this.label1.Location = new System.Drawing.Point(78, 93);
+            this.label1.Location = new System.Drawing.Point(56, 75);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(94, 16);
             this.label1.TabIndex = 2;
@@ -101,10 +97,10 @@
             // 
             // panelSuperior
             // 
-            this.panelSuperior.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
             this.panelSuperior.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(35)))), ((int)(((byte)(25)))), ((int)(((byte)(20)))));
+            this.panelSuperior.Controls.Add(this.label2);
             this.panelSuperior.Controls.Add(this.label7);
+            this.panelSuperior.Controls.Add(this.label1);
             this.panelSuperior.Controls.Add(this.label6);
             this.panelSuperior.Controls.Add(this.label5);
             this.panelSuperior.Controls.Add(this.label4);
@@ -118,7 +114,7 @@
             this.panelSuperior.Controls.Add(this.btnProductos);
             this.panelSuperior.Location = new System.Drawing.Point(0, 0);
             this.panelSuperior.Name = "panelSuperior";
-            this.panelSuperior.Size = new System.Drawing.Size(1219, 113);
+            this.panelSuperior.Size = new System.Drawing.Size(1219, 106);
             this.panelSuperior.TabIndex = 1;
             this.panelSuperior.Paint += new System.Windows.Forms.PaintEventHandler(this.panelSuperior_Paint);
             // 
@@ -128,7 +124,7 @@
             this.label7.AutoSize = true;
             this.label7.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(64)))), ((int)(((byte)(0)))));
             this.label7.ForeColor = System.Drawing.Color.WhiteSmoke;
-            this.label7.Location = new System.Drawing.Point(1107, 93);
+            this.label7.Location = new System.Drawing.Point(1102, 82);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(72, 16);
             this.label7.TabIndex = 8;
@@ -142,7 +138,7 @@
             this.label6.AutoSize = true;
             this.label6.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(64)))), ((int)(((byte)(0)))));
             this.label6.ForeColor = System.Drawing.Color.WhiteSmoke;
-            this.label6.Location = new System.Drawing.Point(916, 93);
+            this.label6.Location = new System.Drawing.Point(916, 82);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(115, 16);
             this.label6.TabIndex = 7;
@@ -152,11 +148,10 @@
             // 
             // label5
             // 
-            this.label5.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.label5.AutoSize = true;
             this.label5.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(64)))), ((int)(((byte)(0)))));
             this.label5.ForeColor = System.Drawing.Color.WhiteSmoke;
-            this.label5.Location = new System.Drawing.Point(711, 93);
+            this.label5.Location = new System.Drawing.Point(640, 82);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(89, 16);
             this.label5.TabIndex = 6;
@@ -166,11 +161,10 @@
             // 
             // label4
             // 
-            this.label4.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.label4.AutoSize = true;
             this.label4.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(64)))), ((int)(((byte)(0)))));
             this.label4.ForeColor = System.Drawing.Color.WhiteSmoke;
-            this.label4.Location = new System.Drawing.Point(558, 93);
+            this.label4.Location = new System.Drawing.Point(487, 82);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(87, 16);
             this.label4.TabIndex = 5;
@@ -180,11 +174,10 @@
             // 
             // label3
             // 
-            this.label3.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.label3.AutoSize = true;
             this.label3.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(64)))), ((int)(((byte)(0)))));
             this.label3.ForeColor = System.Drawing.Color.WhiteSmoke;
-            this.label3.Location = new System.Drawing.Point(415, 93);
+            this.label3.Location = new System.Drawing.Point(356, 82);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(75, 16);
             this.label3.TabIndex = 4;
@@ -203,7 +196,7 @@
             this.buttonCerrarSesion.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(80)))), ((int)(((byte)(58)))), ((int)(((byte)(45)))));
             this.buttonCerrarSesion.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.buttonCerrarSesion.ForeColor = System.Drawing.SystemColors.ButtonHighlight;
-            this.buttonCerrarSesion.Location = new System.Drawing.Point(906, 12);
+            this.buttonCerrarSesion.Location = new System.Drawing.Point(906, 3);
             this.buttonCerrarSesion.Name = "buttonCerrarSesion";
             this.buttonCerrarSesion.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
             this.buttonCerrarSesion.Size = new System.Drawing.Size(128, 67);
@@ -223,7 +216,7 @@
             this.btnSalir.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(80)))), ((int)(((byte)(58)))), ((int)(((byte)(45)))));
             this.btnSalir.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnSalir.ForeColor = System.Drawing.SystemColors.ButtonHighlight;
-            this.btnSalir.Location = new System.Drawing.Point(1079, 12);
+            this.btnSalir.Location = new System.Drawing.Point(1075, 12);
             this.btnSalir.Name = "btnSalir";
             this.btnSalir.Size = new System.Drawing.Size(128, 67);
             this.btnSalir.TabIndex = 0;
@@ -234,7 +227,6 @@
             // 
             // btnReportes
             // 
-            this.btnReportes.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.btnReportes.BackColor = System.Drawing.Color.Transparent;
             this.btnReportes.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("btnReportes.BackgroundImage")));
             this.btnReportes.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
@@ -243,7 +235,7 @@
             this.btnReportes.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(80)))), ((int)(((byte)(58)))), ((int)(((byte)(45)))));
             this.btnReportes.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnReportes.ForeColor = System.Drawing.SystemColors.ButtonHighlight;
-            this.btnReportes.Location = new System.Drawing.Point(695, 12);
+            this.btnReportes.Location = new System.Drawing.Point(618, 12);
             this.btnReportes.Name = "btnReportes";
             this.btnReportes.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
             this.btnReportes.Size = new System.Drawing.Size(128, 67);
@@ -254,7 +246,6 @@
             // 
             // btnUsuarios
             // 
-            this.btnUsuarios.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.btnUsuarios.BackColor = System.Drawing.Color.Transparent;
             this.btnUsuarios.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("btnUsuarios.BackgroundImage")));
             this.btnUsuarios.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
@@ -263,7 +254,7 @@
             this.btnUsuarios.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(80)))), ((int)(((byte)(58)))), ((int)(((byte)(45)))));
             this.btnUsuarios.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnUsuarios.ForeColor = System.Drawing.SystemColors.ButtonHighlight;
-            this.btnUsuarios.Location = new System.Drawing.Point(539, 12);
+            this.btnUsuarios.Location = new System.Drawing.Point(463, 12);
             this.btnUsuarios.Name = "btnUsuarios";
             this.btnUsuarios.RightToLeft = System.Windows.Forms.RightToLeft.No;
             this.btnUsuarios.Size = new System.Drawing.Size(128, 67);
@@ -274,7 +265,6 @@
             // 
             // btnVentas
             // 
-            this.btnVentas.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.btnVentas.BackColor = System.Drawing.Color.Transparent;
             this.btnVentas.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("btnVentas.BackgroundImage")));
             this.btnVentas.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
@@ -283,7 +273,7 @@
             this.btnVentas.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(80)))), ((int)(((byte)(58)))), ((int)(((byte)(45)))));
             this.btnVentas.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnVentas.ForeColor = System.Drawing.SystemColors.ButtonHighlight;
-            this.btnVentas.Location = new System.Drawing.Point(394, 12);
+            this.btnVentas.Location = new System.Drawing.Point(329, 12);
             this.btnVentas.Name = "btnVentas";
             this.btnVentas.Size = new System.Drawing.Size(128, 67);
             this.btnVentas.TabIndex = 0;
@@ -293,7 +283,6 @@
             // 
             // btnClientes
             // 
-            this.btnClientes.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.btnClientes.BackColor = System.Drawing.Color.Transparent;
             this.btnClientes.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("btnClientes.BackgroundImage")));
             this.btnClientes.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
@@ -302,7 +291,7 @@
             this.btnClientes.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(80)))), ((int)(((byte)(58)))), ((int)(((byte)(45)))));
             this.btnClientes.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnClientes.ForeColor = System.Drawing.SystemColors.ButtonHighlight;
-            this.btnClientes.Location = new System.Drawing.Point(237, 12);
+            this.btnClientes.Location = new System.Drawing.Point(195, 3);
             this.btnClientes.Name = "btnClientes";
             this.btnClientes.Size = new System.Drawing.Size(128, 67);
             this.btnClientes.TabIndex = 0;
@@ -312,7 +301,6 @@
             // 
             // btnProductos
             // 
-            this.btnProductos.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.btnProductos.BackColor = System.Drawing.Color.Transparent;
             this.btnProductos.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("btnProductos.BackgroundImage")));
             this.btnProductos.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
@@ -321,7 +309,7 @@
             this.btnProductos.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(80)))), ((int)(((byte)(58)))), ((int)(((byte)(45)))));
             this.btnProductos.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnProductos.ForeColor = System.Drawing.SystemColors.ButtonHighlight;
-            this.btnProductos.Location = new System.Drawing.Point(58, 12);
+            this.btnProductos.Location = new System.Drawing.Point(38, 3);
             this.btnProductos.Name = "btnProductos";
             this.btnProductos.Size = new System.Drawing.Size(128, 67);
             this.btnProductos.TabIndex = 0;
@@ -332,7 +320,6 @@
             // pbLogoInicio
             // 
             this.pbLogoInicio.BackColor = System.Drawing.Color.Black;
-            this.pbLogoInicio.Dock = System.Windows.Forms.DockStyle.Fill;
             this.pbLogoInicio.Image = ((System.Drawing.Image)(resources.GetObject("pbLogoInicio.Image")));
             this.pbLogoInicio.Location = new System.Drawing.Point(0, 0);
             this.pbLogoInicio.Name = "pbLogoInicio";
@@ -346,14 +333,13 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1219, 673);
+            this.ClientSize = new System.Drawing.Size(1215, 673);
             this.Controls.Add(this.panelContenedor);
             this.Controls.Add(this.panel1);
             this.Name = "FormPrincipal";
             this.Text = "Bienvenido a The Good Taste";
             this.Load += new System.EventHandler(this.FormPrincipal_Load);
             this.panelContenedor.ResumeLayout(false);
-            this.panelContenedor.PerformLayout();
             this.panelSuperior.ResumeLayout(false);
             this.panelSuperior.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pbLogoInicio)).EndInit();

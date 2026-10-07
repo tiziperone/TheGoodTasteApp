@@ -35,14 +35,20 @@ namespace TheGoodTaste.UI
                 ConfigurarPermisosPorRol();
             }
 
-            // Solo aseguramos que el panel superior cubra todo el ancho al maximizar
             if (panelSuperior != null)
             {
                 panelSuperior.BackColor = Color.FromArgb(25, 18, 14);
-                panelSuperior.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+                panelSuperior.Dock = DockStyle.Top;
+                panelSuperior.Height = 125;
             }
 
-            // Configuramos el logo para que luzca limpio, sin bordes negros y con zoom prolijo
+            if (panelContenedor != null)
+            {
+                panelContenedor.Dock = DockStyle.Fill;
+                // ESTA ES LA CLAVE: Obliga al contenedor a empezar justo debajo de la barra superior, no detrás de ella
+                panelContenedor.BringToFront();
+            }
+
             if (pbLogoInicio != null)
             {
                 pbLogoInicio.BackColor = ColorFondoPanel;
@@ -50,22 +56,6 @@ namespace TheGoodTaste.UI
             }
 
             CentrarYAmpliarLogo();
-        }
-
-        private void CentrarYAmpliarLogo()
-        {
-            if (pbLogoInicio != null && pbLogoInicio.Visible)
-            {
-                // Calculamos un tamaño proporcional y grande para que destaque en el centro
-                int anchoDeseado = Math.Min(panelContenedor.ClientSize.Width - 80, 650);
-                int altoDeseado = Math.Min(panelContenedor.ClientSize.Height - 80, 450);
-
-                pbLogoInicio.Width = Math.Max(anchoDeseado, 300);
-                pbLogoInicio.Height = Math.Max(altoDeseado, 200);
-
-                pbLogoInicio.Left = (panelContenedor.ClientSize.Width - pbLogoInicio.Width) / 2;
-                pbLogoInicio.Top = (panelContenedor.ClientSize.Height - pbLogoInicio.Height) / 2;
-            }
         }
 
         private void DeshabilitarBoton(Button btn)
@@ -145,7 +135,7 @@ namespace TheGoodTaste.UI
                 {
                     if (btn == _botonActivo)
                     {
-                        btn.BackColor = ColorBotonActivo; // Dorado al seleccionar
+                        btn.BackColor = ColorBotonActivo;
                         btn.ForeColor = Color.Black;
                     }
                     else
@@ -198,6 +188,8 @@ namespace TheGoodTaste.UI
             formularioHijo.BringToFront();
             formularioHijo.ResumeLayout(true);
             formularioHijo.Show();
+
+            // Aquí eliminamos el panelSuperior.BringToFront(); que estaba rompiendo la vista.
         }
 
         public void btnProductos_Click(object sender, EventArgs e) => AbrirFormularioEnPanel(new FormProductos(), (Button)sender);
@@ -211,6 +203,21 @@ namespace TheGoodTaste.UI
             if (MessageBox.Show("¿Está seguro de que desea salir del sistema?", "Salir", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
             {
                 this.Close();
+            }
+        }
+
+        private void CentrarYAmpliarLogo()
+        {
+            if (pbLogoInicio != null && pbLogoInicio.Visible)
+            {
+                int anchoDeseado = Math.Min(panelContenedor.ClientSize.Width - 80, 650);
+                int altoDeseado = Math.Min(panelContenedor.ClientSize.Height - 80, 450);
+
+                pbLogoInicio.Width = Math.Max(anchoDeseado, 300);
+                pbLogoInicio.Height = Math.Max(altoDeseado, 200);
+
+                pbLogoInicio.Left = (panelContenedor.ClientSize.Width - pbLogoInicio.Width) / 2;
+                pbLogoInicio.Top = (panelContenedor.ClientSize.Height - pbLogoInicio.Height) / 2;
             }
         }
 
