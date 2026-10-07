@@ -238,6 +238,7 @@
             this.lblVendedor.Size = new System.Drawing.Size(70, 16);
             this.lblVendedor.TabIndex = 0;
             this.lblVendedor.Text = "Vendedor:";
+            this.lblVendedor.Click += new System.EventHandler(this.lblVendedor_Click);
             // 
             // txtBuscarProducto
             // 
