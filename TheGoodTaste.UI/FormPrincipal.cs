@@ -217,7 +217,7 @@ namespace TheGoodTaste.UI
 
             formularioHijo.TopLevel = false;
             formularioHijo.FormBorderStyle = FormBorderStyle.None;
-            // Se quitó el DockStyle.Fill de aquí
+            formularioHijo.Dock = DockStyle.Fill; 
 
             formularioHijo.FormClosed += (s, args) =>
             {
@@ -229,17 +229,29 @@ namespace TheGoodTaste.UI
                 ResaltarBotonActivo(null);
             };
 
+            foreach (Control ctrl in formularioHijo.Controls)
+            {
+                if (ctrl is DataGridView dgv)
+                {
+                    dgv.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.None;
+                }
+            }
+
             formularioHijo.SuspendLayout();
             this.panelContenedor.Controls.Add(formularioHijo);
             this.panelContenedor.Tag = formularioHijo;
             formularioHijo.BringToFront();
             formularioHijo.ResumeLayout(true);
 
-            // SOLUCIÓN AL ERROR: 
-            // 1. Mostrar el formulario primero para que dibuje el DataGridView
             formularioHijo.Show();
-            // 2. Acoplar al panel después de mostrar
-            formularioHijo.Dock = DockStyle.Fill;
+
+            foreach (Control ctrl in formularioHijo.Controls)
+            {
+                if (ctrl is DataGridView dgv)
+                {
+                    dgv.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+                }
+            }
         }
 
         public void btnProductos_Click(object sender, EventArgs e) => AbrirFormularioEnPanel(new FormProductos(), (Button)sender);

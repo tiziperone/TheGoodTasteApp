@@ -369,5 +369,10 @@ namespace TheGoodTaste.UI
                 FiltrarGrilla(txt.Text.Trim());
             }
         }
+
+        private void LPrecio_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }

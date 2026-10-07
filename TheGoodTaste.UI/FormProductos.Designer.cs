@@ -55,35 +55,35 @@
             // 
             // txtCodigo
             // 
-            this.txtCodigo.Location = new System.Drawing.Point(195, 48);
+            this.txtCodigo.Location = new System.Drawing.Point(195, 80);
             this.txtCodigo.Name = "txtCodigo";
             this.txtCodigo.Size = new System.Drawing.Size(121, 22);
             this.txtCodigo.TabIndex = 0;
             // 
             // txtNombre
             // 
-            this.txtNombre.Location = new System.Drawing.Point(195, 93);
+            this.txtNombre.Location = new System.Drawing.Point(195, 119);
             this.txtNombre.Name = "txtNombre";
             this.txtNombre.Size = new System.Drawing.Size(121, 22);
             this.txtNombre.TabIndex = 1;
             // 
             // txtDescripcion
             // 
-            this.txtDescripcion.Location = new System.Drawing.Point(195, 141);
+            this.txtDescripcion.Location = new System.Drawing.Point(195, 160);
             this.txtDescripcion.Name = "txtDescripcion";
             this.txtDescripcion.Size = new System.Drawing.Size(121, 22);
             this.txtDescripcion.TabIndex = 2;
             // 
             // txtPrecio
             // 
-            this.txtPrecio.Location = new System.Drawing.Point(195, 183);
+            this.txtPrecio.Location = new System.Drawing.Point(195, 207);
             this.txtPrecio.Name = "txtPrecio";
             this.txtPrecio.Size = new System.Drawing.Size(121, 22);
             this.txtPrecio.TabIndex = 3;
             // 
             // nudStock
             // 
-            this.nudStock.Location = new System.Drawing.Point(196, 282);
+            this.nudStock.Location = new System.Drawing.Point(196, 299);
             this.nudStock.Name = "nudStock";
             this.nudStock.Size = new System.Drawing.Size(120, 22);
             this.nudStock.TabIndex = 4;
@@ -92,7 +92,7 @@
             // 
             this.cboCategoria.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cboCategoria.FormattingEnabled = true;
-            this.cboCategoria.Location = new System.Drawing.Point(195, 237);
+            this.cboCategoria.Location = new System.Drawing.Point(195, 250);
             this.cboCategoria.Name = "cboCategoria";
             this.cboCategoria.Size = new System.Drawing.Size(121, 24);
             this.cboCategoria.TabIndex = 5;
@@ -100,7 +100,7 @@
             // LCodProd
             // 
             this.LCodProd.AutoSize = true;
-            this.LCodProd.Location = new System.Drawing.Point(47, 48);
+            this.LCodProd.Location = new System.Drawing.Point(47, 86);
             this.LCodProd.Name = "LCodProd";
             this.LCodProd.Size = new System.Drawing.Size(127, 16);
             this.LCodProd.TabIndex = 6;
@@ -109,7 +109,7 @@
             // LNombreProd
             // 
             this.LNombreProd.AutoSize = true;
-            this.LNombreProd.Location = new System.Drawing.Point(47, 93);
+            this.LNombreProd.Location = new System.Drawing.Point(47, 125);
             this.LNombreProd.Name = "LNombreProd";
             this.LNombreProd.Size = new System.Drawing.Size(56, 16);
             this.LNombreProd.TabIndex = 7;
@@ -118,7 +118,7 @@
             // LDescripcion
             // 
             this.LDescripcion.AutoSize = true;
-            this.LDescripcion.Location = new System.Drawing.Point(47, 144);
+            this.LDescripcion.Location = new System.Drawing.Point(47, 166);
             this.LDescripcion.Name = "LDescripcion";
             this.LDescripcion.Size = new System.Drawing.Size(79, 16);
             this.LDescripcion.TabIndex = 8;
@@ -127,16 +127,17 @@
             // LPrecio
             // 
             this.LPrecio.AutoSize = true;
-            this.LPrecio.Location = new System.Drawing.Point(47, 189);
+            this.LPrecio.Location = new System.Drawing.Point(47, 213);
             this.LPrecio.Name = "LPrecio";
             this.LPrecio.Size = new System.Drawing.Size(46, 16);
             this.LPrecio.TabIndex = 9;
             this.LPrecio.Text = "Precio";
+            this.LPrecio.Click += new System.EventHandler(this.LPrecio_Click);
             // 
             // LNroCategoria
             // 
             this.LNroCategoria.AutoSize = true;
-            this.LNroCategoria.Location = new System.Drawing.Point(47, 241);
+            this.LNroCategoria.Location = new System.Drawing.Point(47, 258);
             this.LNroCategoria.Name = "LNroCategoria";
             this.LNroCategoria.Size = new System.Drawing.Size(66, 16);
             this.LNroCategoria.TabIndex = 10;
@@ -145,7 +146,7 @@
             // LStock
             // 
             this.LStock.AutoSize = true;
-            this.LStock.Location = new System.Drawing.Point(47, 284);
+            this.LStock.Location = new System.Drawing.Point(47, 305);
             this.LStock.Name = "LStock";
             this.LStock.Size = new System.Drawing.Size(41, 16);
             this.LStock.TabIndex = 11;
@@ -158,18 +159,18 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.dgvProductos.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
             this.dgvProductos.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dgvProductos.Location = new System.Drawing.Point(377, 30);
+            this.dgvProductos.Location = new System.Drawing.Point(363, 80);
             this.dgvProductos.Name = "dgvProductos";
             this.dgvProductos.ReadOnly = true;
             this.dgvProductos.RowHeadersWidth = 51;
             this.dgvProductos.RowTemplate.Height = 24;
             this.dgvProductos.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.dgvProductos.Size = new System.Drawing.Size(534, 365);
+            this.dgvProductos.Size = new System.Drawing.Size(761, 522);
             this.dgvProductos.TabIndex = 12;
             // 
             // btnGuardar
             // 
-            this.btnGuardar.Location = new System.Drawing.Point(34, 372);
+            this.btnGuardar.Location = new System.Drawing.Point(34, 413);
             this.btnGuardar.Name = "btnGuardar";
             this.btnGuardar.Size = new System.Drawing.Size(92, 23);
             this.btnGuardar.TabIndex = 13;
@@ -179,7 +180,7 @@
             // 
             // btnLimpiar
             // 
-            this.btnLimpiar.Location = new System.Drawing.Point(151, 372);
+            this.btnLimpiar.Location = new System.Drawing.Point(154, 413);
             this.btnLimpiar.Name = "btnLimpiar";
             this.btnLimpiar.Size = new System.Drawing.Size(75, 23);
             this.btnLimpiar.TabIndex = 16;
@@ -190,7 +191,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(47, 325);
+            this.label1.Location = new System.Drawing.Point(47, 356);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(62, 16);
             this.label1.TabIndex = 17;
@@ -198,14 +199,14 @@
             // 
             // textStockMin
             // 
-            this.textStockMin.Location = new System.Drawing.Point(196, 322);
+            this.textStockMin.Location = new System.Drawing.Point(195, 350);
             this.textStockMin.Name = "textStockMin";
-            this.textStockMin.Size = new System.Drawing.Size(120, 22);
+            this.textStockMin.Size = new System.Drawing.Size(121, 22);
             this.textStockMin.TabIndex = 18;
             // 
             // buttonInactivos
             // 
-            this.buttonInactivos.Location = new System.Drawing.Point(489, 413);
+            this.buttonInactivos.Location = new System.Drawing.Point(481, 51);
             this.buttonInactivos.Name = "buttonInactivos";
             this.buttonInactivos.Size = new System.Drawing.Size(92, 23);
             this.buttonInactivos.TabIndex = 20;
@@ -215,7 +216,7 @@
             // 
             // buttonActivos
             // 
-            this.buttonActivos.Location = new System.Drawing.Point(377, 413);
+            this.buttonActivos.Location = new System.Drawing.Point(363, 51);
             this.buttonActivos.Name = "buttonActivos";
             this.buttonActivos.Size = new System.Drawing.Size(92, 23);
             this.buttonActivos.TabIndex = 21;
@@ -225,18 +226,18 @@
             // 
             // textBoxBuscarProducto
             // 
-            this.textBoxBuscarProducto.Location = new System.Drawing.Point(740, 414);
+            this.textBoxBuscarProducto.Location = new System.Drawing.Point(906, 51);
             this.textBoxBuscarProducto.Name = "textBoxBuscarProducto";
-            this.textBoxBuscarProducto.Size = new System.Drawing.Size(171, 22);
+            this.textBoxBuscarProducto.Size = new System.Drawing.Size(218, 22);
             this.textBoxBuscarProducto.TabIndex = 35;
             this.textBoxBuscarProducto.TextChanged += new System.EventHandler(this.textBoxBuscarProducto_TextChanged);
             // 
             // labelProduct
             // 
             this.labelProduct.AutoSize = true;
-            this.labelProduct.Location = new System.Drawing.Point(672, 420);
+            this.labelProduct.Location = new System.Drawing.Point(837, 54);
             this.labelProduct.Name = "labelProduct";
-            this.labelProduct.Size = new System.Drawing.Size(65, 20);
+            this.labelProduct.Size = new System.Drawing.Size(52, 16);
             this.labelProduct.TabIndex = 36;
             this.labelProduct.Text = "Buscar:";
             // 
@@ -244,7 +245,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1043, 528);
+            this.ClientSize = new System.Drawing.Size(1270, 685);
             this.Controls.Add(this.labelProduct);
             this.Controls.Add(this.textBoxBuscarProducto);
             this.Controls.Add(this.buttonActivos);
