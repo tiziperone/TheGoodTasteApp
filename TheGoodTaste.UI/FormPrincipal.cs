@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.Windows.Forms;
 using The_Good_Taste.Entidades;
 
@@ -13,6 +14,9 @@ namespace TheGoodTaste.UI
         private readonly Color ColorFondoPanel = Color.FromArgb(35, 25, 20);   // Marrón oscuro
         private readonly Color ColorBotonActivo = Color.FromArgb(180, 130, 40); // Dorado
         private readonly Color ColorTextoBoton = Color.White;
+
+        // Color de la barra superior para usarlo de fondo en los botones
+        private readonly Color ColorBarraSuperior = Color.FromArgb(25, 18, 14);
 
         public FormPrincipal()
         {
@@ -37,15 +41,26 @@ namespace TheGoodTaste.UI
 
             if (panelSuperior != null)
             {
-                panelSuperior.BackColor = Color.FromArgb(25, 18, 14);
+                panelSuperior.BackColor = ColorBarraSuperior;
                 panelSuperior.Dock = DockStyle.Top;
                 panelSuperior.Height = 125;
+
+                // CLAVE: Quitamos el fondo cuadrado a todos los botones habilitados desde el inicio
+                foreach (Control control in panelSuperior.Controls)
+                {
+                    if (control is Button btn && btn.Enabled)
+                    {
+                        btn.BackColor = ColorBarraSuperior; // Se funde con la barra
+                        btn.FlatStyle = FlatStyle.Flat;
+                        btn.FlatAppearance.BorderSize = 0;
+                        btn.FlatAppearance.MouseOverBackColor = Color.FromArgb(40, 30, 24); // Leve brillo al pasar el mouse
+                    }
+                }
             }
 
             if (panelContenedor != null)
             {
                 panelContenedor.Dock = DockStyle.Fill;
-                // ESTA ES LA CLAVE: Obliga al contenedor a empezar justo debajo de la barra superior, no detrás de ella
                 panelContenedor.BringToFront();
             }
 
@@ -58,15 +73,47 @@ namespace TheGoodTaste.UI
             CentrarYAmpliarLogo();
         }
 
+        private Image HacerImagenTransparente(Image imagenOriginal, float opacidad)
+        {
+            if (imagenOriginal == null) return null;
+
+            Bitmap bmp = new Bitmap(imagenOriginal.Width, imagenOriginal.Height);
+            using (Graphics g = Graphics.FromImage(bmp))
+            {
+                ColorMatrix matrizColor = new ColorMatrix();
+                matrizColor.Matrix33 = opacidad;
+
+                using (ImageAttributes atributos = new ImageAttributes())
+                {
+                    atributos.SetColorMatrix(matrizColor, ColorMatrixFlag.Default, ColorAdjustType.Bitmap);
+                    g.DrawImage(imagenOriginal, new Rectangle(0, 0, bmp.Width, bmp.Height),
+                                0, 0, imagenOriginal.Width, imagenOriginal.Height,
+                                GraphicsUnit.Pixel, atributos);
+                }
+            }
+            return bmp;
+        }
+
         private void DeshabilitarBoton(Button btn)
         {
             if (btn != null)
             {
                 btn.Enabled = false;
-                btn.BackColor = Color.FromArgb(25, 18, 14);
-                btn.ForeColor = Color.DimGray;
+
+                btn.BackColor = ColorBarraSuperior;
+                btn.ForeColor = Color.FromArgb(90, 90, 90);
                 btn.FlatStyle = FlatStyle.Flat;
                 btn.FlatAppearance.BorderSize = 0;
+
+                if (btn.Image != null)
+                {
+                    btn.Image = HacerImagenTransparente(btn.Image, 0.3f);
+                }
+
+                if (btn.BackgroundImage != null)
+                {
+                    btn.BackgroundImage = HacerImagenTransparente(btn.BackgroundImage, 0.3f);
+                }
             }
         }
 
@@ -140,7 +187,8 @@ namespace TheGoodTaste.UI
                     }
                     else
                     {
-                        btn.BackColor = Color.FromArgb(50, 35, 28);
+                        // CLAVE: Ahora el color vuelve al de la barra en lugar del tono claro anterior
+                        btn.BackColor = ColorBarraSuperior;
                         btn.ForeColor = Color.White;
                     }
                 }
@@ -188,8 +236,6 @@ namespace TheGoodTaste.UI
             formularioHijo.BringToFront();
             formularioHijo.ResumeLayout(true);
             formularioHijo.Show();
-
-            // Aquí eliminamos el panelSuperior.BringToFront(); que estaba rompiendo la vista.
         }
 
         public void btnProductos_Click(object sender, EventArgs e) => AbrirFormularioEnPanel(new FormProductos(), (Button)sender);

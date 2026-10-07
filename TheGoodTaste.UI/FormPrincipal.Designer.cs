@@ -31,10 +31,10 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormPrincipal));
             this.panel1 = new System.Windows.Forms.Panel();
             this.panelContenedor = new System.Windows.Forms.Panel();
-            this.label2 = new System.Windows.Forms.Label();
-            this.label1 = new System.Windows.Forms.Label();
             this.panelSuperior = new System.Windows.Forms.Panel();
+            this.label2 = new System.Windows.Forms.Label();
             this.label7 = new System.Windows.Forms.Label();
+            this.label1 = new System.Windows.Forms.Label();
             this.label6 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
@@ -70,31 +70,6 @@
             this.panelContenedor.TabIndex = 1;
             this.panelContenedor.Paint += new System.Windows.Forms.PaintEventHandler(this.panelContenedor_Paint);
             // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(64)))), ((int)(((byte)(0)))));
-            this.label2.ForeColor = System.Drawing.Color.WhiteSmoke;
-            this.label2.Location = new System.Drawing.Point(213, 75);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(81, 16);
-            this.label2.TabIndex = 3;
-            this.label2.Text = "[F2] Clientes";
-            this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.label2.Click += new System.EventHandler(this.label2_Click);
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(64)))), ((int)(((byte)(0)))));
-            this.label1.ForeColor = System.Drawing.Color.WhiteSmoke;
-            this.label1.Location = new System.Drawing.Point(56, 75);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(94, 16);
-            this.label1.TabIndex = 2;
-            this.label1.Text = "[F1] Productos";
-            this.label1.Click += new System.EventHandler(this.label1_Click);
-            // 
             // panelSuperior
             // 
             this.panelSuperior.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(35)))), ((int)(((byte)(25)))), ((int)(((byte)(20)))));
@@ -118,6 +93,19 @@
             this.panelSuperior.TabIndex = 1;
             this.panelSuperior.Paint += new System.Windows.Forms.PaintEventHandler(this.panelSuperior_Paint);
             // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(64)))), ((int)(((byte)(0)))));
+            this.label2.ForeColor = System.Drawing.Color.WhiteSmoke;
+            this.label2.Location = new System.Drawing.Point(214, 82);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(81, 16);
+            this.label2.TabIndex = 3;
+            this.label2.Text = "[F2] Clientes";
+            this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.label2.Click += new System.EventHandler(this.label2_Click);
+            // 
             // label7
             // 
             this.label7.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
@@ -131,6 +119,18 @@
             this.label7.Text = "[ESC] Salir";
             this.label7.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.label7.Click += new System.EventHandler(this.label7_Click);
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(64)))), ((int)(((byte)(0)))));
+            this.label1.ForeColor = System.Drawing.Color.WhiteSmoke;
+            this.label1.Location = new System.Drawing.Point(56, 82);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(94, 16);
+            this.label1.TabIndex = 2;
+            this.label1.Text = "[F1] Productos";
+            this.label1.Click += new System.EventHandler(this.label1_Click);
             // 
             // label6
             // 
@@ -196,7 +196,7 @@
             this.buttonCerrarSesion.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(80)))), ((int)(((byte)(58)))), ((int)(((byte)(45)))));
             this.buttonCerrarSesion.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.buttonCerrarSesion.ForeColor = System.Drawing.SystemColors.ButtonHighlight;
-            this.buttonCerrarSesion.Location = new System.Drawing.Point(906, 3);
+            this.buttonCerrarSesion.Location = new System.Drawing.Point(906, 12);
             this.buttonCerrarSesion.Name = "buttonCerrarSesion";
             this.buttonCerrarSesion.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
             this.buttonCerrarSesion.Size = new System.Drawing.Size(128, 67);
@@ -293,7 +293,7 @@
             this.btnClientes.ForeColor = System.Drawing.SystemColors.ButtonHighlight;
             this.btnClientes.Location = new System.Drawing.Point(195, 3);
             this.btnClientes.Name = "btnClientes";
-            this.btnClientes.Size = new System.Drawing.Size(128, 67);
+            this.btnClientes.Size = new System.Drawing.Size(128, 76);
             this.btnClientes.TabIndex = 0;
             this.btnClientes.TextAlign = System.Drawing.ContentAlignment.TopLeft;
             this.btnClientes.UseVisualStyleBackColor = false;
@@ -311,7 +311,7 @@
             this.btnProductos.ForeColor = System.Drawing.SystemColors.ButtonHighlight;
             this.btnProductos.Location = new System.Drawing.Point(38, 3);
             this.btnProductos.Name = "btnProductos";
-            this.btnProductos.Size = new System.Drawing.Size(128, 67);
+            this.btnProductos.Size = new System.Drawing.Size(128, 76);
             this.btnProductos.TabIndex = 0;
             this.btnProductos.TextAlign = System.Drawing.ContentAlignment.TopLeft;
             this.btnProductos.UseVisualStyleBackColor = false;
@@ -320,10 +320,11 @@
             // pbLogoInicio
             // 
             this.pbLogoInicio.BackColor = System.Drawing.Color.Black;
+            this.pbLogoInicio.Dock = System.Windows.Forms.DockStyle.Fill;
             this.pbLogoInicio.Image = ((System.Drawing.Image)(resources.GetObject("pbLogoInicio.Image")));
             this.pbLogoInicio.Location = new System.Drawing.Point(0, 0);
             this.pbLogoInicio.Name = "pbLogoInicio";
-            this.pbLogoInicio.Size = new System.Drawing.Size(1219, 673);
+            this.pbLogoInicio.Size = new System.Drawing.Size(1519, 841);
             this.pbLogoInicio.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.pbLogoInicio.TabIndex = 0;
             this.pbLogoInicio.TabStop = false;
