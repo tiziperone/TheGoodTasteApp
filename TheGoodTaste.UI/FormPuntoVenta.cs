@@ -360,14 +360,14 @@ namespace TheGoodTaste.UI
 
             try
             {
-                int idCliente = _clienteSeleccionado != null ? Convert.ToInt32(_clienteSeleccionado["dniCliente"]) : 1;
+                int DniCliente = _clienteSeleccionado != null ? Convert.ToInt32(_clienteSeleccionado["dniCliente"]) : 1;
 
                 Venta nuevaVenta = new Venta
                 {
-                    Fecha = dtpFechaVenta.Value,
-                    IdCliente = idCliente,
+                    FechaVenta = dtpFechaVenta.Value,
+                    DniCliente = DniCliente.ToString(),
                     DNIUsuario = _dniVendedorActivo,
-                    Total = CalcularTotalVenta(),
+                    TotalVenta = CalcularTotalVenta(),
                     Detalles = new List<VentaDetalle>()
                 };
 
@@ -428,8 +428,8 @@ namespace TheGoodTaste.UI
                     writer.WriteLine("==========================================");
                     writer.WriteLine("           THE GOOD TASTE POS             ");
                     writer.WriteLine("==========================================");
-                    writer.WriteLine($"Fecha: {venta.Fecha:dd/MM/yyyy HH:mm:ss}");
-                    writer.WriteLine($"Cliente ID/DNI: {venta.IdCliente}");
+                    writer.WriteLine($"Fecha: {venta.FechaVenta:dd/MM/yyyy HH:mm:ss}");
+                    writer.WriteLine($"Cliente ID/DNI: {venta.DniCliente}");
                     writer.WriteLine($"Vendedor DNI: {venta.DNIUsuario}");
                     writer.WriteLine("------------------------------------------");
                     writer.WriteLine(string.Format("{0,-20} {1,5} {2,12}", "Producto", "Cant", "Subtotal"));
@@ -446,7 +446,7 @@ namespace TheGoodTaste.UI
                     }
 
                     writer.WriteLine("------------------------------------------");
-                    writer.WriteLine($"TOTAL: ${venta.Total:N2}");
+                    writer.WriteLine($"TOTAL: ${venta.TotalVenta:N2}");
                     writer.WriteLine("==========================================");
                     writer.WriteLine("      ¡Gracias por su compra!             ");
                 }
