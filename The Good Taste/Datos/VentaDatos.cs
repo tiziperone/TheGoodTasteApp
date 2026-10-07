@@ -6,7 +6,6 @@ namespace The_Good_Taste.Datos
 {
     public class VentaDatos
     {
-        // --- CORRECCIÓN: Método agregado para leer el stock directo de la BD ---
         public static int ObtenerStockActual(string codigo)
         {
             using (SqlConnection con = Conexion.ObtenerConexion())
@@ -18,11 +17,9 @@ namespace The_Good_Taste.Datos
 
                 object result = cmd.ExecuteScalar();
 
-                // Retorna el stock actual, o 0 si por alguna razón no encuentra el registro
                 return (result != null && result != DBNull.Value) ? Convert.ToInt32(result) : 0;
             }
         }
-        // -----------------------------------------------------------------------
 
         public static bool RegistrarVenta(Venta venta)
         {
@@ -33,9 +30,9 @@ namespace The_Good_Taste.Datos
 
                 try
                 {
-                    // Nombres exactos de tu DER: Tabla Venta, columnas fechaVenta, dniCliente, DNIUsuario, totalVenta
-                    string queryVenta = @"INSERT INTO Venta (fechaVenta, dniCliente, DNIUsuario, totalVenta) 
-                                          VALUES (@Fecha, @IdCliente, @DNIUsuario, @Total);
+                    // --- CORRECCIÓN: Se agregó idTipoPago en el INSERT y en los VALUES ---
+                    string queryVenta = @"INSERT INTO Venta (fechaVenta, dniCliente, DNIUsuario, totalVenta, idTipoPago) 
+                                          VALUES (@Fecha, @IdCliente, @DNIUsuario, @Total, @IdTipoPago);
                                           SELECT SCOPE_IDENTITY();";
 
                     SqlCommand cmdVenta = new SqlCommand(queryVenta, con, transaccion);
@@ -44,12 +41,13 @@ namespace The_Good_Taste.Datos
                     cmdVenta.Parameters.AddWithValue("@DNIUsuario", venta.DNIUsuario);
                     cmdVenta.Parameters.AddWithValue("@Total", venta.TotalVenta);
 
+                    // --- CORRECCIÓN: Se agrega el parámetro con el valor que viene de la UI ---
+                    cmdVenta.Parameters.AddWithValue("@IdTipoPago", venta.IdTipoPago);
+
                     int idVentaGenerado = Convert.ToInt32(cmdVenta.ExecuteScalar());
 
                     foreach (var item in venta.Detalles)
                     {
-                        // 1. DESCONTAR STOCK CON CONDICIÓN DE CONCURRENCIA
-                        // El 'AND Stock >= @Cantidad' evita la condición de carrera
                         string queryStock = @"UPDATE Productos 
                                               SET Stock = Stock - @Cantidad 
                                               WHERE Codigo = @Codigo AND Stock >= @Cantidad;";
@@ -60,13 +58,11 @@ namespace The_Good_Taste.Datos
 
                         int filasAfectadas = cmdStock.ExecuteNonQuery();
 
-                        // Si devuelve 0, sólo lanzamos la excepción sin hacer Rollback acá
                         if (filasAfectadas == 0)
                         {
                             throw new Exception($"El producto con código '{item.Codigo}' ya no cuenta con suficiente stock debido a una venta simultánea.");
                         }
 
-                        // 2. REGISTRAR DETALLE DE VENTA
                         string queryDetalle = @"INSERT INTO VentaDetalle (idVenta, Codigo, cantidad, precioUnitario) 
                                                 VALUES (@IdVenta, @Codigo, @Cantidad, @PrecioUnitario);";
 
@@ -84,7 +80,6 @@ namespace The_Good_Taste.Datos
                 }
                 catch
                 {
-                    // El Rollback se centraliza una sola vez acá para cancelar todo de forma segura
                     if (transaccion != null && transaccion.Connection != null)
                     {
                         transaccion.Rollback();
