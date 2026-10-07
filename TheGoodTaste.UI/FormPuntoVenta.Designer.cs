@@ -40,6 +40,8 @@
             this.lblVendedor = new System.Windows.Forms.Label();
             this.txtBuscarProducto = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
+            this.labelTipoPago = new System.Windows.Forms.Label();
+            this.cboTipoPago = new System.Windows.Forms.ComboBox();
             ((System.ComponentModel.ISupportInitialize)(this.nudCantidad)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dgvDetalles)).BeginInit();
             this.SuspendLayout();
@@ -82,7 +84,7 @@
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(37, 288);
+            this.label5.Location = new System.Drawing.Point(34, 288);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(46, 16);
             this.label5.TabIndex = 9;
@@ -99,7 +101,7 @@
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(37, 246);
+            this.label6.Location = new System.Drawing.Point(34, 246);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(61, 16);
             this.label6.TabIndex = 11;
@@ -124,7 +126,7 @@
             // 
             // btnAgregar
             // 
-            this.btnAgregar.Location = new System.Drawing.Point(95, 342);
+            this.btnAgregar.Location = new System.Drawing.Point(106, 380);
             this.btnAgregar.Name = "btnAgregar";
             this.btnAgregar.Size = new System.Drawing.Size(132, 44);
             this.btnAgregar.TabIndex = 13;
@@ -150,7 +152,7 @@
             this.dgvDetalles.Name = "dgvDetalles";
             this.dgvDetalles.RowHeadersWidth = 51;
             this.dgvDetalles.RowTemplate.Height = 24;
-            this.dgvDetalles.Size = new System.Drawing.Size(561, 254);
+            this.dgvDetalles.Size = new System.Drawing.Size(561, 390);
             this.dgvDetalles.TabIndex = 14;
             // 
             // colIdProducto
@@ -256,11 +258,33 @@
             this.label1.TabIndex = 0;
             this.label1.Text = "Ingresar DNI del Cliente";
             // 
+            // labelTipoPago
+            // 
+            this.labelTipoPago.AutoSize = true;
+            this.labelTipoPago.Location = new System.Drawing.Point(34, 326);
+            this.labelTipoPago.Name = "labelTipoPago";
+            this.labelTipoPago.Size = new System.Drawing.Size(68, 16);
+            this.labelTipoPago.TabIndex = 21;
+            this.labelTipoPago.Text = "TipoPago";
+            this.labelTipoPago.Click += new System.EventHandler(this.labelTipoPago_Click);
+            // 
+            // cboTipoPago
+            // 
+            this.cboTipoPago.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cboTipoPago.FormattingEnabled = true;
+            this.cboTipoPago.Location = new System.Drawing.Point(149, 322);
+            this.cboTipoPago.Name = "cboTipoPago";
+            this.cboTipoPago.Size = new System.Drawing.Size(169, 24);
+            this.cboTipoPago.TabIndex = 22;
+            this.cboTipoPago.SelectedIndexChanged += new System.EventHandler(this.cboTipoPago_SelectedIndexChanged);
+            // 
             // FormPuntoVenta
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1014, 441);
+            this.ClientSize = new System.Drawing.Size(1014, 577);
+            this.Controls.Add(this.cboTipoPago);
+            this.Controls.Add(this.labelTipoPago);
             this.Controls.Add(this.txtBuscarProducto);
             this.Controls.Add(this.txtBuscarCliente);
             this.Controls.Add(this.btnLimpiar);
@@ -314,5 +338,7 @@
         private System.Windows.Forms.Label lblVendedor;
         private System.Windows.Forms.TextBox txtBuscarProducto;
         private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label labelTipoPago;
+        private System.Windows.Forms.ComboBox cboTipoPago;
     }
 }

@@ -18,6 +18,9 @@ namespace TheGoodTaste.UI
         private readonly ClienteNegocio _clienteNegocio = new ClienteNegocio();
         private readonly ProductoNegocio _productoNegocio = new ProductoNegocio();
 
+        // --- NUEVO: Instancia del negocio de Tipos de Pago ---
+        private readonly TipoPagoNegocio _tipoPagoNegocio = new TipoPagoNegocio();
+
         private List<Producto> _listaProductos = new List<Producto>();
         private DataTable _tablaClientes = new DataTable();
 
@@ -89,6 +92,16 @@ namespace TheGoodTaste.UI
                 _tablaClientes = _clienteNegocio.ObtenerClientes(true) ?? new DataTable();
                 _listaProductos = _productoNegocio.ObtenerProductos() ?? new List<Producto>();
 
+                // --- NUEVO: Cargar los tipos de pago al ComboBox ---
+                List<TipoPago> tipos = _tipoPagoNegocio.ObtenerTiposPago();
+                cboTipoPago.DataSource = tipos;
+                cboTipoPago.DisplayMember = "NombreTipoPago"; // Lo que el usuario ve
+                cboTipoPago.ValueMember = "IdTipoPago";        // El ID oculto (1, 2, 3...)
+
+                if (cboTipoPago.Items.Count > 0)
+                    cboTipoPago.SelectedIndex = 0; // Seleccionar el primero por defecto
+                // ----------------------------------------------------
+
                 ConfigurarBuscadoresAutocompletado();
             }
             catch (Exception ex)
@@ -99,7 +112,6 @@ namespace TheGoodTaste.UI
 
         private void ConfigurarBuscadoresAutocompletado()
         {
-            // --- BUSCADOR CLIENTES (por DNI y por Nombre) ---
             Control[] ctrlCliente = Controls.Find("txtBuscarCliente", true);
             if (ctrlCliente.Length > 0 && ctrlCliente[0] is TextBox txtCliente)
             {
@@ -116,15 +128,12 @@ namespace TheGoodTaste.UI
                 }
 
                 txtCliente.AutoCompleteCustomSource = colClientes;
-
                 txtCliente.KeyDown -= txtBuscarCliente_KeyDown;
                 txtCliente.Leave -= txtBuscarCliente_Leave;
-
                 txtCliente.KeyDown += txtBuscarCliente_KeyDown;
                 txtCliente.Leave += txtBuscarCliente_Leave;
             }
 
-            // --- BUSCADOR PRODUCTOS (por Nombre y por ID/Código) ---
             Control[] ctrlProd = Controls.Find("txtBuscarProducto", true);
             if (ctrlProd.Length > 0 && ctrlProd[0] is TextBox txtProd)
             {
@@ -139,10 +148,8 @@ namespace TheGoodTaste.UI
                 }
 
                 txtProd.AutoCompleteCustomSource = colProds;
-
                 txtProd.KeyDown -= txtBuscarProducto_KeyDown;
                 txtProd.Leave -= txtBuscarProducto_Leave;
-
                 txtProd.KeyDown += txtBuscarProducto_KeyDown;
                 txtProd.Leave += txtBuscarProducto_Leave;
             }
@@ -162,10 +169,7 @@ namespace TheGoodTaste.UI
             }
         }
 
-        private void txtBuscarProducto_Leave(object sender, EventArgs e)
-        {
-            ProcesarSeleccionProducto();
-        }
+        private void txtBuscarProducto_Leave(object sender, EventArgs e) => ProcesarSeleccionProducto();
 
         private void ProcesarSeleccionProducto()
         {
@@ -217,10 +221,7 @@ namespace TheGoodTaste.UI
             }
         }
 
-        private void txtBuscarCliente_Leave(object sender, EventArgs e)
-        {
-            ProcesarSeleccionCliente();
-        }
+        private void txtBuscarCliente_Leave(object sender, EventArgs e) => ProcesarSeleccionCliente();
 
         private void ProcesarSeleccionCliente()
         {
@@ -309,12 +310,9 @@ namespace TheGoodTaste.UI
             string codigoProd = _productoSeleccionado.Codigo;
             string nombreProd = _productoSeleccionado.Nombre;
 
-            // --- CORRECCIÓN: Consultar el stock real en la BD en este milisegundo ---
             int stockReal = _ventaNegocio.ObtenerStockActual(codigoProd);
-            _productoSeleccionado.Stock = stockReal; // Actualizamos la memoria local
-            // ------------------------------------------------------------------------
+            _productoSeleccionado.Stock = stockReal;
 
-            // 1. Determinar la cantidad total acumulada (si ya estaba cargado en la grilla + lo nuevo)
             int cantidadExistenteEnGrilla = 0;
             DataGridViewRow filaExistente = null;
 
@@ -330,7 +328,6 @@ namespace TheGoodTaste.UI
 
             int cantidadTotalAVender = cantidadExistenteEnGrilla + cantidad;
 
-            // 2. Validación de Stock Disponible en Capa de Negocio
             if (cantidadTotalAVender > _productoSeleccionado.Stock)
             {
                 MessageBox.Show($"Stock insuficiente. Quedan {_productoSeleccionado.Stock} unidades disponibles en stock " +
@@ -339,13 +336,11 @@ namespace TheGoodTaste.UI
                 return;
             }
 
-            // 3. Alerta de Stock Mínimo mediante la Capa de Negocio
             if (_productoNegocio.ValidarStockMinimo(_productoSeleccionado, cantidadTotalAVender, out string mensajeAlerta))
             {
                 MessageBox.Show(mensajeAlerta, "Alerta de Stock Mínimo", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
 
-            // 4. Agregar o actualizar en el DataGridView
             if (filaExistente != null)
             {
                 decimal nuevoSubtotal = cantidadTotalAVender * precio;
@@ -375,7 +370,6 @@ namespace TheGoodTaste.UI
             }
 
             string totalFormateado = total.ToString("N2");
-
             Control[] ctrls = Controls.Find("lblTotalMonto", true);
             if (ctrls.Length > 0 && ctrls[0] is Label labelTotal)
             {
@@ -383,13 +377,8 @@ namespace TheGoodTaste.UI
             }
             else
             {
-                try
-                {
-                    lblTotalMonto.Text = totalFormateado;
-                }
-                catch { }
+                try { lblTotalMonto.Text = totalFormateado; } catch { }
             }
-
             return total;
         }
 
@@ -401,6 +390,14 @@ namespace TheGoodTaste.UI
                 return;
             }
 
+            // --- NUEVO: Validar que hayan seleccionado un tipo de pago ---
+            if (cboTipoPago.SelectedValue == null)
+            {
+                MessageBox.Show("Por favor, seleccione un Tipo de Pago.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+            // -------------------------------------------------------------
+
             try
             {
                 int DniCliente = _clienteSeleccionado != null ? Convert.ToInt32(_clienteSeleccionado["dniCliente"]) : 1;
@@ -410,6 +407,7 @@ namespace TheGoodTaste.UI
                     FechaVenta = dtpFechaVenta.Value,
                     DniCliente = DniCliente.ToString(),
                     DNIUsuario = _dniVendedorActivo,
+                    IdTipoPago = Convert.ToInt32(cboTipoPago.SelectedValue), // ASIGNAR FK
                     TotalVenta = CalcularTotalVenta(),
                     Detalles = new List<VentaDetalle>()
                 };
@@ -474,6 +472,12 @@ namespace TheGoodTaste.UI
                     writer.WriteLine($"Fecha: {venta.FechaVenta:dd/MM/yyyy HH:mm:ss}");
                     writer.WriteLine($"Cliente ID/DNI: {venta.DniCliente}");
                     writer.WriteLine($"Vendedor DNI: {venta.DNIUsuario}");
+
+                    // --- NUEVO: Extraer nombre del pago del ComboBox para el ticket ---
+                    string metodoPago = cboTipoPago.Text;
+                    writer.WriteLine($"Forma de Pago: {metodoPago}");
+                    // ------------------------------------------------------------------
+
                     writer.WriteLine("------------------------------------------");
                     writer.WriteLine(string.Format("{0,-20} {1,5} {2,12}", "Producto", "Cant", "Subtotal"));
                     writer.WriteLine("------------------------------------------");
@@ -531,25 +535,21 @@ namespace TheGoodTaste.UI
         private void LimpiarSeleccionProducto()
         {
             _bloquearEventos = true;
-
             Control[] ctrlProd = Controls.Find("txtBuscarProducto", true);
             if (ctrlProd.Length > 0 && ctrlProd[0] is TextBox txtProd)
             {
                 txtProd.Clear();
                 txtProd.Focus();
             }
-
             _productoSeleccionado = null;
             nudCantidad.Value = 1;
             txtPrecio.Clear();
-
             _bloquearEventos = false;
         }
 
         private void LimpiarTodo()
         {
             _bloquearEventos = true;
-
             Control[] ctrlCliente = Controls.Find("txtBuscarCliente", true);
             if (ctrlCliente.Length > 0 && ctrlCliente[0] is TextBox txtCliente)
             {
@@ -564,8 +564,10 @@ namespace TheGoodTaste.UI
             dgvDetalles.Rows.Clear();
             LimpiarSeleccionProducto();
 
-            _bloquearEventos = false;
+            // Volver a seleccionar el primer tipo de pago al limpiar
+            if (cboTipoPago.Items.Count > 0) cboTipoPago.SelectedIndex = 0;
 
+            _bloquearEventos = false;
             CalcularTotalVenta();
             ActualizarEstadoBotones();
         }
@@ -600,39 +602,11 @@ namespace TheGoodTaste.UI
             btnLimpiar.Enabled = _clienteSeleccionado != null || _productoSeleccionado != null || dgvDetalles.Rows.Count > 0;
         }
 
-        private void lblTotalMonto_Click(object sender, EventArgs e)
-        {
-            // Evento vacío de Designer
-        }
-
-        private void AgregarProductoAGrilla(Producto producto, int cantidadSolicitada)
-        {
-            // 1. Validar que no supere el stock disponible actual
-            if (cantidadSolicitada > producto.Stock)
-            {
-                MessageBox.Show($"Stock insuficiente. Solo quedan {producto.Stock} unidades de '{producto.Nombre}'.",
-                                "Stock Insuficiente", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-
-            // 2. Alerta preventiva si el stock restante caerá por debajo del stock mínimo (ejemplo: stockMinimo = 5)
-            int stockRestante = producto.Stock - cantidadSolicitada;
-            int stockMinimoPermitido = producto.StockMinimo; // O un valor fijo como 5 si no está en la BD
-
-            if (stockRestante <= stockMinimoPermitido)
-            {
-                MessageBox.Show($"¡Atención! Al vender este producto, el stock restante ({stockRestante}) quedará igual o por debajo del stock mínimo ({stockMinimoPermitido}).",
-                                "Alerta de Stock Mínimo", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            }
-
-            // ... Agregar a la grilla y actualizar totales ...
-        }
+        private void lblTotalMonto_Click(object sender, EventArgs e) { }
+        private void lblVendedor_Click(object sender, EventArgs e) { }
+        private void cboTipoPago_SelectedIndexChanged(object sender, EventArgs e) { }
+        private void labelTipoPago_Click(object sender, EventArgs e) { }
 
         #endregion
-
-        private void lblVendedor_Click(object sender, EventArgs e)
-        {
-
-        }
     }
 }
