@@ -11,6 +11,7 @@ namespace TheGoodTaste.UI
     public partial class FormReportes : Form
     {
         private readonly UsuarioSistema _usuarioActual;
+        private Label _lblInfoUsuario; // Label creado dinámicamente por código
 
         public FormReportes()
         {
@@ -37,11 +38,53 @@ namespace TheGoodTaste.UI
             fechaHasta.Value = DateTime.Now;
 
             ConfigurarVistaInicialSegunRol();
+            MostrarInfoUsuario();
+        }
+
+        private void MostrarInfoUsuario()
+        {
+            if (_usuarioActual == null) return;
+
+            string texto = $"{_usuarioActual.Rol} DNI: {_usuarioActual.DNI}";
+
+            // 1. Si ya existe un control llamado lblVendedor en el diseñador, lo usamos:
+            Control[] controles = Controls.Find("lblVendedor", true);
+            if (controles.Length > 0 && controles[0] is Label lbl)
+            {
+                lbl.Text = texto;
+                return;
+            }
+
+            // 2. Si no existe, creamos el Label automáticamente en la esquina superior izquierda
+            if (_lblInfoUsuario == null)
+            {
+                _lblInfoUsuario = new Label
+                {
+                    Name = "lblInfoUsuarioDinamico",
+                    AutoSize = true,
+                    Location = new Point(25, 20),
+                    Font = new Font("Segoe UI", 10.5f, FontStyle.Bold),
+                    ForeColor = Color.FromArgb(230, 160, 50), // Tono dorado acorde al tema
+                    BackColor = Color.Transparent
+                };
+                this.Controls.Add(_lblInfoUsuario);
+                _lblInfoUsuario.BringToFront();
+            }
+
+            _lblInfoUsuario.Text = texto;
         }
 
         private void ConfigurarVistaInicialSegunRol()
         {
             if (_usuarioActual == null) return;
+
+            // Búsqueda segura del título de la grilla (sin depender de si se llama label2)
+            Label lblTituloGrilla = null;
+            Control[] controlesLabel2 = Controls.Find("label2", true);
+            if (controlesLabel2.Length > 0 && controlesLabel2[0] is Label l)
+            {
+                lblTituloGrilla = l;
+            }
 
             if (_usuarioActual.Rol == RolUsuario.Vendedor)
             {
@@ -51,15 +94,27 @@ namespace TheGoodTaste.UI
                 botonProductoVendido.Visible = false;
                 panelVentasVendedor.Visible = false;
 
-                // Ocultar el botón y el panel de clientes para el vendedor
+                // Ocultamos solo el botón de listar clientes (de gerencia)
                 button1.Visible = false;
-                panelClientes.Visible = false;
+
+                // Dejamos el contenedor y la grilla visibles para que el vendedor vea sus ventas
+                panelClientes.Visible = true;
+                listaClientes.Visible = true;
+
+                if (lblTituloGrilla != null)
+                {
+                    lblTituloGrilla.Text = "Detalle de Mis Ventas";
+                }
 
                 botonVentas.Text = "Mis Ventas";
             }
             else
             {
                 this.Text = "Reportes Estratégicos - Gerencia";
+                if (lblTituloGrilla != null)
+                {
+                    lblTituloGrilla.Text = "Listado de Clientes";
+                }
             }
         }
 
@@ -90,6 +145,8 @@ namespace TheGoodTaste.UI
                 }
             }
         }
+
+        // --- BOTONES ---
 
         private void botonVentas_Click(object sender, EventArgs e)
         {
@@ -151,7 +208,6 @@ namespace TheGoodTaste.UI
             RenderizarGrafico(dt, "Ventas por Vendedor", SeriesChartType.Doughnut, mostrarAlerta);
         }
 
-        // --- NUEVO REPORTE DE CLIENTES ---
         private void button1_Click(object sender, EventArgs e)
         {
             ReporteNegocio negocio = new ReporteNegocio();
@@ -159,10 +215,10 @@ namespace TheGoodTaste.UI
             DateTime hasta = fechaHasta.Value.Date.AddDays(1).AddSeconds(-1);
 
             DataTable dt = negocio.GenerarTopClientes(desde, hasta);
-            // Gráfico de torta (Pie) o Dona (Doughnut) queda muy bien para top clientes
             RenderizarGrafico(dt, "Top 5 Clientes con más compras", SeriesChartType.Pie);
         }
 
+        // Eventos del diseñador
         private void FormReporte_Load(object sender, EventArgs e) => FormReportes_Load(sender, e);
         private void tituloDesde_Click(object sender, EventArgs e) { }
         private void label1_Click(object sender, EventArgs e) { }
