@@ -40,5 +40,20 @@ namespace TheGoodTaste.Negocio
         {
             return _datos.ObtenerMisVentasPorPeriodo(dniVendedor, desde, hasta);
         }
+
+        public DataTable GenerarMisVentasPorTipoPago(int dni, DateTime desde, DateTime hasta)
+        {
+            return _datos.ObtenerMisVentasPorTipoPago(dni, desde, hasta);
+        }
+
+        public DataTable GenerarVentasPorTipoPagoGlobal(DateTime desde, DateTime hasta)
+        {
+            return _datos.ObtenerVentasPorTipoPagoGlobal(desde, hasta);
+        }
+
+        public DataTable GenerarVentasPorDiaSemana(DateTime desde, DateTime hasta)
+        {
+            return _datos.ObtenerVentasPorDiaSemana(desde, hasta);
+        }
     }
 }

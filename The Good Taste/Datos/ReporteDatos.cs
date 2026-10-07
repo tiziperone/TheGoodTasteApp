@@ -99,5 +99,46 @@ namespace The_Good_Taste.Datos
             }
             return dt;
         }
+
+        public DataTable ObtenerMisVentasPorTipoPago(int dniVendedor, DateTime desde, DateTime hasta)
+        {
+            // Hacemos JOIN entre Venta (v), VentaDetalle (vd) y TipoPago (tp)
+            string query = @"SELECT tp.nombreTipoPago AS [Forma de Pago], SUM(vd.precioUnitario * vd.cantidad) AS Recaudacion 
+                     FROM Venta v
+                     INNER JOIN VentaDetalle vd ON v.idVenta = vd.idVenta
+                     INNER JOIN TipoPago tp ON vd.idTipoPago = tp.idTipoPago
+                     WHERE v.DNIUsuario = @Dni 
+                       AND v.fechaVenta BETWEEN @Desde AND @Hasta
+                     GROUP BY tp.nombreTipoPago
+                     ORDER BY Recaudacion DESC";
+
+            return EjecutarConsulta(query, desde, hasta, dniVendedor);
+        }
+
+        public DataTable ObtenerVentasPorTipoPagoGlobal(DateTime desde, DateTime hasta)
+        {
+            string query = @"SELECT tp.nombreTipoPago AS [Forma de Pago], SUM(vd.precioUnitario * vd.cantidad) AS Recaudacion 
+                     FROM Venta v
+                     INNER JOIN VentaDetalle vd ON v.idVenta = vd.idVenta
+                     INNER JOIN TipoPago tp ON vd.idTipoPago = tp.idTipoPago
+                     WHERE v.fechaVenta BETWEEN @Desde AND @Hasta
+                     GROUP BY tp.nombreTipoPago
+                     ORDER BY Recaudacion DESC";
+
+            return EjecutarConsulta(query, desde, hasta);
+        }
+
+        public DataTable ObtenerVentasPorDiaSemana(DateTime desde, DateTime hasta)
+        {
+            // Forzamos el idioma en la sesión para asegurarnos que devuelva 'Lunes', 'Martes', etc.
+            string query = @"SET LANGUAGE Spanish;
+                     SELECT DATENAME(WEEKDAY, fechaVenta) AS Dia, SUM(totalVenta) AS Recaudacion 
+                     FROM Venta 
+                     WHERE fechaVenta BETWEEN @Desde AND @Hasta
+                     GROUP BY DATENAME(WEEKDAY, fechaVenta), DATEPART(WEEKDAY, fechaVenta)
+                     ORDER BY DATEPART(WEEKDAY, fechaVenta)";
+
+            return EjecutarConsulta(query, desde, hasta);
+        }
     }
 }
