@@ -14,7 +14,7 @@ namespace The_Good_Taste.Datos
         public UsuarioSistema Autenticar(string user, string pass)
         {
             string query = @"
-                SELECT DNI, Username, (Nombre + ' ' + Apellido) AS NombreCompleto, IdRol, Activo
+                SELECT DNI, Username, Nombre, Apellido, IdRol, Activo
                 FROM Usuarios
                 WHERE Username = @user 
                   AND PasswordHash = @pass 
@@ -37,7 +37,8 @@ namespace The_Good_Taste.Datos
                             {
                                 DNI = Convert.ToInt32(reader["DNI"]),
                                 Username = reader["Username"].ToString(),
-                                // Ahora solo se convierte a int, sin cast explícito a enum
+                                Nombre = reader["Nombre"] != DBNull.Value ? reader["Nombre"].ToString() : string.Empty,
+                                Apellido = reader["Apellido"] != DBNull.Value ? reader["Apellido"].ToString() : string.Empty,
                                 IdRol = Convert.ToInt32(reader["IdRol"])
                             };
                         }
