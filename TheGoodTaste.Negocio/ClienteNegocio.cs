@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Data;
+using System.Data.SqlClient;
 using System.Text.RegularExpressions;
 using The_Good_Taste.Datos;
 
@@ -62,5 +63,7 @@ namespace TheGoodTaste.Negocio
             if (fechaNacimiento.Date > DateTime.Today.AddYears(-edad)) edad--;
             if (edad < 18) throw new Exception("El cliente debe ser mayor de edad (18 años o más).");
         }
+
+        
     }
 }

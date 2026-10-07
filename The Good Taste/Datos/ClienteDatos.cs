@@ -220,5 +220,19 @@ namespace The_Good_Taste.Datos
                 return cmd.ExecuteNonQuery() > 0;
             }
         }
+
+        public bool ExisteClientePorDni(string dni)
+        {
+            string query = "SELECT COUNT(1) FROM dbo.Cliente WHERE dniCliente = @dni";
+
+            using (SqlConnection con = Conexion.ObtenerConexion())
+            {
+                SqlCommand cmd = new SqlCommand(query, con);
+                cmd.Parameters.AddWithValue("@dni", dni);
+                con.Open();
+                int count = Convert.ToInt32(cmd.ExecuteScalar());
+                return count > 0;
+            }
+        }
     }
 }
