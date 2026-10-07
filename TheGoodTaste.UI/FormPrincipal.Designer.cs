@@ -31,7 +31,14 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormPrincipal));
             this.panel1 = new System.Windows.Forms.Panel();
             this.panelContenedor = new System.Windows.Forms.Panel();
+            this.label2 = new System.Windows.Forms.Label();
+            this.label1 = new System.Windows.Forms.Label();
             this.panelSuperior = new System.Windows.Forms.Panel();
+            this.label7 = new System.Windows.Forms.Label();
+            this.label6 = new System.Windows.Forms.Label();
+            this.label5 = new System.Windows.Forms.Label();
+            this.label4 = new System.Windows.Forms.Label();
+            this.label3 = new System.Windows.Forms.Label();
             this.buttonCerrarSesion = new System.Windows.Forms.Button();
             this.btnSalir = new System.Windows.Forms.Button();
             this.btnReportes = new System.Windows.Forms.Button();
@@ -54,6 +61,8 @@
             // 
             // panelContenedor
             // 
+            this.panelContenedor.Controls.Add(this.label2);
+            this.panelContenedor.Controls.Add(this.label1);
             this.panelContenedor.Controls.Add(this.panelSuperior);
             this.panelContenedor.Controls.Add(this.pbLogoInicio);
             this.panelContenedor.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -63,9 +72,43 @@
             this.panelContenedor.TabIndex = 1;
             this.panelContenedor.Paint += new System.Windows.Forms.PaintEventHandler(this.panelContenedor_Paint);
             // 
+            // label2
+            // 
+            this.label2.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.label2.AutoSize = true;
+            this.label2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(64)))), ((int)(((byte)(0)))));
+            this.label2.ForeColor = System.Drawing.Color.WhiteSmoke;
+            this.label2.Location = new System.Drawing.Point(258, 93);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(81, 16);
+            this.label2.TabIndex = 3;
+            this.label2.Text = "[F2] Clientes";
+            this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.label2.Click += new System.EventHandler(this.label2_Click);
+            // 
+            // label1
+            // 
+            this.label1.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.label1.AutoSize = true;
+            this.label1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(64)))), ((int)(((byte)(0)))));
+            this.label1.ForeColor = System.Drawing.Color.WhiteSmoke;
+            this.label1.Location = new System.Drawing.Point(78, 93);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(94, 16);
+            this.label1.TabIndex = 2;
+            this.label1.Text = "[F1] Productos";
+            this.label1.Click += new System.EventHandler(this.label1_Click);
+            // 
             // panelSuperior
             // 
+            this.panelSuperior.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.panelSuperior.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(35)))), ((int)(((byte)(25)))), ((int)(((byte)(20)))));
+            this.panelSuperior.Controls.Add(this.label7);
+            this.panelSuperior.Controls.Add(this.label6);
+            this.panelSuperior.Controls.Add(this.label5);
+            this.panelSuperior.Controls.Add(this.label4);
+            this.panelSuperior.Controls.Add(this.label3);
             this.panelSuperior.Controls.Add(this.buttonCerrarSesion);
             this.panelSuperior.Controls.Add(this.btnSalir);
             this.panelSuperior.Controls.Add(this.btnReportes);
@@ -73,15 +116,85 @@
             this.panelSuperior.Controls.Add(this.btnVentas);
             this.panelSuperior.Controls.Add(this.btnClientes);
             this.panelSuperior.Controls.Add(this.btnProductos);
-            this.panelSuperior.Dock = System.Windows.Forms.DockStyle.Top;
             this.panelSuperior.Location = new System.Drawing.Point(0, 0);
             this.panelSuperior.Name = "panelSuperior";
             this.panelSuperior.Size = new System.Drawing.Size(1219, 113);
             this.panelSuperior.TabIndex = 1;
+            this.panelSuperior.Paint += new System.Windows.Forms.PaintEventHandler(this.panelSuperior_Paint);
+            // 
+            // label7
+            // 
+            this.label7.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.label7.AutoSize = true;
+            this.label7.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(64)))), ((int)(((byte)(0)))));
+            this.label7.ForeColor = System.Drawing.Color.WhiteSmoke;
+            this.label7.Location = new System.Drawing.Point(1107, 93);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(72, 16);
+            this.label7.TabIndex = 8;
+            this.label7.Text = "[ESC] Salir";
+            this.label7.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.label7.Click += new System.EventHandler(this.label7_Click);
+            // 
+            // label6
+            // 
+            this.label6.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.label6.AutoSize = true;
+            this.label6.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(64)))), ((int)(((byte)(0)))));
+            this.label6.ForeColor = System.Drawing.Color.WhiteSmoke;
+            this.label6.Location = new System.Drawing.Point(916, 93);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(115, 16);
+            this.label6.TabIndex = 7;
+            this.label6.Text = "[F7] Cerrar Sesión";
+            this.label6.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.label6.Click += new System.EventHandler(this.label6_Click);
+            // 
+            // label5
+            // 
+            this.label5.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.label5.AutoSize = true;
+            this.label5.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(64)))), ((int)(((byte)(0)))));
+            this.label5.ForeColor = System.Drawing.Color.WhiteSmoke;
+            this.label5.Location = new System.Drawing.Point(711, 93);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(89, 16);
+            this.label5.TabIndex = 6;
+            this.label5.Text = "[F6] Reportes";
+            this.label5.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.label5.Click += new System.EventHandler(this.label5_Click);
+            // 
+            // label4
+            // 
+            this.label4.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.label4.AutoSize = true;
+            this.label4.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(64)))), ((int)(((byte)(0)))));
+            this.label4.ForeColor = System.Drawing.Color.WhiteSmoke;
+            this.label4.Location = new System.Drawing.Point(558, 93);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(87, 16);
+            this.label4.TabIndex = 5;
+            this.label4.Text = "[F4] Usuarios";
+            this.label4.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.label4.Click += new System.EventHandler(this.label4_Click);
+            // 
+            // label3
+            // 
+            this.label3.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.label3.AutoSize = true;
+            this.label3.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(64)))), ((int)(((byte)(0)))));
+            this.label3.ForeColor = System.Drawing.Color.WhiteSmoke;
+            this.label3.Location = new System.Drawing.Point(415, 93);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(75, 16);
+            this.label3.TabIndex = 4;
+            this.label3.Text = "[F3] Ventas";
+            this.label3.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.label3.Click += new System.EventHandler(this.label3_Click);
             // 
             // buttonCerrarSesion
             // 
-            this.buttonCerrarSesion.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.buttonCerrarSesion.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.buttonCerrarSesion.BackColor = System.Drawing.Color.Transparent;
             this.buttonCerrarSesion.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("buttonCerrarSesion.BackgroundImage")));
             this.buttonCerrarSesion.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
@@ -90,13 +203,12 @@
             this.buttonCerrarSesion.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(80)))), ((int)(((byte)(58)))), ((int)(((byte)(45)))));
             this.buttonCerrarSesion.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.buttonCerrarSesion.ForeColor = System.Drawing.SystemColors.ButtonHighlight;
-            this.buttonCerrarSesion.Location = new System.Drawing.Point(935, 12);
+            this.buttonCerrarSesion.Location = new System.Drawing.Point(906, 12);
             this.buttonCerrarSesion.Name = "buttonCerrarSesion";
             this.buttonCerrarSesion.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
-            this.buttonCerrarSesion.Size = new System.Drawing.Size(128, 86);
+            this.buttonCerrarSesion.Size = new System.Drawing.Size(128, 67);
             this.buttonCerrarSesion.TabIndex = 1;
-            this.buttonCerrarSesion.Text = "[F7] Cerrar Sesion";
-            this.buttonCerrarSesion.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+            this.buttonCerrarSesion.TextAlign = System.Drawing.ContentAlignment.TopRight;
             this.buttonCerrarSesion.UseVisualStyleBackColor = false;
             this.buttonCerrarSesion.Click += new System.EventHandler(this.buttonCerrarSesion_Click);
             // 
@@ -113,11 +225,10 @@
             this.btnSalir.ForeColor = System.Drawing.SystemColors.ButtonHighlight;
             this.btnSalir.Location = new System.Drawing.Point(1079, 12);
             this.btnSalir.Name = "btnSalir";
-            this.btnSalir.Size = new System.Drawing.Size(128, 86);
+            this.btnSalir.Size = new System.Drawing.Size(128, 67);
             this.btnSalir.TabIndex = 0;
             this.btnSalir.TabStop = false;
-            this.btnSalir.Text = "Salir [ESC]";
-            this.btnSalir.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+            this.btnSalir.TextAlign = System.Drawing.ContentAlignment.TopRight;
             this.btnSalir.UseVisualStyleBackColor = false;
             this.btnSalir.Click += new System.EventHandler(this.btnSalir_Click);
             // 
@@ -135,10 +246,9 @@
             this.btnReportes.Location = new System.Drawing.Point(695, 12);
             this.btnReportes.Name = "btnReportes";
             this.btnReportes.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
-            this.btnReportes.Size = new System.Drawing.Size(128, 86);
+            this.btnReportes.Size = new System.Drawing.Size(128, 67);
             this.btnReportes.TabIndex = 0;
-            this.btnReportes.Text = "[F6] Reportes";
-            this.btnReportes.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+            this.btnReportes.TextAlign = System.Drawing.ContentAlignment.TopLeft;
             this.btnReportes.UseVisualStyleBackColor = false;
             this.btnReportes.Click += new System.EventHandler(this.btnReportes_Click);
             // 
@@ -156,10 +266,9 @@
             this.btnUsuarios.Location = new System.Drawing.Point(539, 12);
             this.btnUsuarios.Name = "btnUsuarios";
             this.btnUsuarios.RightToLeft = System.Windows.Forms.RightToLeft.No;
-            this.btnUsuarios.Size = new System.Drawing.Size(128, 86);
+            this.btnUsuarios.Size = new System.Drawing.Size(128, 67);
             this.btnUsuarios.TabIndex = 0;
-            this.btnUsuarios.Text = "[F4] Usuarios";
-            this.btnUsuarios.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+            this.btnUsuarios.TextAlign = System.Drawing.ContentAlignment.TopLeft;
             this.btnUsuarios.UseVisualStyleBackColor = false;
             this.btnUsuarios.Click += new System.EventHandler(this.btnUsuarios_Click);
             // 
@@ -176,10 +285,9 @@
             this.btnVentas.ForeColor = System.Drawing.SystemColors.ButtonHighlight;
             this.btnVentas.Location = new System.Drawing.Point(394, 12);
             this.btnVentas.Name = "btnVentas";
-            this.btnVentas.Size = new System.Drawing.Size(128, 86);
+            this.btnVentas.Size = new System.Drawing.Size(128, 67);
             this.btnVentas.TabIndex = 0;
-            this.btnVentas.Text = "[F3] Ventas";
-            this.btnVentas.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+            this.btnVentas.TextAlign = System.Drawing.ContentAlignment.TopLeft;
             this.btnVentas.UseVisualStyleBackColor = false;
             this.btnVentas.Click += new System.EventHandler(this.btnVentas_Click);
             // 
@@ -196,10 +304,9 @@
             this.btnClientes.ForeColor = System.Drawing.SystemColors.ButtonHighlight;
             this.btnClientes.Location = new System.Drawing.Point(237, 12);
             this.btnClientes.Name = "btnClientes";
-            this.btnClientes.Size = new System.Drawing.Size(128, 86);
+            this.btnClientes.Size = new System.Drawing.Size(128, 67);
             this.btnClientes.TabIndex = 0;
-            this.btnClientes.Text = "[F2] Clientes";
-            this.btnClientes.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+            this.btnClientes.TextAlign = System.Drawing.ContentAlignment.TopLeft;
             this.btnClientes.UseVisualStyleBackColor = false;
             this.btnClientes.Click += new System.EventHandler(this.btnClientes_Click);
             // 
@@ -214,12 +321,11 @@
             this.btnProductos.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(80)))), ((int)(((byte)(58)))), ((int)(((byte)(45)))));
             this.btnProductos.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnProductos.ForeColor = System.Drawing.SystemColors.ButtonHighlight;
-            this.btnProductos.Location = new System.Drawing.Point(65, 12);
+            this.btnProductos.Location = new System.Drawing.Point(58, 12);
             this.btnProductos.Name = "btnProductos";
-            this.btnProductos.Size = new System.Drawing.Size(128, 86);
+            this.btnProductos.Size = new System.Drawing.Size(128, 67);
             this.btnProductos.TabIndex = 0;
-            this.btnProductos.Text = "[F1] Productos";
-            this.btnProductos.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+            this.btnProductos.TextAlign = System.Drawing.ContentAlignment.TopLeft;
             this.btnProductos.UseVisualStyleBackColor = false;
             this.btnProductos.Click += new System.EventHandler(this.btnProductos_Click);
             // 
@@ -247,7 +353,9 @@
             this.Text = "Bienvenido a The Good Taste";
             this.Load += new System.EventHandler(this.FormPrincipal_Load);
             this.panelContenedor.ResumeLayout(false);
+            this.panelContenedor.PerformLayout();
             this.panelSuperior.ResumeLayout(false);
+            this.panelSuperior.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pbLogoInicio)).EndInit();
             this.ResumeLayout(false);
 
@@ -265,6 +373,13 @@
         private System.Windows.Forms.Button btnSalir;
         private System.Windows.Forms.Button btnReportes;
         private System.Windows.Forms.Button buttonCerrarSesion;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.Label label3;
     }
 }
 

@@ -5,21 +5,19 @@ using The_Good_Taste.Entidades;
 
 namespace TheGoodTaste.UI
 {
-    public partial class FormPrincipal : Form //Clase principal del formulario que maneja la navegación y la interfaz de usuario
+    public partial class FormPrincipal : Form
     {
         private readonly UsuarioSistema _usuarioActual;
         private Button _botonActivo = null;
 
-        //Colores para el tema visual
         private readonly Color ColorFondoPanel = Color.FromArgb(35, 25, 20);   // Marrón oscuro
-        private readonly Color ColorBotonBase = Color.FromArgb(60, 42, 33);    // Marrón café
         private readonly Color ColorBotonActivo = Color.FromArgb(180, 130, 40); // Dorado
         private readonly Color ColorTextoBoton = Color.White;
 
         public FormPrincipal()
         {
             InitializeComponent();
-            this.KeyPreview = true; // Activa la escucha de atajos globales (F1-F6 y ESC)
+            this.KeyPreview = true;
         }
 
         public FormPrincipal(UsuarioSistema usuario) : this()
@@ -37,18 +35,46 @@ namespace TheGoodTaste.UI
                 ConfigurarPermisosPorRol();
             }
 
-            CentrarLogo();
+            // Solo aseguramos que el panel superior cubra todo el ancho al maximizar
+            if (panelSuperior != null)
+            {
+                panelSuperior.BackColor = Color.FromArgb(25, 18, 14);
+                panelSuperior.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            }
+
+            // Configuramos el logo para que luzca limpio, sin bordes negros y con zoom prolijo
+            if (pbLogoInicio != null)
+            {
+                pbLogoInicio.BackColor = ColorFondoPanel;
+                pbLogoInicio.SizeMode = PictureBoxSizeMode.Zoom;
+            }
+
+            CentrarYAmpliarLogo();
+        }
+
+        private void CentrarYAmpliarLogo()
+        {
+            if (pbLogoInicio != null && pbLogoInicio.Visible)
+            {
+                // Calculamos un tamaño proporcional y grande para que destaque en el centro
+                int anchoDeseado = Math.Min(panelContenedor.ClientSize.Width - 80, 650);
+                int altoDeseado = Math.Min(panelContenedor.ClientSize.Height - 80, 450);
+
+                pbLogoInicio.Width = Math.Max(anchoDeseado, 300);
+                pbLogoInicio.Height = Math.Max(altoDeseado, 200);
+
+                pbLogoInicio.Left = (panelContenedor.ClientSize.Width - pbLogoInicio.Width) / 2;
+                pbLogoInicio.Top = (panelContenedor.ClientSize.Height - pbLogoInicio.Height) / 2;
+            }
         }
 
         private void DeshabilitarBoton(Button btn)
         {
             if (btn != null)
             {
-                btn.Enabled = false; // Bloquea los clics
-
-                // Efecto visual de apagado/transparencia
-                btn.BackColor = ColorFondoPanel; // Se funde con el fondo del panel
-                btn.ForeColor = Color.DimGray;   // Letras grises
+                btn.Enabled = false;
+                btn.BackColor = Color.FromArgb(25, 18, 14);
+                btn.ForeColor = Color.DimGray;
                 btn.FlatStyle = FlatStyle.Flat;
                 btn.FlatAppearance.BorderSize = 0;
             }
@@ -61,31 +87,24 @@ namespace TheGoodTaste.UI
             switch (_usuarioActual.Rol)
             {
                 case RolUsuario.Admin:
-                    // El Admin solo ve Reportes y Usuarios
                     DeshabilitarBoton(btnProductos);
                     DeshabilitarBoton(btnClientes);
                     DeshabilitarBoton(btnVentas);
                     break;
 
                 case RolUsuario.Gerente:
-                    // Bloqueamos los módulos que no debe usar
                     DeshabilitarBoton(btnUsuarios);
                     DeshabilitarBoton(btnVentas);
                     DeshabilitarBoton(btnClientes);
-
-                    // Reportes queda habilitado
                     break;
 
                 case RolUsuario.Vendedor:
-                    // Bloqueamos Usuarios y Reportes
                     DeshabilitarBoton(btnUsuarios);
-                    DeshabilitarBoton(btnProductos);
-                    // Productos, Clientes y Ventas quedan habilitados
+                    DeshabilitarBoton(btnReportes);
                     break;
             }
         }
 
-        // Atajos de teclado (F1 a F6 y ESC)
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
             switch (keyData)
@@ -119,44 +138,27 @@ namespace TheGoodTaste.UI
         {
             if (panelSuperior == null) return;
 
-            panelSuperior.BackColor = ColorFondoPanel;
-
+            _botonActivo = botonPresionado;
             foreach (Control control in panelSuperior.Controls)
             {
-                if (control is Button btn && btn != btnSalir)
+                if (control is Button btn && btn != btnSalir && btn.Enabled)
                 {
-                    if (btn.Enabled)
+                    if (btn == _botonActivo)
                     {
-                        btn.BackColor = ColorBotonBase;
-                        btn.ForeColor = ColorTextoBoton;
-                        btn.FlatStyle = FlatStyle.Flat;
-                        btn.FlatAppearance.BorderSize = 0;
-                        btn.Font = new Font(btn.Font, FontStyle.Regular);
+                        btn.BackColor = ColorBotonActivo; // Dorado al seleccionar
+                        btn.ForeColor = Color.Black;
+                    }
+                    else
+                    {
+                        btn.BackColor = Color.FromArgb(50, 35, 28);
+                        btn.ForeColor = Color.White;
                     }
                 }
-            }
-
-            // Estilo sutil para el botón Salir
-            if (btnSalir != null && btnSalir.Enabled)
-            {
-                btnSalir.BackColor = Color.FromArgb(140, 40, 40);
-                btnSalir.ForeColor = ColorTextoBoton;
-                btnSalir.FlatStyle = FlatStyle.Flat;
-                btnSalir.FlatAppearance.BorderSize = 0;
-            }
-
-            // Marca la pestaña activa (si tiene permiso)
-            _botonActivo = botonPresionado;
-            if (_botonActivo != null && _botonActivo.Enabled)
-            {
-                _botonActivo.BackColor = ColorBotonActivo;
-                _botonActivo.Font = new Font(_botonActivo.Font, FontStyle.Bold);
             }
         }
 
         private void AbrirFormularioEnPanel(Form formularioHijo, Button botonPresionado)
         {
-            // Si el botón no está habilitado, cancelamos la apertura
             if (botonPresionado != null && !botonPresionado.Enabled) return;
 
             ResaltarBotonActivo(botonPresionado);
@@ -185,93 +187,53 @@ namespace TheGoodTaste.UI
                 if (pbLogoInicio != null)
                 {
                     pbLogoInicio.Visible = true;
-                    CentrarLogo();
+                    CentrarYAmpliarLogo();
                 }
                 ResaltarBotonActivo(null);
             };
 
-            // 1. Pausamos el rediseño para prevenir el fallo de los DataGridViews
             formularioHijo.SuspendLayout();
-
             this.panelContenedor.Controls.Add(formularioHijo);
             this.panelContenedor.Tag = formularioHijo;
             formularioHijo.BringToFront();
-
-            // 2. Reanudamos el diseño y mostramos
             formularioHijo.ResumeLayout(true);
             formularioHijo.Show();
         }
 
-        // Métodos vinculados a cada botón
-        public void btnProductos_Click(object sender, EventArgs e)
-        {
-            AbrirFormularioEnPanel(new FormProductos(), (Button)sender);
-        }
-
-        public void btnClientes_Click(object sender, EventArgs e)
-        {
-            AbrirFormularioEnPanel(new FormClientes(), (Button)sender);
-        }
-
-        public void btnVentas_Click(object sender, EventArgs e)
-        {
-            // Pasamos el DNI del usuario logueado. 
-            // Asegurate de cambiar "UsuarioAutenticado" por el nombre exacto de la variable 
-            // donde tenés guardado al usuario en tu formulario principal.
-            AbrirFormularioEnPanel(new FormPuntoVenta(_usuarioActual.DNI), (Button)sender);
-        }
-
-        public void btnUsuarios_Click(object sender, EventArgs e)
-        {
-            AbrirFormularioEnPanel(new FormUsuarios(), (Button)sender);
-        }
-
-        public void btnReportes_Click(object sender, EventArgs e)
-        {
-            AbrirFormularioEnPanel(new FormReportes(_usuarioActual), (Button)sender);
-        }
+        public void btnProductos_Click(object sender, EventArgs e) => AbrirFormularioEnPanel(new FormProductos(), (Button)sender);
+        public void btnClientes_Click(object sender, EventArgs e) => AbrirFormularioEnPanel(new FormClientes(), (Button)sender);
+        public void btnVentas_Click(object sender, EventArgs e) => AbrirFormularioEnPanel(new FormPuntoVenta(_usuarioActual.DNI), (Button)sender);
+        public void btnUsuarios_Click(object sender, EventArgs e) => AbrirFormularioEnPanel(new FormUsuarios(), (Button)sender);
+        public void btnReportes_Click(object sender, EventArgs e) => AbrirFormularioEnPanel(new FormReportes(_usuarioActual), (Button)sender);
 
         public void btnSalir_Click(object sender, EventArgs e)
         {
-            if (MessageBox.Show("¿Está seguro de que desea cerrar la sesión?", "Cerrar Sesión",
-                MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+            if (MessageBox.Show("¿Está seguro de que desea salir del sistema?", "Salir", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
             {
                 this.Close();
             }
         }
 
-        private void CentrarLogo()
-        {
-            if (pbLogoInicio != null && pbLogoInicio.Visible)
-            {
-                pbLogoInicio.Left = (panelContenedor.ClientSize.Width - pbLogoInicio.Width) / 2;
-                pbLogoInicio.Top = (panelContenedor.ClientSize.Height - pbLogoInicio.Height) / 2;
-            }
-        }
-
-        private void panelContenedor_Resize(object sender, EventArgs e)
-        {
-            CentrarLogo();
-        }
-
+        private void panelContenedor_Resize(object sender, EventArgs e) => CentrarYAmpliarLogo();
         private void panelContenedor_Paint(object sender, PaintEventArgs e) { }
         private void pbLogoInicio_Click(object sender, EventArgs e) { }
 
         private void buttonCerrarSesion_Click(object sender, EventArgs e)
         {
-            // 1. Preguntamos al usuario si realmente quiere salir
-            DialogResult respuesta = MessageBox.Show(
-                "¿Está seguro que desea cerrar la sesión actual?",
-                "Cerrar Sesión",
-                MessageBoxButtons.YesNo,
-                MessageBoxIcon.Question
-            );
-
-            // 2. Si dice que sí, reiniciamos la aplicación
-            if (respuesta == DialogResult.Yes)
+            if (MessageBox.Show("¿Está seguro que desea cerrar la sesión actual?", "Cerrar Sesión", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
             {
                 Application.Restart();
             }
         }
+
+        private void panelSuperior_Paint(object sender, PaintEventArgs e) { }
+
+        private void label2_Click(object sender, EventArgs e) { }
+        private void label1_Click(object sender, EventArgs e) { }
+        private void label3_Click(object sender, EventArgs e) { }
+        private void label4_Click(object sender, EventArgs e) { }
+        private void label5_Click(object sender, EventArgs e) { }
+        private void label6_Click(object sender, EventArgs e) { }
+        private void label7_Click(object sender, EventArgs e) { }
     }
 }

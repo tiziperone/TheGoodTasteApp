@@ -45,14 +45,13 @@ namespace TheGoodTaste.UI
         {
             if (_usuarioActual == null) return;
 
-            // Formatear el nombre para que se vea el Nombre y Apellido (si existen) o el Username como plan B.
+            // Formatear el nombre para que se vea el Nombre y Apellido (si existen) o el Username
             string nombreAMostrar = !string.IsNullOrWhiteSpace(_usuarioActual.Nombre)
                 ? $"{_usuarioActual.Nombre} {_usuarioActual.Apellido}".Trim()
                 : _usuarioActual.Username;
 
             string texto = $"{_usuarioActual.Rol}: {nombreAMostrar} (DNI: {_usuarioActual.DNI})";
 
-            // 1. Si ya existe un control llamado lblVendedor en el diseñador, lo usamos:
             Control[] controles = Controls.Find("lblVendedor", true);
             if (controles.Length > 0 && controles[0] is Label lbl)
             {
@@ -60,7 +59,7 @@ namespace TheGoodTaste.UI
                 return;
             }
 
-            // 2. Si no existe en el diseñador, creamos el Label automáticamente arriba a la izquierda
+
             if (_lblInfoUsuario == null)
             {
                 _lblInfoUsuario = new Label
@@ -69,7 +68,7 @@ namespace TheGoodTaste.UI
                     AutoSize = true,
                     Location = new Point(25, 20),
                     Font = new Font("Segoe UI", 10.5f, FontStyle.Bold),
-                    ForeColor = Color.FromArgb(230, 160, 50), // Tono dorado acorde al tema
+                    ForeColor = Color.FromArgb(230, 160, 50), // Tono dorado 
                     BackColor = Color.Transparent
                 };
                 this.Controls.Add(_lblInfoUsuario);
