@@ -2,21 +2,23 @@
 
 namespace The_Good_Taste.Entidades
 {
-    public class Cliente // Clase que representa a un cliente en el sistema
+    public class Cliente
     {
-        public int IdCliente { get; set; }
-        public string Dni { get; set; }
-        public string Nombre { get; set; }
-        public string Apellido { get; set; }
-        public DateTime FechaNacimiento { get; set; }
-        public string Email { get; set; }
-        public string Telefono { get; set; }
-        public string Calle { get; set; }
-        public string Numero { get; set; }
-        public string Localiad { get; set; }
-        public string Provincia { get; set; }
-        public string Pais { get; set; }
-        public DateTime FechaAlta { get; set; }
+        public string DniCliente { get; set; }
+        public string NombreCliente { get; set; }
+        public string ApellidoCliente { get; set; }
+
+        public DateTime FechaNacimientoCliente { get; set; }
+
+        public string CorreoCliente { get; set; }
+        public string TelefonoCliente { get; set; }
+
+        // Clave foránea hacia DireccionCliente
+        public int IdDireccionCliente { get; set; }
+
         public bool Activo { get; set; }
+
+        public DireccionCliente Direccion { get; set; }
+
     }
 }

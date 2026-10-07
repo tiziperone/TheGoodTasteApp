@@ -28,9 +28,9 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea3 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend3 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series3 = new System.Windows.Forms.DataVisualization.Charting.Series();
             this.panelReportes = new System.Windows.Forms.Panel();
             this.panelVentasVendedor = new System.Windows.Forms.Panel();
             this.textBoxBuscarVendedor = new System.Windows.Forms.TextBox();
@@ -44,8 +44,8 @@
             this.botonVentas = new System.Windows.Forms.Button();
             this.botonRecaudacion = new System.Windows.Forms.Button();
             this.panelClientes = new System.Windows.Forms.Panel();
+            this.button1 = new System.Windows.Forms.Button();
             this.listaClientes = new System.Windows.Forms.DataGridView();
-            this.label2 = new System.Windows.Forms.Label();
             this.chart1 = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.panelReportes.SuspendLayout();
             this.panelVentasVendedor.SuspendLayout();
@@ -56,8 +56,8 @@
             // 
             // panelReportes
             // 
-            this.panelReportes.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-            | System.Windows.Forms.AnchorStyles.Left)
+            this.panelReportes.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.panelReportes.AutoSize = true;
             this.panelReportes.Controls.Add(this.panelVentasVendedor);
@@ -183,74 +183,71 @@
             // 
             // panelClientes
             // 
-            this.panelClientes.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-            | System.Windows.Forms.AnchorStyles.Left)
+            this.panelClientes.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.panelClientes.Controls.Add(this.button1);
             this.panelClientes.Controls.Add(this.listaClientes);
             this.panelClientes.Location = new System.Drawing.Point(707, 73);
             this.panelClientes.Name = "panelClientes";
             this.panelClientes.Size = new System.Drawing.Size(553, 558);
             this.panelClientes.TabIndex = 1;
             // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(18, 19);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(159, 28);
+            this.button1.TabIndex = 1;
+            this.button1.Text = "Listado de Clientes";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
+            // 
             // listaClientes
             // 
             this.listaClientes.AllowUserToAddRows = false;
-            this.listaClientes.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-            | System.Windows.Forms.AnchorStyles.Left)
+            this.listaClientes.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.listaClientes.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
             this.listaClientes.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.listaClientes.Location = new System.Drawing.Point(18, 47);
+            this.listaClientes.Location = new System.Drawing.Point(18, 67);
             this.listaClientes.Name = "listaClientes";
             this.listaClientes.ReadOnly = true;
             this.listaClientes.RowHeadersWidth = 51;
             this.listaClientes.RowTemplate.Height = 24;
             this.listaClientes.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.listaClientes.Size = new System.Drawing.Size(521, 462);
+            this.listaClientes.Size = new System.Drawing.Size(521, 442);
             this.listaClientes.TabIndex = 0;
             this.listaClientes.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.listaClientes_CellContentClick);
             // 
-            // label2
-            // 
-            this.label2.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-            | System.Windows.Forms.AnchorStyles.Left)
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(704, 54);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(121, 16);
-            this.label2.TabIndex = 2;
-            this.label2.Text = "Listado de Clientes";
-            this.label2.Click += new System.EventHandler(this.tituloDesde_Click);
-            // 
             // chart1
             // 
-            chartArea1.Name = "ChartArea1";
-            this.chart1.ChartAreas.Add(chartArea1);
-            legend1.Name = "Legend1";
-            this.chart1.Legends.Add(legend1);
+            chartArea3.Name = "ChartArea1";
+            this.chart1.ChartAreas.Add(chartArea3);
+            legend3.Name = "Legend1";
+            this.chart1.Legends.Add(legend3);
             this.chart1.Location = new System.Drawing.Point(72, 431);
             this.chart1.Name = "chart1";
-            series1.ChartArea = "ChartArea1";
-            series1.Legend = "Legend1";
-            series1.Name = "Series1";
-            this.chart1.Series.Add(series1);
+            series3.ChartArea = "ChartArea1";
+            series3.Legend = "Legend1";
+            series3.Name = "Series1";
+            this.chart1.Series.Add(series3);
             this.chart1.Size = new System.Drawing.Size(543, 242);
             this.chart1.TabIndex = 3;
             this.chart1.Text = "chart1";
             this.chart1.Click += new System.EventHandler(this.chart1_Click);
             // 
-            // FormReporte
+            // FormReportes
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1272, 719);
             this.Controls.Add(this.chart1);
             this.Controls.Add(this.panelClientes);
-            this.Controls.Add(this.label2);
             this.Controls.Add(this.panelReportes);
-            this.Name = "FormReporte";
-            this.Text = "FormReporteGerente";
+            this.Name = "FormReportes";
+            this.Text = "FormReportes";
             this.Load += new System.EventHandler(this.FormReporte_Load);
             this.panelReportes.ResumeLayout(false);
             this.panelReportes.PerformLayout();
@@ -280,7 +277,7 @@
         private System.Windows.Forms.DateTimePicker fechaDesde;
         private System.Windows.Forms.Panel panelClientes;
         private System.Windows.Forms.DataGridView listaClientes;
-        private System.Windows.Forms.Label label2;
         private System.Windows.Forms.DataVisualization.Charting.Chart chart1;
+        private System.Windows.Forms.Button button1;
     }
 }

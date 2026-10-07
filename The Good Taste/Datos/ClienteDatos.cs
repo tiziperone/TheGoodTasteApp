@@ -48,13 +48,17 @@ namespace The_Good_Taste.Datos
                     {
                         cliente = new Cliente
                         {
-                            Dni = dr["dniCliente"].ToString(),
-                            Nombre = dr["nombreCliente"].ToString(),
-                            Apellido = dr["apellidoCliente"].ToString(),
-                            Telefono = dr["telefonoCliente"].ToString(),
-                            Email = dr["correoCliente"].ToString(),
-                            Calle = dr["calleCliente"].ToString(),
-                            Numero = dr["altura"].ToString()
+                            DniCliente = dr["dniCliente"].ToString(),
+                            NombreCliente = dr["nombreCliente"].ToString(),
+                            ApellidoCliente = dr["apellidoCliente"].ToString(),
+                            TelefonoCliente = dr["telefonoCliente"].ToString(),
+                            CorreoCliente = dr["correoCliente"].ToString(),
+                            // Se asignan los datos a la entidad Direccion dentro del Cliente
+                            Direccion = new DireccionCliente
+                            {
+                                CalleCliente = dr["calleCliente"].ToString(),
+                                Altura = dr["altura"].ToString()
+                            }
                         };
                     }
                 }

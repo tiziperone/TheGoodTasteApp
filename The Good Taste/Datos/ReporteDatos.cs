@@ -53,6 +53,20 @@ namespace The_Good_Taste.Datos
             return EjecutarConsulta(query, desde, hasta);
         }
 
+        // REPORTE DE TOP CLIENTES (Adaptado a tu DER)
+        public DataTable ObtenerTopClientes(DateTime desde, DateTime hasta)
+        {
+            // Se usa "nombreCliente", "apellidoCliente" y "dniCliente" tal cual está en tu DER
+            string query = @"SELECT TOP 5 c.nombreCliente + ' ' + c.apellidoCliente AS Cliente, SUM(v.totalVenta) AS TotalComprado 
+                             FROM Venta v 
+                             INNER JOIN Cliente c ON v.dniCliente = c.dniCliente 
+                             WHERE v.fechaVenta BETWEEN @Desde AND @Hasta
+                             GROUP BY c.nombreCliente, c.apellidoCliente 
+                             ORDER BY TotalComprado DESC";
+
+            return EjecutarConsulta(query, desde, hasta);
+        }
+
         // EL ÚNICO REPORTE DEL VENDEDOR: Solo su propia recaudación
         public DataTable ObtenerMisVentasPorPeriodo(int dniVendedor, DateTime desde, DateTime hasta)
         {

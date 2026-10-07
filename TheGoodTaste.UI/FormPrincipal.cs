@@ -33,7 +33,7 @@ namespace TheGoodTaste.UI
 
             if (_usuarioActual != null)
             {
-                this.Text = $"Bienvenido a The Good Taste - Usuario: {_usuarioActual.NombreUsuario} [{_usuarioActual.Rol}]";
+                this.Text = $"Bienvenido a The Good Taste - Usuario: {_usuarioActual.Username} [{_usuarioActual.Rol}]";
                 ConfigurarPermisosPorRol();
             }
 

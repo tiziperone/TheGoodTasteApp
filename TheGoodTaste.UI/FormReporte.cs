@@ -26,7 +26,6 @@ namespace TheGoodTaste.UI
         {
             TemaVisual.AplicarEstilo(this);
 
-            // Limpiar datos dummy del diseñador
             if (chart1.Series.Count > 0)
             {
                 chart1.Series[0].Points.Clear();
@@ -34,7 +33,6 @@ namespace TheGoodTaste.UI
             chart1.Titles.Clear();
             listaClientes.DataSource = null;
 
-            // Fechas por defecto: primer día del mes actual hasta hoy
             fechaDesde.Value = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
             fechaHasta.Value = DateTime.Now;
 
@@ -47,14 +45,15 @@ namespace TheGoodTaste.UI
 
             if (_usuarioActual.Rol == RolUsuario.Vendedor)
             {
-                this.Text = $"Mis Reportes - Vendedor: {_usuarioActual.NombreUsuario}";
+                this.Text = $"Mis Reportes - Vendedor: {_usuarioActual.Username}";
 
-                // Ocultar métricas del negocio ajenas al vendedor
                 botonRecaudacion.Visible = false;
                 botonProductoVendido.Visible = false;
-
-                // Ocultar buscador de otros empleados
                 panelVentasVendedor.Visible = false;
+
+                // Ocultar el botón y el panel de clientes para el vendedor
+                button1.Visible = false;
+                panelClientes.Visible = false;
 
                 botonVentas.Text = "Mis Ventas";
             }
@@ -91,8 +90,6 @@ namespace TheGoodTaste.UI
                 }
             }
         }
-
-        // --- EVENTOS DE BOTONES ---
 
         private void botonVentas_Click(object sender, EventArgs e)
         {
@@ -140,7 +137,6 @@ namespace TheGoodTaste.UI
 
         private void textBoxBuscarVendedor_TextChanged(object sender, EventArgs e)
         {
-            // Busca en vivo sin mostrar alertas emergentes si no hay coincidencia inmediata
             EjecutarBusquedaVendedor(false);
         }
 
@@ -155,7 +151,18 @@ namespace TheGoodTaste.UI
             RenderizarGrafico(dt, "Ventas por Vendedor", SeriesChartType.Doughnut, mostrarAlerta);
         }
 
-        // --- EVENTOS VINCULADOS EN EL DESIGNER ---
+        // --- NUEVO REPORTE DE CLIENTES ---
+        private void button1_Click(object sender, EventArgs e)
+        {
+            ReporteNegocio negocio = new ReporteNegocio();
+            DateTime desde = fechaDesde.Value.Date;
+            DateTime hasta = fechaHasta.Value.Date.AddDays(1).AddSeconds(-1);
+
+            DataTable dt = negocio.GenerarTopClientes(desde, hasta);
+            // Gráfico de torta (Pie) o Dona (Doughnut) queda muy bien para top clientes
+            RenderizarGrafico(dt, "Top 5 Clientes con más compras", SeriesChartType.Pie);
+        }
+
         private void FormReporte_Load(object sender, EventArgs e) => FormReportes_Load(sender, e);
         private void tituloDesde_Click(object sender, EventArgs e) { }
         private void label1_Click(object sender, EventArgs e) { }
