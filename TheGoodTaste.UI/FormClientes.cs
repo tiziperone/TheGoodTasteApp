@@ -393,7 +393,13 @@ namespace TheGoodTaste.UI
             if (txtApellido != null) txtApellido.Clear();
             if (txtEmail != null) txtEmail.Clear();
             if (txtTelefono != null) txtTelefono.Clear();
-            if (textPais != null) textPais.Clear();
+
+            // --- PAÍS POR DEFECTO EDITABLE ---
+            if (textPais != null)
+            {
+                textPais.Text = "Argentina"; // Se carga Argentina por defecto pero queda editable
+            }
+
             if (txtProvincia != null) txtProvincia.Clear();
             if (textLocalidad != null) textLocalidad.Clear();
             if (txtCalle != null) txtCalle.Clear();
