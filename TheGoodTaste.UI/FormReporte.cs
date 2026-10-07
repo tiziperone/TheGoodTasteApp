@@ -45,7 +45,12 @@ namespace TheGoodTaste.UI
         {
             if (_usuarioActual == null) return;
 
-            string texto = $"{_usuarioActual.Rol} DNI: {_usuarioActual.DNI}";
+            // Formatear el nombre para que se vea el Nombre y Apellido (si existen) o el Username como plan B.
+            string nombreAMostrar = !string.IsNullOrWhiteSpace(_usuarioActual.Nombre)
+                ? $"{_usuarioActual.Nombre} {_usuarioActual.Apellido}".Trim()
+                : _usuarioActual.Username;
+
+            string texto = $"{_usuarioActual.Rol}: {nombreAMostrar} (DNI: {_usuarioActual.DNI})";
 
             // 1. Si ya existe un control llamado lblVendedor en el diseñador, lo usamos:
             Control[] controles = Controls.Find("lblVendedor", true);
@@ -55,7 +60,7 @@ namespace TheGoodTaste.UI
                 return;
             }
 
-            // 2. Si no existe, creamos el Label automáticamente en la esquina superior izquierda
+            // 2. Si no existe en el diseñador, creamos el Label automáticamente arriba a la izquierda
             if (_lblInfoUsuario == null)
             {
                 _lblInfoUsuario = new Label
@@ -218,7 +223,7 @@ namespace TheGoodTaste.UI
             RenderizarGrafico(dt, "Top 5 Clientes con más compras", SeriesChartType.Pie);
         }
 
-        // Eventos del diseñador
+        // Eventos del diseñador (se dejan vacíos para no romper referencias del archivo FormReportes.Designer.cs)
         private void FormReporte_Load(object sender, EventArgs e) => FormReportes_Load(sender, e);
         private void tituloDesde_Click(object sender, EventArgs e) { }
         private void label1_Click(object sender, EventArgs e) { }
