@@ -39,6 +39,7 @@
             this.label5 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
+            this.buttonBackup = new System.Windows.Forms.Button();
             this.buttonCerrarSesion = new System.Windows.Forms.Button();
             this.btnSalir = new System.Windows.Forms.Button();
             this.btnReportes = new System.Windows.Forms.Button();
@@ -47,6 +48,7 @@
             this.btnClientes = new System.Windows.Forms.Button();
             this.btnProductos = new System.Windows.Forms.Button();
             this.pbLogoInicio = new System.Windows.Forms.PictureBox();
+            this.labelBackup = new System.Windows.Forms.Label();
             this.panelContenedor.SuspendLayout();
             this.panelSuperior.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pbLogoInicio)).BeginInit();
@@ -73,6 +75,8 @@
             // panelSuperior
             // 
             this.panelSuperior.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(35)))), ((int)(((byte)(25)))), ((int)(((byte)(20)))));
+            this.panelSuperior.Controls.Add(this.labelBackup);
+            this.panelSuperior.Controls.Add(this.buttonBackup);
             this.panelSuperior.Controls.Add(this.label2);
             this.panelSuperior.Controls.Add(this.label7);
             this.panelSuperior.Controls.Add(this.label1);
@@ -184,6 +188,25 @@
             this.label3.Text = "[F3] Ventas";
             this.label3.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.label3.Click += new System.EventHandler(this.label3_Click);
+            // 
+            // buttonBackup
+            // 
+            this.buttonBackup.BackColor = System.Drawing.Color.Transparent;
+            this.buttonBackup.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("buttonBackup.BackgroundImage")));
+            this.buttonBackup.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.buttonBackup.FlatAppearance.BorderSize = 0;
+            this.buttonBackup.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(130)))), ((int)(((byte)(40)))));
+            this.buttonBackup.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(80)))), ((int)(((byte)(58)))), ((int)(((byte)(45)))));
+            this.buttonBackup.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.buttonBackup.ForeColor = System.Drawing.SystemColors.ButtonHighlight;
+            this.buttonBackup.Location = new System.Drawing.Point(752, 12);
+            this.buttonBackup.Name = "buttonBackup";
+            this.buttonBackup.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
+            this.buttonBackup.Size = new System.Drawing.Size(128, 67);
+            this.buttonBackup.TabIndex = 9;
+            this.buttonBackup.TextAlign = System.Drawing.ContentAlignment.TopLeft;
+            this.buttonBackup.UseVisualStyleBackColor = false;
+            this.buttonBackup.Click += new System.EventHandler(this.buttonBackup_Click);
             // 
             // buttonCerrarSesion
             // 
@@ -324,11 +347,23 @@
             this.pbLogoInicio.Image = ((System.Drawing.Image)(resources.GetObject("pbLogoInicio.Image")));
             this.pbLogoInicio.Location = new System.Drawing.Point(0, 0);
             this.pbLogoInicio.Name = "pbLogoInicio";
-            this.pbLogoInicio.Size = new System.Drawing.Size(1519, 841);
+            this.pbLogoInicio.Size = new System.Drawing.Size(1215, 673);
             this.pbLogoInicio.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.pbLogoInicio.TabIndex = 0;
             this.pbLogoInicio.TabStop = false;
             this.pbLogoInicio.Click += new System.EventHandler(this.pbLogoInicio_Click);
+            // 
+            // labelBackup
+            // 
+            this.labelBackup.AutoSize = true;
+            this.labelBackup.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(64)))), ((int)(((byte)(0)))));
+            this.labelBackup.ForeColor = System.Drawing.Color.WhiteSmoke;
+            this.labelBackup.Location = new System.Drawing.Point(788, 82);
+            this.labelBackup.Name = "labelBackup";
+            this.labelBackup.Size = new System.Drawing.Size(53, 16);
+            this.labelBackup.TabIndex = 10;
+            this.labelBackup.Text = "Backup";
+            this.labelBackup.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // FormPrincipal
             // 
@@ -367,6 +402,8 @@
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Button buttonBackup;
+        private System.Windows.Forms.Label labelBackup;
     }
 }
 

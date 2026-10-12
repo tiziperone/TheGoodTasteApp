@@ -1,17 +1,19 @@
 ﻿using System;
-using System.Drawing;
 using System.Data;
+using System.Drawing;
 using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
-using TheGoodTaste.Negocio;
 using The_Good_Taste.Entidades;
+using TheGoodTaste.Negocio;
 
 namespace TheGoodTaste.UI
 {
     public partial class FormReportes : Form
     {
         private readonly UsuarioSistema _usuarioActual;
-        private Label _lblInfoUsuario; // Label creado dinámicamente por código
+        private Label _lblInfoUsuario;
+        private ComboBox _cmbReportesGerencia;
+        private Button _btnGenerarReporte;
 
         public FormReportes()
         {
@@ -45,7 +47,6 @@ namespace TheGoodTaste.UI
         {
             if (_usuarioActual == null) return;
 
-            // Formatear el nombre para que se vea el Nombre y Apellido (si existen) o el Username
             string nombreAMostrar = !string.IsNullOrWhiteSpace(_usuarioActual.Nombre)
                 ? $"{_usuarioActual.Nombre} {_usuarioActual.Apellido}".Trim()
                 : _usuarioActual.Username;
@@ -59,7 +60,6 @@ namespace TheGoodTaste.UI
                 return;
             }
 
-
             if (_lblInfoUsuario == null)
             {
                 _lblInfoUsuario = new Label
@@ -68,7 +68,7 @@ namespace TheGoodTaste.UI
                     AutoSize = true,
                     Location = new Point(25, 20),
                     Font = new Font("Segoe UI", 10.5f, FontStyle.Bold),
-                    ForeColor = Color.FromArgb(230, 160, 50), // Tono dorado 
+                    ForeColor = Color.FromArgb(230, 160, 50),
                     BackColor = Color.Transparent
                 };
                 this.Controls.Add(_lblInfoUsuario);
@@ -82,7 +82,6 @@ namespace TheGoodTaste.UI
         {
             if (_usuarioActual == null) return;
 
-            // Búsqueda segura del título de la grilla (sin depender de si se llama label2)
             Label lblTituloGrilla = null;
             Control[] controlesLabel2 = Controls.Find("label2", true);
             if (controlesLabel2.Length > 0 && controlesLabel2[0] is Label l)
@@ -93,15 +92,12 @@ namespace TheGoodTaste.UI
             if (_usuarioActual.Rol == RolUsuario.Vendedor)
             {
                 this.Text = $"Mis Reportes - Vendedor: {_usuarioActual.Username}";
-
-                botonRecaudacion.Visible = false;
-                botonProductoVendido.Visible = false;
                 panelVentasVendedor.Visible = false;
-
-                // Ocultamos solo el botón de listar clientes (de gerencia)
                 button1.Visible = false;
 
-                // Dejamos el contenedor y la grilla visibles para que el vendedor vea sus ventas
+                if (_cmbReportesGerencia != null) _cmbReportesGerencia.Visible = false;
+                if (_btnGenerarReporte != null) _btnGenerarReporte.Visible = false;
+
                 panelClientes.Visible = true;
                 listaClientes.Visible = true;
 
@@ -110,15 +106,117 @@ namespace TheGoodTaste.UI
                     lblTituloGrilla.Text = "Detalle de Mis Ventas";
                 }
 
-                botonVentas.Text = "Mis Ventas";
             }
             else
             {
                 this.Text = "Reportes Estratégicos - Gerencia";
                 if (lblTituloGrilla != null)
                 {
-                    lblTituloGrilla.Text = "Listado de Clientes";
+                    lblTituloGrilla.Text = "Listado de Datos";
                 }
+
+                InicializarSelectorReportesGerencia();
+            }
+        }
+
+        private void InicializarSelectorReportesGerencia()
+        {
+            if (_cmbReportesGerencia == null)
+            {
+                _cmbReportesGerencia = new ComboBox
+                {
+                    Name = "cmbReportesGerencia",
+                    DropDownStyle = ComboBoxStyle.DropDownList,
+                    Location = new Point(25, 60),
+                    Width = 320,
+                    Font = new Font("Segoe UI", 9.5f)
+                };
+
+                _cmbReportesGerencia.Items.AddRange(new string[]
+                {
+                    "Ventas Globales",
+                    "Recaudación Global",
+                    "Ventas por Vendedor",
+                    "Ventas por Medio de Pago",
+                    "Ticket Promedio Diario",
+                    "Top 5 Productos Más Vendidos",
+                    "Stock Crítico / Faltantes",
+                    "Día de Mayor Venta por Producto",
+                    "Top 5 Clientes",
+                    "Clientes Fieles (Múltiples Compras)"
+                });
+
+                _cmbReportesGerencia.SelectedIndex = 0;
+
+                _btnGenerarReporte = new Button
+                {
+                    Name = "btnGenerarReporte",
+                    Text = "Generar Reporte",
+                    Location = new Point(355, 58),
+                    Height = 28,
+                    Width = 120,
+                    Font = new Font("Segoe UI", 9f, FontStyle.Bold)
+                };
+
+                _btnGenerarReporte.Click += BtnGenerarReporte_Click;
+
+                this.Controls.Add(_cmbReportesGerencia);
+                this.Controls.Add(_btnGenerarReporte);
+                _cmbReportesGerencia.BringToFront();
+                _btnGenerarReporte.BringToFront();
+            }
+        }
+
+        private void BtnGenerarReporte_Click(object sender, EventArgs e)
+        {
+            ReporteNegocio negocio = new ReporteNegocio();
+            DateTime desde = fechaDesde.Value.Date;
+            DateTime hasta = fechaHasta.Value.Date.AddDays(1).AddSeconds(-1);
+            DataTable dt;
+
+            switch (_cmbReportesGerencia.SelectedIndex)
+            {
+                case 0:
+                    dt = negocio.GenerarVentasGenerales(desde, hasta);
+                    RenderizarGrafico(dt, "Ventas Globales", SeriesChartType.Line);
+                    break;
+                case 1:
+                    dt = negocio.GenerarRecaudacionGlobal(desde, hasta);
+                    RenderizarGrafico(dt, "Recaudación Global", SeriesChartType.Line);
+                    break;
+                case 2:
+                    string filtroVendedor = textBoxBuscarVendedor != null ? textBoxBuscarVendedor.Text.Trim() : "";
+                    dt = negocio.GenerarVentasPorVendedor(desde, hasta, filtroVendedor);
+                    RenderizarGrafico(dt, "Ventas por Vendedor", SeriesChartType.Doughnut);
+                    break;
+                case 3:
+                    dt = negocio.GenerarVentasPorMedioPago(desde, hasta);
+                    RenderizarGrafico(dt, "Ventas por Medio de Pago", SeriesChartType.Doughnut);
+                    break;
+                case 4:
+                    dt = negocio.GenerarTicketPromedio(desde, hasta);
+                    RenderizarGrafico(dt, "Ticket Promedio Diario ($)", SeriesChartType.Line);
+                    break;
+                case 5:
+                    dt = negocio.GenerarTopProductos(desde, hasta);
+                    RenderizarGrafico(dt, "Top 5 Productos Más Vendidos", SeriesChartType.Bar);
+                    break;
+                case 6:
+                    dt = negocio.GenerarStockCritico();
+                    RenderizarGrafico(dt, "Productos con Stock Crítico", SeriesChartType.Column);
+                    break;
+                case 7:
+                    dt = negocio.GenerarDiaMasVendidoPorProducto(desde, hasta);
+                    RenderizarGrafico(dt, "Día de Mayor Venta por Producto", SeriesChartType.Column);
+                    break;
+                case 8:
+                    dt = negocio.GenerarTopClientes(desde, hasta);
+                    RenderizarGrafico(dt, "Top 5 Clientes", SeriesChartType.Pie);
+                    break;
+                case 9:
+                    dt = negocio.GenerarClientesFieles(desde, hasta);
+                    RenderizarGrafico(dt, "Clientes Fieles (Múltiples Compras)", SeriesChartType.Column);
+                    break;
             }
         }
 
@@ -126,7 +224,7 @@ namespace TheGoodTaste.UI
         {
             listaClientes.DataSource = dt;
 
-            if (dt != null && dt.Rows.Count > 0)
+            if (dt != null && dt.Rows.Count > 0 && dt.Columns.Count >= 2)
             {
                 string colX = dt.Columns[0].ColumnName;
                 string colY = dt.Columns[1].ColumnName;
@@ -222,7 +320,7 @@ namespace TheGoodTaste.UI
             RenderizarGrafico(dt, "Top 5 Clientes con más compras", SeriesChartType.Pie);
         }
 
-        // Eventos del diseñador (se dejan vacíos para no romper referencias del archivo FormReportes.Designer.cs)
+        // Eventos del diseñador
         private void FormReporte_Load(object sender, EventArgs e) => FormReportes_Load(sender, e);
         private void tituloDesde_Click(object sender, EventArgs e) { }
         private void label1_Click(object sender, EventArgs e) { }

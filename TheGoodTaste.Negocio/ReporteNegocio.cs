@@ -8,37 +8,23 @@ namespace TheGoodTaste.Negocio
     {
         private readonly ReporteDatos _datos = new ReporteDatos();
 
-        // Métodos de Gerente
-        public DataTable GenerarRecaudacionGlobal(DateTime desde, DateTime hasta)
-        {
-            return _datos.ObtenerRecaudacionGlobal(desde, hasta);
-        }
+        // 1. VENTAS Y FACTURACIÓN (GERENCIA)
+        public DataTable GenerarRecaudacionGlobal(DateTime desde, DateTime hasta) => _datos.ObtenerRecaudacionGlobal(desde, hasta);
+        public DataTable GenerarVentasGenerales(DateTime desde, DateTime hasta) => _datos.ObtenerVentasGenerales(desde, hasta);
+        public DataTable GenerarVentasPorMedioPago(DateTime desde, DateTime hasta) => _datos.ObtenerVentasPorMedioPago(desde, hasta);
+        public DataTable GenerarTicketPromedio(DateTime desde, DateTime hasta) => _datos.ObtenerTicketPromedioDiario(desde, hasta);
+        public DataTable GenerarVentasPorVendedor(DateTime desde, DateTime hasta, string nombreVendedor) => _datos.ObtenerVentasPorVendedor(desde, hasta, nombreVendedor);
 
-        public DataTable GenerarVentasGenerales(DateTime desde, DateTime hasta)
-        {
-            return _datos.ObtenerVentasGenerales(desde, hasta);
-        }
+        // 2. INVENTARIO Y PRODUCTOS (GERENCIA)
+        public DataTable GenerarTopProductos(DateTime desde, DateTime hasta) => _datos.ObtenerTopProductosMasVendidos(desde, hasta);
+        public DataTable GenerarStockCritico() => _datos.ObtenerStockCritico();
+        public DataTable GenerarDiaMasVendidoPorProducto(DateTime desde, DateTime hasta) => _datos.ObtenerDiaMasVendidoPorProducto(desde, hasta);
 
-        public DataTable GenerarVentasPorVendedor(DateTime desde, DateTime hasta, string nombreVendedor)
-        {
-            return _datos.ObtenerVentasPorVendedor(desde, hasta, nombreVendedor);
-        }
+        // 3. FIDELIZACIÓN Y CLIENTES (GERENCIA)
+        public DataTable GenerarTopClientes(DateTime desde, DateTime hasta) => _datos.ObtenerTopClientes(desde, hasta);
+        public DataTable GenerarClientesFieles(DateTime desde, DateTime hasta) => _datos.ObtenerClientesFieles(desde, hasta);
 
-        public DataTable GenerarTopProductos(DateTime desde, DateTime hasta)
-        {
-            return _datos.ObtenerTopProductosMasVendidos(desde, hasta);
-        }
-
-        // NUEVO MÉTODO PARA TOP CLIENTES
-        public DataTable GenerarTopClientes(DateTime desde, DateTime hasta)
-        {
-            return _datos.ObtenerTopClientes(desde, hasta);
-        }
-
-        // Métodos de Vendedor (Solo lo que él vendió)
-        public DataTable GenerarMisVentas(int dniVendedor, DateTime desde, DateTime hasta)
-        {
-            return _datos.ObtenerMisVentasPorPeriodo(dniVendedor, desde, hasta);
-        }
+        // REPORTE EXCLUSIVO DEL VENDEDOR
+        public DataTable GenerarMisVentas(int dniVendedor, DateTime desde, DateTime hasta) => _datos.ObtenerMisVentasPorPeriodo(dniVendedor, desde, hasta);
     }
 }

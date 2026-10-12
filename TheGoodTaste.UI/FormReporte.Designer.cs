@@ -28,9 +28,9 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea3 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend3 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series3 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
             this.panelReportes = new System.Windows.Forms.Panel();
             this.panelVentasVendedor = new System.Windows.Forms.Panel();
             this.textBoxBuscarVendedor = new System.Windows.Forms.TextBox();
@@ -40,9 +40,6 @@
             this.tituloDesde = new System.Windows.Forms.Label();
             this.fechaHasta = new System.Windows.Forms.DateTimePicker();
             this.fechaDesde = new System.Windows.Forms.DateTimePicker();
-            this.botonProductoVendido = new System.Windows.Forms.Button();
-            this.botonVentas = new System.Windows.Forms.Button();
-            this.botonRecaudacion = new System.Windows.Forms.Button();
             this.panelClientes = new System.Windows.Forms.Panel();
             this.button1 = new System.Windows.Forms.Button();
             this.listaClientes = new System.Windows.Forms.DataGridView();
@@ -56,8 +53,8 @@
             // 
             // panelReportes
             // 
-            this.panelReportes.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-            | System.Windows.Forms.AnchorStyles.Left)
+            this.panelReportes.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.panelReportes.AutoSize = true;
             this.panelReportes.Controls.Add(this.panelVentasVendedor);
@@ -65,9 +62,6 @@
             this.panelReportes.Controls.Add(this.tituloDesde);
             this.panelReportes.Controls.Add(this.fechaHasta);
             this.panelReportes.Controls.Add(this.fechaDesde);
-            this.panelReportes.Controls.Add(this.botonProductoVendido);
-            this.panelReportes.Controls.Add(this.botonVentas);
-            this.panelReportes.Controls.Add(this.botonRecaudacion);
             this.panelReportes.Location = new System.Drawing.Point(23, 67);
             this.panelReportes.Name = "panelReportes";
             this.panelReportes.Size = new System.Drawing.Size(827, 333);
@@ -79,7 +73,7 @@
             this.panelVentasVendedor.Controls.Add(this.textBoxBuscarVendedor);
             this.panelVentasVendedor.Controls.Add(this.botonVentasVendedor);
             this.panelVentasVendedor.Controls.Add(this.tituloVendedor);
-            this.panelVentasVendedor.Location = new System.Drawing.Point(39, 229);
+            this.panelVentasVendedor.Location = new System.Drawing.Point(49, 161);
             this.panelVentasVendedor.Name = "panelVentasVendedor";
             this.panelVentasVendedor.Size = new System.Drawing.Size(563, 91);
             this.panelVentasVendedor.TabIndex = 3;
@@ -151,40 +145,10 @@
             this.fechaDesde.TabIndex = 1;
             this.fechaDesde.ValueChanged += new System.EventHandler(this.fechaDesde_ValueChanged);
             // 
-            // botonProductoVendido
-            // 
-            this.botonProductoVendido.Location = new System.Drawing.Point(431, 137);
-            this.botonProductoVendido.Name = "botonProductoVendido";
-            this.botonProductoVendido.Size = new System.Drawing.Size(152, 56);
-            this.botonProductoVendido.TabIndex = 0;
-            this.botonProductoVendido.Text = "Producto mas vendido";
-            this.botonProductoVendido.UseVisualStyleBackColor = true;
-            this.botonProductoVendido.Click += new System.EventHandler(this.botonProductoVendido_Click);
-            // 
-            // botonVentas
-            // 
-            this.botonVentas.Location = new System.Drawing.Point(251, 137);
-            this.botonVentas.Name = "botonVentas";
-            this.botonVentas.Size = new System.Drawing.Size(139, 56);
-            this.botonVentas.TabIndex = 0;
-            this.botonVentas.Text = "Ventas";
-            this.botonVentas.UseVisualStyleBackColor = true;
-            this.botonVentas.Click += new System.EventHandler(this.botonVentas_Click);
-            // 
-            // botonRecaudacion
-            // 
-            this.botonRecaudacion.Location = new System.Drawing.Point(74, 137);
-            this.botonRecaudacion.Name = "botonRecaudacion";
-            this.botonRecaudacion.Size = new System.Drawing.Size(139, 56);
-            this.botonRecaudacion.TabIndex = 0;
-            this.botonRecaudacion.Text = "Recaudacion";
-            this.botonRecaudacion.UseVisualStyleBackColor = true;
-            this.botonRecaudacion.Click += new System.EventHandler(this.botonRecaudacion_Click);
-            // 
             // panelClientes
             // 
-            this.panelClientes.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-            | System.Windows.Forms.AnchorStyles.Left)
+            this.panelClientes.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.panelClientes.Controls.Add(this.button1);
             this.panelClientes.Controls.Add(this.listaClientes);
@@ -206,8 +170,8 @@
             // listaClientes
             // 
             this.listaClientes.AllowUserToAddRows = false;
-            this.listaClientes.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-            | System.Windows.Forms.AnchorStyles.Left)
+            this.listaClientes.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.listaClientes.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
             this.listaClientes.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
@@ -223,16 +187,16 @@
             // 
             // chart1
             // 
-            chartArea3.Name = "ChartArea1";
-            this.chart1.ChartAreas.Add(chartArea3);
-            legend3.Name = "Legend1";
-            this.chart1.Legends.Add(legend3);
+            chartArea1.Name = "ChartArea1";
+            this.chart1.ChartAreas.Add(chartArea1);
+            legend1.Name = "Legend1";
+            this.chart1.Legends.Add(legend1);
             this.chart1.Location = new System.Drawing.Point(72, 431);
             this.chart1.Name = "chart1";
-            series3.ChartArea = "ChartArea1";
-            series3.Legend = "Legend1";
-            series3.Name = "Series1";
-            this.chart1.Series.Add(series3);
+            series1.ChartArea = "ChartArea1";
+            series1.Legend = "Legend1";
+            series1.Name = "Series1";
+            this.chart1.Series.Add(series1);
             this.chart1.Size = new System.Drawing.Size(543, 242);
             this.chart1.TabIndex = 3;
             this.chart1.Text = "chart1";
@@ -264,9 +228,6 @@
         #endregion
 
         private System.Windows.Forms.Panel panelReportes;
-        private System.Windows.Forms.Button botonVentas;
-        private System.Windows.Forms.Button botonRecaudacion;
-        private System.Windows.Forms.Button botonProductoVendido;
         private System.Windows.Forms.Panel panelVentasVendedor;
         private System.Windows.Forms.TextBox textBoxBuscarVendedor;
         private System.Windows.Forms.Button botonVentasVendedor;

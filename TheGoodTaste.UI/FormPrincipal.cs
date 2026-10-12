@@ -45,7 +45,7 @@ namespace TheGoodTaste.UI
                 panelSuperior.Dock = DockStyle.Top;
                 panelSuperior.Height = 125;
 
-                // CLAVE: Quitamos el fondo cuadrado a todos los botones habilitados desde el inicio
+                // Quitamos el fondo cuadrado a todos los botones habilitados desde el inicio
                 foreach (Control control in panelSuperior.Controls)
                 {
                     if (control is Button btn && btn.Enabled)
@@ -127,18 +127,20 @@ namespace TheGoodTaste.UI
                     DeshabilitarBoton(btnProductos);
                     DeshabilitarBoton(btnClientes);
                     DeshabilitarBoton(btnVentas);
+                    DeshabilitarBoton(btnReportes); // Administrador NO ve reportes comerciales
                     break;
 
                 case RolUsuario.Gerente:
                     DeshabilitarBoton(btnUsuarios);
                     DeshabilitarBoton(btnVentas);
                     DeshabilitarBoton(btnClientes);
+                    DeshabilitarBoton(buttonBackup); // Gerente NO realiza backups
                     break;
 
                 case RolUsuario.Vendedor:
-                    DeshabilitarBoton(btnProductos); // Bloquea el acceso al catálogo/gestión de productos
+                    DeshabilitarBoton(btnProductos);
                     DeshabilitarBoton(btnUsuarios);
-                    
+                    DeshabilitarBoton(buttonBackup); // Vendedor NO realiza backups
                     break;
             }
         }
@@ -158,6 +160,9 @@ namespace TheGoodTaste.UI
                     return true;
                 case Keys.F4:
                     if (btnUsuarios != null && btnUsuarios.Enabled) btnUsuarios.PerformClick();
+                    return true;
+                case Keys.F5:
+                    if (buttonBackup != null && buttonBackup.Enabled) buttonBackup.PerformClick();
                     return true;
                 case Keys.F6:
                     if (btnReportes != null && btnReportes.Enabled) btnReportes.PerformClick();
@@ -260,6 +265,11 @@ namespace TheGoodTaste.UI
         public void btnVentas_Click(object sender, EventArgs e) => AbrirFormularioEnPanel(new FormPuntoVenta(_usuarioActual.DNI), (Button)sender);
         public void btnUsuarios_Click(object sender, EventArgs e) => AbrirFormularioEnPanel(new FormUsuarios(), (Button)sender);
         public void btnReportes_Click(object sender, EventArgs e) => AbrirFormularioEnPanel(new FormReportes(_usuarioActual), (Button)sender);
+
+        private void buttonBackup_Click(object sender, EventArgs e)
+        {
+            AbrirFormularioEnPanel(new FormAdminBackup(_usuarioActual), (Button)sender);
+        }
 
         public void btnSalir_Click(object sender, EventArgs e)
         {
