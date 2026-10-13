@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Data;
 using System.Drawing;
-using System.Linq;
 using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
+using System.Linq;
 using The_Good_Taste.Entidades;
 using TheGoodTaste.Negocio;
 
@@ -42,6 +42,23 @@ namespace TheGoodTaste.UI
 
             ConfigurarVistaInicialSegunRol();
             MostrarInfoUsuario();
+
+            // Cargar automáticamente los datos al abrir si es VENDEDOR
+            if (_usuarioActual != null && _usuarioActual.Rol == RolUsuario.Vendedor)
+            {
+                CargarReporteVendedor();
+            }
+        }
+
+        // Método auxiliar para buscar controles dentro de Paneles o Contenedores anidados
+        private Control BuscarControlEnTodoElFormulario(string nombreControl)
+        {
+            Control[] controles = Controls.Find(nombreControl, true);
+            if (controles.Length > 0)
+            {
+                return controles[0];
+            }
+            return null;
         }
 
         private void MostrarInfoUsuario()
@@ -52,12 +69,14 @@ namespace TheGoodTaste.UI
                 ? $"{_usuarioActual.Nombre} {_usuarioActual.Apellido}".Trim()
                 : _usuarioActual.Username;
 
-            string texto = $"{_usuarioActual.Rol}: {nombreAMostrar} (DNI: {_usuarioActual.DNI})";
+            string texto = $"Vendedor: {nombreAMostrar} (DNI: {_usuarioActual.DNI})";
 
-            Control[] controles = Controls.Find("lblVendedor", true);
-            if (controles.Length > 0 && controles[0] is Label lbl)
+            Control lbl = BuscarControlEnTodoElFormulario("lblVendedor");
+            if (lbl is Label lblCast)
             {
-                lbl.Text = texto;
+                lblCast.Text = texto;
+                lblCast.Visible = true;
+                lblCast.BringToFront();
                 return;
             }
 
@@ -83,40 +102,35 @@ namespace TheGoodTaste.UI
         {
             if (_usuarioActual == null) return;
 
-            Label lblTituloGrilla = null;
-            Control[] controlesLabel2 = Controls.Find("label2", true);
-            if (controlesLabel2.Length > 0 && controlesLabel2[0] is Label l)
-            {
-                lblTituloGrilla = l;
-            }
+            Control lblTituloGrilla = BuscarControlEnTodoElFormulario("label2");
+            Control btnRecaudacion = BuscarControlEnTodoElFormulario("botonRecaudacion");
+            Control btnProductoVendido = BuscarControlEnTodoElFormulario("botonProductoVendido");
+            Control btnVentas = BuscarControlEnTodoElFormulario("botonVentas");
+            Control panelVendedorSearch = BuscarControlEnTodoElFormulario("panelVentasVendedor");
+            Control btnTopClientes = BuscarControlEnTodoElFormulario("button1");
+            Control pnlClientes = BuscarControlEnTodoElFormulario("panelClientes");
 
-            // Búsqueda 100% segura por nombre para evitar errores de compilación
-            Button btnRecaudacion = Controls.Find("botonRecaudacion", true).FirstOrDefault() as Button;
-            Button btnProductoVendido = Controls.Find("botonProductoVendido", true).FirstOrDefault() as Button;
-            Button btnVentas = Controls.Find("botonVentas", true).FirstOrDefault() as Button;
+            // Inicializamos la barra/desplegable para AMBOS roles
+            InicializarSelectorReportes();
 
             if (_usuarioActual.Rol == RolUsuario.Vendedor)
             {
                 this.Text = $"Mis Reportes - Vendedor: {_usuarioActual.Username}";
 
+                // Ocultar botones laterales de Gerente
                 if (btnRecaudacion != null) btnRecaudacion.Visible = false;
                 if (btnProductoVendido != null) btnProductoVendido.Visible = false;
+                if (panelVendedorSearch != null) panelVendedorSearch.Visible = false;
+                if (btnTopClientes != null) btnTopClientes.Visible = false;
+                if (btnVentas != null) btnVentas.Visible = false;
 
-                if (panelVentasVendedor != null) panelVentasVendedor.Visible = false;
-                if (button1 != null) button1.Visible = false;
+                if (pnlClientes != null) pnlClientes.Visible = true;
+                if (listaClientes != null) listaClientes.Visible = true;
 
-                if (_cmbReportesGerencia != null) _cmbReportesGerencia.Visible = false;
-                if (_btnGenerarReporte != null) _btnGenerarReporte.Visible = false;
-
-                panelClientes.Visible = true;
-                listaClientes.Visible = true;
-
-                if (lblTituloGrilla != null)
+                if (lblTituloGrilla is Label l)
                 {
-                    lblTituloGrilla.Text = "Detalle de Mis Ventas";
+                    l.Text = "Detalle de Mis Ventas";
                 }
-
-                if (btnVentas != null) btnVentas.Text = "Mis Ventas";
             }
             else
             {
@@ -124,21 +138,29 @@ namespace TheGoodTaste.UI
 
                 if (btnRecaudacion != null) btnRecaudacion.Visible = true;
                 if (btnProductoVendido != null) btnProductoVendido.Visible = true;
-                if (panelVentasVendedor != null) panelVentasVendedor.Visible = true;
-                if (button1 != null) button1.Visible = true;
+                if (panelVendedorSearch != null) panelVendedorSearch.Visible = true;
+                if (btnTopClientes != null) btnTopClientes.Visible = true;
+                if (btnVentas != null) btnVentas.Visible = true;
 
-                if (lblTituloGrilla != null)
+                if (lblTituloGrilla is Label l)
                 {
-                    lblTituloGrilla.Text = "Listado de Datos";
+                    l.Text = "Listado de Datos";
                 }
-
-                InicializarSelectorReportesGerencia();
-                if (_cmbReportesGerencia != null) _cmbReportesGerencia.Visible = true;
-                if (_btnGenerarReporte != null) _btnGenerarReporte.Visible = true;
             }
         }
 
-        private void InicializarSelectorReportesGerencia()
+        private void CargarReporteVendedor()
+        {
+            ReporteNegocio negocio = new ReporteNegocio();
+            DateTime desde = fechaDesde.Value.Date;
+            DateTime hasta = fechaHasta.Value.Date.AddDays(1).AddSeconds(-1);
+
+            DataTable dt = negocio.GenerarMisVentas(_usuarioActual.DNI, desde, hasta);
+            RenderizarGrafico(dt, "Mis Ventas por Día", SeriesChartType.Column, false);
+        }
+
+
+        private void InicializarSelectorReportes()
         {
             if (_cmbReportesGerencia == null)
             {
@@ -151,19 +173,32 @@ namespace TheGoodTaste.UI
                     Font = new Font("Segoe UI", 9.5f)
                 };
 
-                _cmbReportesGerencia.Items.AddRange(new string[]
+                if (_usuarioActual != null && _usuarioActual.Rol == RolUsuario.Vendedor)
                 {
-                    "Ventas Globales",
-                    "Recaudación Global",
-                    "Ventas por Vendedor",
-                    "Ventas por Medio de Pago",
-                    "Ticket Promedio Diario",
-                    "Top 5 Productos Más Vendidos",
-                    "Stock Crítico / Faltantes",
-                    "Día de Mayor Venta por Producto",
-                    "Top 5 Clientes",
-                    "Clientes Fieles (Múltiples Compras)"
-                });
+                    // Opciones disponibles para el VENDEDOR
+                    _cmbReportesGerencia.Items.AddRange(new string[]
+                    {
+                "Mis Ventas por Día",
+                "Cierre de Caja (Formas de Pago)"
+                    });
+                }
+                else
+                {
+                    // Opciones disponibles para GERENCIA
+                    _cmbReportesGerencia.Items.AddRange(new string[]
+                    {
+                "Ventas Globales",
+                "Recaudación Global",
+                "Ventas por Vendedor",
+                "Ventas por Medio de Pago",
+                "Ticket Promedio Diario",
+                "Top 5 Productos Más Vendidos",
+                "Stock Crítico / Faltantes",
+                "Día de Mayor Venta por Producto",
+                "Top 5 Clientes",
+                "Clientes Fieles (Múltiples Compras)"
+                    });
+                }
 
                 _cmbReportesGerencia.SelectedIndex = 0;
 
@@ -193,49 +228,67 @@ namespace TheGoodTaste.UI
             DateTime hasta = fechaHasta.Value.Date.AddDays(1).AddSeconds(-1);
             DataTable dt;
 
-            switch (_cmbReportesGerencia.SelectedIndex)
+            if (_usuarioActual != null && _usuarioActual.Rol == RolUsuario.Vendedor)
             {
-                case 0:
-                    dt = negocio.GenerarVentasGenerales(desde, hasta);
-                    RenderizarGrafico(dt, "Ventas Globales", SeriesChartType.Line);
-                    break;
-                case 1:
-                    dt = negocio.GenerarRecaudacionGlobal(desde, hasta);
-                    RenderizarGrafico(dt, "Recaudación Global", SeriesChartType.Line);
-                    break;
-                case 2:
-                    string filtroVendedor = textBoxBuscarVendedor != null ? textBoxBuscarVendedor.Text.Trim() : "";
-                    dt = negocio.GenerarVentasPorVendedor(desde, hasta, filtroVendedor);
-                    RenderizarGrafico(dt, "Ventas por Vendedor", SeriesChartType.Doughnut);
-                    break;
-                case 3:
-                    dt = negocio.GenerarVentasPorMedioPago(desde, hasta);
-                    RenderizarGrafico(dt, "Ventas por Medio de Pago", SeriesChartType.Doughnut);
-                    break;
-                case 4:
-                    dt = negocio.GenerarTicketPromedio(desde, hasta);
-                    RenderizarGrafico(dt, "Ticket Promedio Diario ($)", SeriesChartType.Line);
-                    break;
-                case 5:
-                    dt = negocio.GenerarTopProductos(desde, hasta);
-                    RenderizarGrafico(dt, "Top 5 Productos Más Vendidos", SeriesChartType.Bar);
-                    break;
-                case 6:
-                    dt = negocio.GenerarStockCritico();
-                    RenderizarGrafico(dt, "Productos con Stock Crítico", SeriesChartType.Column);
-                    break;
-                case 7:
-                    dt = negocio.GenerarDiaMasVendidoPorProducto(desde, hasta);
-                    RenderizarGrafico(dt, "Día de Mayor Venta por Producto", SeriesChartType.Column);
-                    break;
-                case 8:
-                    dt = negocio.GenerarTopClientes(desde, hasta);
-                    RenderizarGrafico(dt, "Top 5 Clientes", SeriesChartType.Pie);
-                    break;
-                case 9:
-                    dt = negocio.GenerarClientesFieles(desde, hasta);
-                    RenderizarGrafico(dt, "Clientes Fieles (Múltiples Compras)", SeriesChartType.Column);
-                    break;
+                switch (_cmbReportesGerencia.SelectedIndex)
+                {
+                    case 0: // Mis Ventas por Día
+                        dt = negocio.GenerarMisVentas(_usuarioActual.DNI, desde, hasta);
+                        RenderizarGrafico(dt, "Mis Ventas por Día", SeriesChartType.Column);
+                        break;
+                    case 1: // Cierre de Caja / Formas de Pago del vendedor
+                        dt = negocio.GenerarVentasPorMedioPago(desde, hasta);
+                        RenderizarGrafico(dt, "Cierre de Caja - Formas de Pago", SeriesChartType.Doughnut);
+                        break;
+                }
+            }
+            else
+            {
+                switch (_cmbReportesGerencia.SelectedIndex)
+                {
+                    case 0:
+                        dt = negocio.GenerarVentasGenerales(desde, hasta);
+                        RenderizarGrafico(dt, "Ventas Globales", SeriesChartType.Line);
+                        break;
+                    case 1:
+                        dt = negocio.GenerarRecaudacionGlobal(desde, hasta);
+                        RenderizarGrafico(dt, "Recaudación Global", SeriesChartType.Line);
+                        break;
+                    case 2:
+                        Control txtVendedor = BuscarControlEnTodoElFormulario("textBoxBuscarVendedor");
+                        string filtroVendedor = txtVendedor != null ? txtVendedor.Text.Trim() : "";
+                        dt = negocio.GenerarVentasPorVendedor(desde, hasta, filtroVendedor);
+                        RenderizarGrafico(dt, "Ventas por Vendedor", SeriesChartType.Doughnut);
+                        break;
+                    case 3:
+                        dt = negocio.GenerarVentasPorMedioPago(desde, hasta);
+                        RenderizarGrafico(dt, "Ventas por Medio de Pago", SeriesChartType.Doughnut);
+                        break;
+                    case 4:
+                        dt = negocio.GenerarTicketPromedio(desde, hasta);
+                        RenderizarGrafico(dt, "Ticket Promedio Diario ($)", SeriesChartType.Line);
+                        break;
+                    case 5:
+                        dt = negocio.GenerarTopProductos(desde, hasta);
+                        RenderizarGrafico(dt, "Top 5 Productos Más Vendidos", SeriesChartType.Bar);
+                        break;
+                    case 6:
+                        dt = negocio.GenerarStockCritico();
+                        RenderizarGrafico(dt, "Productos con Stock Crítico", SeriesChartType.Column);
+                        break;
+                    case 7:
+                        dt = negocio.GenerarDiaMasVendidoPorProducto(desde, hasta);
+                        RenderizarGrafico(dt, "Día de Mayor Venta por Producto", SeriesChartType.Column);
+                        break;
+                    case 8:
+                        dt = negocio.GenerarTopClientes(desde, hasta);
+                        RenderizarGrafico(dt, "Top 5 Clientes", SeriesChartType.Pie);
+                        break;
+                    case 9:
+                        dt = negocio.GenerarClientesFieles(desde, hasta);
+                        RenderizarGrafico(dt, "Clientes Fieles (Múltiples Compras)", SeriesChartType.Column);
+                        break;
+                }
             }
         }
 
@@ -267,7 +320,7 @@ namespace TheGoodTaste.UI
             }
         }
 
-        // --- BOTONES ---
+        // --- MANEJADORES DE EVENTOS ---
 
         private void botonVentas_Click(object sender, EventArgs e)
         {
@@ -275,15 +328,13 @@ namespace TheGoodTaste.UI
             DateTime desde = fechaDesde.Value.Date;
             DateTime hasta = fechaHasta.Value.Date.AddDays(1).AddSeconds(-1);
 
-            DataTable dt;
             if (_usuarioActual != null && _usuarioActual.Rol == RolUsuario.Vendedor)
             {
-                dt = negocio.GenerarMisVentas(_usuarioActual.DNI, desde, hasta);
-                RenderizarGrafico(dt, "Mis Ventas por Día", SeriesChartType.Column);
+                CargarReporteVendedor();
             }
             else
             {
-                dt = negocio.GenerarVentasGenerales(desde, hasta);
+                DataTable dt = negocio.GenerarVentasGenerales(desde, hasta);
                 RenderizarGrafico(dt, "Ventas Globales", SeriesChartType.Line);
             }
         }
@@ -323,7 +374,9 @@ namespace TheGoodTaste.UI
             ReporteNegocio negocio = new ReporteNegocio();
             DateTime desde = fechaDesde.Value.Date;
             DateTime hasta = fechaHasta.Value.Date.AddDays(1).AddSeconds(-1);
-            string vendedorFiltro = textBoxBuscarVendedor.Text.Trim();
+
+            Control txt = BuscarControlEnTodoElFormulario("textBoxBuscarVendedor");
+            string vendedorFiltro = txt != null ? txt.Text.Trim() : "";
 
             DataTable dt = negocio.GenerarVentasPorVendedor(desde, hasta, vendedorFiltro);
             RenderizarGrafico(dt, "Ventas por Vendedor", SeriesChartType.Doughnut, mostrarAlerta);
