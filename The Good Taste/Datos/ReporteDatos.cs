@@ -8,12 +8,19 @@ namespace The_Good_Taste.Datos
     {
         public DataTable ObtenerRecaudacionGlobal(DateTime desde, DateTime hasta)
         {
-            string query = @"SELECT CAST(fechaVenta AS DATE) AS Fecha, SUM(totalVenta) AS Recaudacion 
-                             FROM Venta 
-                             WHERE fechaVenta BETWEEN @Desde AND @Hasta
-                             GROUP BY CAST(fechaVenta AS DATE) 
-                             ORDER BY Fecha";
-            return EjecutarConsulta(query, desde, hasta);
+            DataTable dt = new DataTable();
+            using (SqlConnection con = Conexion.ObtenerConexion())
+            {
+                SqlCommand cmd = new SqlCommand("sp_ObtenerRecaudacionGlobal", con);
+                cmd.CommandType = CommandType.StoredProcedure; // <--- Procedimiento almacenado
+
+                cmd.Parameters.AddWithValue("@Desde", desde);
+                cmd.Parameters.AddWithValue("@Hasta", hasta);
+
+                SqlDataAdapter da = new SqlDataAdapter(cmd);
+                da.Fill(dt);
+            }
+            return dt;
         }
 
         public DataTable ObtenerVentasGenerales(DateTime desde, DateTime hasta)

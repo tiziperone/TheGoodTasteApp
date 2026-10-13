@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Data;
 using System.Drawing;
+using System.Linq;
 using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
 using The_Good_Taste.Entidades;
@@ -89,11 +90,20 @@ namespace TheGoodTaste.UI
                 lblTituloGrilla = l;
             }
 
+            // Búsqueda 100% segura por nombre para evitar errores de compilación
+            Button btnRecaudacion = Controls.Find("botonRecaudacion", true).FirstOrDefault() as Button;
+            Button btnProductoVendido = Controls.Find("botonProductoVendido", true).FirstOrDefault() as Button;
+            Button btnVentas = Controls.Find("botonVentas", true).FirstOrDefault() as Button;
+
             if (_usuarioActual.Rol == RolUsuario.Vendedor)
             {
                 this.Text = $"Mis Reportes - Vendedor: {_usuarioActual.Username}";
-                panelVentasVendedor.Visible = false;
-                button1.Visible = false;
+
+                if (btnRecaudacion != null) btnRecaudacion.Visible = false;
+                if (btnProductoVendido != null) btnProductoVendido.Visible = false;
+
+                if (panelVentasVendedor != null) panelVentasVendedor.Visible = false;
+                if (button1 != null) button1.Visible = false;
 
                 if (_cmbReportesGerencia != null) _cmbReportesGerencia.Visible = false;
                 if (_btnGenerarReporte != null) _btnGenerarReporte.Visible = false;
@@ -106,16 +116,25 @@ namespace TheGoodTaste.UI
                     lblTituloGrilla.Text = "Detalle de Mis Ventas";
                 }
 
+                if (btnVentas != null) btnVentas.Text = "Mis Ventas";
             }
             else
             {
                 this.Text = "Reportes Estratégicos - Gerencia";
+
+                if (btnRecaudacion != null) btnRecaudacion.Visible = true;
+                if (btnProductoVendido != null) btnProductoVendido.Visible = true;
+                if (panelVentasVendedor != null) panelVentasVendedor.Visible = true;
+                if (button1 != null) button1.Visible = true;
+
                 if (lblTituloGrilla != null)
                 {
                     lblTituloGrilla.Text = "Listado de Datos";
                 }
 
                 InicializarSelectorReportesGerencia();
+                if (_cmbReportesGerencia != null) _cmbReportesGerencia.Visible = true;
+                if (_btnGenerarReporte != null) _btnGenerarReporte.Visible = true;
             }
         }
 
