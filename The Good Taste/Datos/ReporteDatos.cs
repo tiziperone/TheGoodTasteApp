@@ -98,25 +98,26 @@ namespace The_Good_Taste.Datos
         public DataTable ObtenerDiaMasVendidoPorProducto(DateTime desde, DateTime hasta)
         {
             string query = @"SET LANGUAGE Spanish;
-                     WITH VentasPorDia AS (
-                        SELECT 
-                            p.Nombre AS Producto,
-                            DATENAME(dw, v.fechaVenta) AS DiaSemana,
-                            CAST(v.fechaVenta AS DATE) AS FechaPico,
-                            SUM(vd.cantidad) AS CantidadVendida,
-                            ROW_NUMBER() OVER (PARTITION BY p.Nombre ORDER BY SUM(vd.cantidad) DESC) AS Ranking
-                        FROM VentaDetalle vd
-                        INNER JOIN Venta v ON vd.idVenta = v.idVenta
-                        INNER JOIN Productos p ON vd.Codigo = p.Codigo
-                        WHERE v.fechaVenta BETWEEN @Desde AND @Hasta
-                        GROUP BY p.Nombre, DATENAME(dw, v.fechaVenta), CAST(v.fechaVenta AS DATE)
-                     )
-                     SELECT 
-                        Producto, 
-                        UPPER(LEFT(DiaSemana, 1)) + LOWER(SUBSTRING(DiaSemana, 2, LEN(DiaSemana))) + ' ' + CAST(FechaPico AS VARCHAR) + ' (' + CAST(CantidadVendida AS VARCHAR) + ' un.)' AS [Día Pico]
-                     FROM VentasPorDia
-                     WHERE Ranking = 1
-                     ORDER BY CantidadVendida DESC";
+             WITH VentasPorDia AS (
+                SELECT 
+                    p.Nombre AS Producto,
+                    DATENAME(dw, v.fechaVenta) AS DiaSemana,
+                    CAST(v.fechaVenta AS DATE) AS FechaPico,
+                    SUM(vd.cantidad) AS CantidadVendida,
+                    ROW_NUMBER() OVER (PARTITION BY p.Nombre ORDER BY SUM(vd.cantidad) DESC) AS Ranking
+                FROM VentaDetalle vd
+                INNER JOIN Venta v ON vd.idVenta = v.idVenta
+                INNER JOIN Productos p ON vd.Codigo = p.Codigo
+                WHERE v.fechaVenta BETWEEN @Desde AND @Hasta
+                GROUP BY p.Nombre, DATENAME(dw, v.fechaVenta), CAST(v.fechaVenta AS DATE)
+             )
+             SELECT 
+                Producto, 
+                UPPER(LEFT(DiaSemana, 1)) + LOWER(SUBSTRING(DiaSemana, 2, LEN(DiaSemana))) + ' ' + CAST(FechaPico AS VARCHAR) AS [Día Pico],
+                CantidadVendida AS [Cantidad]
+             FROM VentasPorDia
+             WHERE Ranking = 1
+             ORDER BY CantidadVendida DESC";
             return EjecutarConsulta(query, desde, hasta);
         }
 

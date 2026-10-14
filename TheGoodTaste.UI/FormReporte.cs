@@ -159,7 +159,6 @@ namespace TheGoodTaste.UI
             RenderizarGrafico(dt, "Mis Ventas por Día", SeriesChartType.Column, false);
         }
 
-
         private void InicializarSelectorReportes()
         {
             if (_cmbReportesGerencia == null)
@@ -178,8 +177,8 @@ namespace TheGoodTaste.UI
                     // Opciones disponibles para el VENDEDOR
                     _cmbReportesGerencia.Items.AddRange(new string[]
                     {
-                "Mis Ventas por Día",
-                "Cierre de Caja (Formas de Pago)"
+                        "Mis Ventas por Día",
+                        "Cierre de Caja (Formas de Pago)"
                     });
                 }
                 else
@@ -187,16 +186,16 @@ namespace TheGoodTaste.UI
                     // Opciones disponibles para GERENCIA
                     _cmbReportesGerencia.Items.AddRange(new string[]
                     {
-                "Ventas Globales",
-                "Recaudación Global",
-                "Ventas por Vendedor",
-                "Ventas por Medio de Pago",
-                "Ticket Promedio Diario",
-                "Top 5 Productos Más Vendidos",
-                "Stock Crítico / Faltantes",
-                "Día de Mayor Venta por Producto",
-                "Top 5 Clientes",
-                "Clientes Fieles (Múltiples Compras)"
+                        "Ventas Globales",
+                        "Recaudación Global",
+                        "Ventas por Vendedor",
+                        "Ventas por Medio de Pago",
+                        "Ticket Promedio Diario",
+                        "Top 5 Productos Más Vendidos",
+                        "Stock Crítico / Faltantes",
+                        "Día de Mayor Venta por Producto",
+                        "Top 5 Clientes",
+                        "Clientes Fieles (Múltiples Compras)"
                     });
                 }
 
@@ -240,6 +239,7 @@ namespace TheGoodTaste.UI
                         dt = negocio.GenerarVentasPorMedioPago(desde, hasta);
                         RenderizarGrafico(dt, "Cierre de Caja - Formas de Pago", SeriesChartType.Doughnut);
                         break;
+
                 }
             }
             else
@@ -278,7 +278,8 @@ namespace TheGoodTaste.UI
                         break;
                     case 7:
                         dt = negocio.GenerarDiaMasVendidoPorProducto(desde, hasta);
-                        RenderizarGrafico(dt, "Día de Mayor Venta por Producto", SeriesChartType.Column);
+                        // Le pasamos el DataTable; RenderizarGrafico tomará la col 0 (Producto) y la col 2 (Cantidad) para las barras
+                        RenderizarGraficoPersonalizado(dt, "Día de Mayor Venta por Producto", SeriesChartType.Column);
                         break;
                     case 8:
                         dt = negocio.GenerarTopClientes(desde, hasta);
@@ -294,19 +295,111 @@ namespace TheGoodTaste.UI
 
         private void RenderizarGrafico(DataTable dt, string titulo, SeriesChartType tipoGrafico, bool mostrarAlertaVacio = true)
         {
-            listaClientes.DataSource = dt;
-
             if (dt != null && dt.Rows.Count > 0 && dt.Columns.Count >= 2)
             {
-                string colX = dt.Columns[0].ColumnName;
-                string colY = dt.Columns[1].ColumnName;
+                DataTable dtClon = new DataTable();
+                dtClon.Columns.Add("EjeX_Formateado", typeof(string));
+                dtClon.Columns.Add(dt.Columns[1].ColumnName, dt.Columns[1].DataType);
 
-                chart1.Series[0].Points.DataBindXY(dt.DefaultView, colX, dt.DefaultView, colY);
+                // Cultura en español para obtener los nombres de días en español
+                System.Globalization.CultureInfo culturaEs = new System.Globalization.CultureInfo("es-AR");
+
+                foreach (DataRow row in dt.Rows)
+                {
+                    if (row[0] != DBNull.Value)
+                    {
+                        string valorStr = row[0].ToString();
+                        string etiquetaFinal = valorStr;
+
+                        DateTime fechaDetectada = default;
+                        bool esFecha = false;
+
+                        // 1. Si viene como número serial OLE/Excel (ej: 46295)
+                        if (double.TryParse(valorStr, out double numSerial) && numSerial > 30000 && numSerial < 60000)
+                        {
+                            try
+                            {
+                                fechaDetectada = DateTime.FromOADate(numSerial);
+                                esFecha = true;
+                            }
+                            catch { esFecha = false; }
+                        }
+                        // 2. Si viene como fecha normal
+                        else if (DateTime.TryParse(valorStr, out fechaDetectada))
+                        {
+                            esFecha = true;
+                        }
+
+                        if (esFecha)
+                        {
+                            // Formato Ejecutivo: "Mié 07/10" (Día abreviado + día/mes)
+                            // Si prefieres "Miércoles 07/10", cambia "ddd" por "dddd"
+                            string diaNombre = culturaEs.TextInfo.ToTitleCase(fechaDetectada.ToString("ddd", culturaEs));
+                            etiquetaFinal = $"{diaNombre} {fechaDetectada:dd/MM}";
+                        }
+
+                        dtClon.Rows.Add(etiquetaFinal, row[1]);
+                    }
+                }
+
+                listaClientes.DataSource = dtClon;
+
+                string colX = dtClon.Columns[0].ColumnName;
+                string colY = dtClon.Columns[1].ColumnName;
+
+                chart1.Series[0].Points.Clear();
+                chart1.Series[0].Points.DataBindXY(dtClon.DefaultView, colX, dtClon.DefaultView, colY);
                 chart1.Series[0].ChartType = tipoGrafico;
                 chart1.Series[0].IsValueShownAsLabel = true;
 
+                // Formato para los valores sobre las barras/puntos: mostrar signo pesos si es dinero
+                if (titulo.Contains("$") || titulo.Contains("Recaudación") || titulo.Contains("Ventas") || titulo.Contains("Ticket"))
+                {
+                    chart1.Series[0].LabelFormat = "$#,##0";
+                }
+
+                // Estilo visual moderno del Eje X
+                chart1.ChartAreas[0].AxisX.LabelStyle.Angle = -35; // Inclinación suave y legible
+                chart1.ChartAreas[0].AxisX.Interval = 1;
+                chart1.ChartAreas[0].AxisX.MajorGrid.LineColor = Color.LightGray;
+                chart1.ChartAreas[0].AxisY.MajorGrid.LineColor = Color.LightGray;
+
                 chart1.Titles.Clear();
-                chart1.Titles.Add(titulo).Font = new Font("Segoe UI", 10f, FontStyle.Bold);
+                chart1.Titles.Add(titulo).Font = new Font("Segoe UI", 11f, FontStyle.Bold);
+            }
+            else
+            {
+                listaClientes.DataSource = dt;
+                chart1.Series[0].Points.Clear();
+                chart1.Titles.Clear();
+
+                if (mostrarAlertaVacio)
+                {
+                    MessageBox.Show("No se encontraron registros en el período seleccionado.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+            }
+        }
+
+        private void RenderizarGraficoPersonalizado(DataTable dt, string titulo, SeriesChartType tipoGrafico, bool mostrarAlertaVacio = true)
+        {
+            listaClientes.DataSource = dt; // La tabla muestra todo el detalle bonito con el día y la cantidad
+
+            if (dt != null && dt.Rows.Count > 0 && dt.Columns.Count >= 3)
+            {
+                string colX = dt.Columns[0].ColumnName; // Producto
+                string colY = dt.Columns[2].ColumnName; // Cantidad numérica
+
+                chart1.Series[0].Points.Clear();
+                chart1.Series[0].Points.DataBindXY(dt.DefaultView, colX, dt.DefaultView, colY);
+                chart1.Series[0].ChartType = tipoGrafico;
+                chart1.Series[0].IsValueShownAsLabel = true;
+                chart1.Series[0].LabelFormat = "#,##0 \"un.\""; // Muestra ej: "12 un."
+
+                chart1.ChartAreas[0].AxisX.LabelStyle.Angle = -35;
+                chart1.ChartAreas[0].AxisX.Interval = 1;
+
+                chart1.Titles.Clear();
+                chart1.Titles.Add(titulo).Font = new Font("Segoe UI", 11f, FontStyle.Bold);
             }
             else
             {
