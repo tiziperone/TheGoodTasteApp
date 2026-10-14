@@ -12,7 +12,7 @@ namespace The_Good_Taste.Datos
             using (SqlConnection con = Conexion.ObtenerConexion())
             {
                 SqlCommand cmd = new SqlCommand("sp_ObtenerRecaudacionGlobal", con);
-                cmd.CommandType = CommandType.StoredProcedure; // <--- Procedimiento almacenado
+                cmd.CommandType = CommandType.StoredProcedure; // <--- Esto le avisa a C# que es un SP
 
                 cmd.Parameters.AddWithValue("@Desde", desde);
                 cmd.Parameters.AddWithValue("@Hasta", hasta);
