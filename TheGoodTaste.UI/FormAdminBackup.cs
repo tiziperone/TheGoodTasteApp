@@ -10,6 +10,7 @@ namespace TheGoodTaste.UI
     {
         private readonly UsuarioSistema _usuarioActual;
         private readonly BackupNegocio _backupNegocio = new BackupNegocio();
+        private readonly UsuarioNegocio _usuarioNegocio = new UsuarioNegocio();
 
         // Controles de interfaz
         private Panel panelTarjeta;
@@ -146,6 +147,33 @@ namespace TheGoodTaste.UI
 
         private void BtnRestaurarBackup_Click(object sender, EventArgs e)
         {
+            if (_usuarioActual == null)
+            {
+                MessageBox.Show("No se encuentra la información de la sesión actual.",
+                                "Acceso denegado", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            // Solicitar la contraseña mediante un diálogo modal
+            string claveIngresada = SolicitarContraseniaGerente();
+            if (string.IsNullOrEmpty(claveIngresada))
+            {
+                return; // El usuario canceló o dejó el campo vacío
+            }
+
+            try
+            {
+                // Reutilizamos el método Autenticar de UsuarioNegocio con el usuario activo en sesión
+                _usuarioNegocio.Autenticar(_usuarioActual.Username, claveIngresada);
+            }
+            catch (Exception)
+            {
+                MessageBox.Show("Contraseña incorrecta. No se puede proceder con la restauración de la base de datos.",
+                                "Validación Fallida", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            // Si la autenticación no lanzó excepción, procedemos a seleccionar el archivo de backup
             using (OpenFileDialog ofd = new OpenFileDialog())
             {
                 ofd.Filter = "Archivos de Respaldo (*.bak)|*.bak";
@@ -174,6 +202,99 @@ namespace TheGoodTaste.UI
                         }
                     }
                 }
+            }
+        }
+
+        /// <summary>
+        /// Muestra un cuadro de diálogo para solicitar la contraseña del gerente con opción de visibilidad.
+        /// </summary>
+        private string SolicitarContraseniaGerente()
+        {
+            using (Form formPassword = new Form())
+            {
+                formPassword.Width = 380;
+                formPassword.Height = 220;
+                formPassword.FormBorderStyle = FormBorderStyle.FixedDialog;
+                formPassword.Text = "Confirmación de Seguridad";
+                formPassword.StartPosition = FormStartPosition.CenterParent;
+                formPassword.MaximizeBox = false;
+                formPassword.MinimizeBox = false;
+                formPassword.BackColor = Color.FromArgb(35, 25, 20);
+
+                Label lblMensaje = new Label()
+                {
+                    Left = 20,
+                    Top = 20,
+                    Width = 320,
+                    Text = "Ingrese la contraseña del usuario Gerente:",
+                    ForeColor = Color.White,
+                    Font = new Font("Segoe UI", 9.5f)
+                };
+
+                TextBox txtPassword = new TextBox()
+                {
+                    Left = 20,
+                    Top = 50,
+                    Width = 320,
+                    UseSystemPasswordChar = true,
+                    Font = new Font("Segoe UI", 10f)
+                };
+
+                // CheckBox para mostrar/ocultar contraseña
+                CheckBox chkMostrarOcultar = new CheckBox()
+                {
+                    Left = 20,
+                    Top = 85,
+                    Width = 200,
+                    Text = "Mostrar contraseña",
+                    ForeColor = Color.White,
+                    Font = new Font("Segoe UI", 9f),
+                    Cursor = Cursors.Hand
+                };
+
+                chkMostrarOcultar.CheckedChanged += (s, e) =>
+                {
+                    txtPassword.UseSystemPasswordChar = !chkMostrarOcultar.Checked;
+                };
+
+                Button btnAceptar = new Button()
+                {
+                    Text = "Aceptar",
+                    Left = 140,
+                    Width = 90,
+                    Top = 125,
+                    DialogResult = DialogResult.OK,
+                    BackColor = Color.FromArgb(180, 130, 40),
+                    ForeColor = Color.Black,
+                    FlatStyle = FlatStyle.Flat,
+                    Cursor = Cursors.Hand
+                };
+                btnAceptar.FlatAppearance.BorderSize = 0;
+
+                Button btnCancelar = new Button()
+                {
+                    Text = "Cancelar",
+                    Left = 250,
+                    Width = 90,
+                    Top = 125,
+                    DialogResult = DialogResult.Cancel,
+                    BackColor = Color.FromArgb(60, 45, 38),
+                    ForeColor = Color.White,
+                    FlatStyle = FlatStyle.Flat,
+                    Cursor = Cursors.Hand
+                };
+                btnCancelar.FlatAppearance.BorderSize = 0;
+
+                formPassword.Controls.Add(lblMensaje);
+                formPassword.Controls.Add(txtPassword);
+                formPassword.Controls.Add(chkMostrarOcultar);
+                formPassword.Controls.Add(btnAceptar);
+                formPassword.Controls.Add(btnCancelar);
+
+                formPassword.AcceptButton = btnAceptar;
+                formPassword.CancelButton = btnCancelar;
+
+                return formPassword.ShowDialog(this) == DialogResult.OK ? txtPassword.Text : string.Empty;
             }
         }
     }
