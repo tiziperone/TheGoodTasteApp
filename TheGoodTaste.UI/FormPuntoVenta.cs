@@ -29,7 +29,7 @@ namespace TheGoodTaste.UI
         private readonly int _dniVendedorActivo;
         private readonly UsuarioNegocio _usuarioNegocio = new UsuarioNegocio();
 
-        // Variables para guardar los datos del cobro en efectivo y mostrarlos en el ticket
+        // Variables para ticket
         private decimal _efectivoRecibidoTicket = 0;
         private decimal _vueltoTicket = 0;
         private bool _huboPagoEfectivo = false;
@@ -65,9 +65,40 @@ namespace TheGoodTaste.UI
             dgvDetalles.Columns["IdPago"].Visible = false;
             dgvDetalles.Columns.Add("TipoPago", "Forma de Pago");
 
+            // Columna de botón para quitar cada producto individualmente de la grilla
+            DataGridViewButtonColumn colEliminar = new DataGridViewButtonColumn
+            {
+                Name = "colQuitar",
+                HeaderText = "Acción",
+                Text = "❌ Quitar",
+                UseColumnTextForButtonValue = true,
+                Width = 85,
+                FlatStyle = FlatStyle.Flat
+            };
+            colEliminar.DefaultCellStyle.BackColor = Color.FromArgb(190, 50, 50);
+            colEliminar.DefaultCellStyle.ForeColor = Color.White;
+            colEliminar.DefaultCellStyle.Font = new Font("Segoe UI", 8.5f, FontStyle.Bold);
+
+            dgvDetalles.Columns.Add(colEliminar);
+
             dgvDetalles.AllowUserToAddRows = false;
             dgvDetalles.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             dgvDetalles.MultiSelect = false;
+
+            // Evento al hacer clic en el botón de la fila
+            dgvDetalles.CellContentClick -= DgvDetalles_CellContentClick;
+            dgvDetalles.CellContentClick += DgvDetalles_CellContentClick;
+        }
+
+        private void DgvDetalles_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+            // Verifica si hizo clic en el botón "❌ Quitar" de la columna
+            if (e.RowIndex >= 0 && dgvDetalles.Columns[e.ColumnIndex].Name == "colQuitar")
+            {
+                dgvDetalles.Rows.RemoveAt(e.RowIndex);
+                CalcularTotalVenta();
+                ActualizarEstadoBotones();
+            }
         }
 
         private void MostrarInfoVendedor()
@@ -95,7 +126,9 @@ namespace TheGoodTaste.UI
             try
             {
                 _tablaClientes = _clienteNegocio.ObtenerClientes(true) ?? new DataTable();
-                _listaProductos = _productoNegocio.ObtenerProductos() ?? new List<Producto>();
+
+                // Filtra productos donde DeleteAt IS NULL
+                _listaProductos = _ventaNegocio.ObtenerProductosActivos() ?? new List<Producto>();
 
                 List<TipoPago> tipos = _tipoPagoNegocio.ObtenerTiposPago();
                 cboTipoPago.DataSource = tipos;
@@ -291,7 +324,7 @@ namespace TheGoodTaste.UI
 
             if (_productoSeleccionado == null)
             {
-                MessageBox.Show("Seleccione o busque un producto válido.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Seleccione o busque un producto válido y activo.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
@@ -321,11 +354,9 @@ namespace TheGoodTaste.UI
             int idPago = Convert.ToInt32(cboTipoPago.SelectedValue);
             string nombrePago = cboTipoPago.Text;
 
-            // Consultamos el stock actual del producto en tiempo real
             int stockReal = _ventaNegocio.ObtenerStockActual(codigoProd);
             _productoSeleccionado.Stock = stockReal;
 
-            // 1. RESTRICCIÓN BÁSICA: Si no hay stock absoluto (stock 0), no permite agregar
             if (stockReal <= 0)
             {
                 MessageBox.Show($"El producto '{nombreProd}' no cuenta con stock disponible en este momento (Stock: 0).",
@@ -333,7 +364,6 @@ namespace TheGoodTaste.UI
                 return;
             }
 
-            // Calculamos cuánto del mismo producto ya hay en el carrito de esta venta
             int cantidadExistenteEnGrilla = 0;
             DataGridViewRow filaExistente = null;
 
@@ -358,13 +388,11 @@ namespace TheGoodTaste.UI
 
             int cantidadAcumulada = cantidadTotalMismoProductoEnGrilla + cantidad;
 
-            // 2. ADVERTENCIA INFORMATIVA: Alerta de Stock Mínimo (no frena la carga, solo avisa)
             if (_productoNegocio.ValidarStockMinimo(_productoSeleccionado, cantidadAcumulada, out string mensajeAlerta))
             {
                 MessageBox.Show(mensajeAlerta, "Alerta de Stock Mínimo", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
 
-            // Agregamos o actualizamos la fila en la grilla del carrito
             if (filaExistente != null)
             {
                 decimal nuevoSubtotal = (cantidadExistenteEnGrilla + cantidad) * precio;
@@ -375,6 +403,7 @@ namespace TheGoodTaste.UI
             else
             {
                 decimal subtotal = precio * cantidad;
+                // Se agrega la fila con sus celdas de datos (el botón de la última columna toma su texto por defecto)
                 dgvDetalles.Rows.Add(codigoProd, nombreProd, precio.ToString("N2"), cantidad, subtotal.ToString("N2"), idPago, nombrePago);
             }
 
@@ -416,7 +445,6 @@ namespace TheGoodTaste.UI
 
             try
             {
-                // Reiniciamos valores de vuelto
                 _huboPagoEfectivo = false;
                 _efectivoRecibidoTicket = 0;
                 _vueltoTicket = 0;
@@ -427,7 +455,7 @@ namespace TheGoodTaste.UI
                     if (row.IsNewRow) continue;
                     int idPago = Convert.ToInt32(row.Cells["IdPago"].Value);
 
-                    if (idPago == 1) // ID 1 = Efectivo
+                    if (idPago == 1) // Efectivo
                     {
                         totalEfectivo += ConvertirADecimal(row.Cells["Subtotal"].Value?.ToString());
                     }
@@ -442,7 +470,6 @@ namespace TheGoodTaste.UI
                             return;
                         }
 
-                        // Guardamos los datos para imprimirlos en el ticket
                         _huboPagoEfectivo = true;
                         _efectivoRecibidoTicket = formCobro.DineroIngresado;
                         _vueltoTicket = formCobro.VueltoCalculado;
@@ -494,7 +521,6 @@ namespace TheGoodTaste.UI
             }
             catch (Exception ex)
             {
-                // Actualizado para reflejar claramente si hubo un conflicto de stock simultáneo
                 MessageBox.Show(ex.Message, "Conflicto de Stock / Venta Simultánea", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
@@ -547,7 +573,6 @@ namespace TheGoodTaste.UI
                     writer.WriteLine("--------------------------------------------------");
                     writer.WriteLine($"TOTAL: ${venta.TotalVenta:N2}");
 
-                    // Si hubo pago en efectivo, añadimos la sección de dinero recibido y vuelto al ticket
                     if (_huboPagoEfectivo)
                     {
                         writer.WriteLine($"Efectivo Recibido: ${_efectivoRecibidoTicket:N2}");
@@ -555,7 +580,7 @@ namespace TheGoodTaste.UI
                     }
 
                     writer.WriteLine("==================================================");
-                    writer.WriteLine("             ¡Gracias por su compra!              ");
+                    writer.WriteLine("              ¡Gracias por su compra!              ");
                 }
 
                 return rutaCompleta;
@@ -583,7 +608,7 @@ namespace TheGoodTaste.UI
                 btnLimpiar.PerformClick();
                 e.Handled = true;
             }
-            else if (e.KeyCode == Keys.Delete && dgvDetalles.Focused && dgvDetalles.CurrentRow != null)
+            else if (e.KeyCode == Keys.Delete && dgvDetalles.Focused && dgvDetalles.CurrentRow != null && !dgvDetalles.CurrentRow.IsNewRow)
             {
                 dgvDetalles.Rows.Remove(dgvDetalles.CurrentRow);
                 CalcularTotalVenta();

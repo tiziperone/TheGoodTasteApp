@@ -16,7 +16,7 @@ namespace TheGoodTaste.UI
         private ComboBox _cmbReportesGerencia;
         private Button _btnGenerarReporte;
 
-        // Panel de Búsqueda de Facturas (Sin solapamientos)
+        // Panel de Búsqueda de Facturas
         private Panel _pnlBuscarFactura;
         private ComboBox _cmbFacturas;
         private Button _btnBuscarFactura;
@@ -145,6 +145,9 @@ namespace TheGoodTaste.UI
                 if (btnTopClientes != null) btnTopClientes.Visible = false;
                 if (btnVentas != null) btnVentas.Visible = false;
 
+                // Ocultar el buscador de facturas al rol VENDEDOR
+                if (_pnlBuscarFactura != null) _pnlBuscarFactura.Visible = false;
+
                 if (lblTituloGrilla is Label l)
                 {
                     l.Text = "Detalle de Mis Ventas";
@@ -160,6 +163,9 @@ namespace TheGoodTaste.UI
                 if (btnTopClientes != null) btnTopClientes.Visible = true;
                 if (btnVentas != null) btnVentas.Visible = true;
 
+                // Mostrar el buscador de facturas únicamente a GERENCIA
+                if (_pnlBuscarFactura != null) _pnlBuscarFactura.Visible = true;
+
                 if (lblTituloGrilla is Label l)
                 {
                     l.Text = "Listado de Datos / Clientes";
@@ -171,7 +177,6 @@ namespace TheGoodTaste.UI
         {
             if (_pnlBuscarFactura == null)
             {
-                // Ubicación en X=540, Y=12 para evitar solapamiento con los contenedores inferiores
                 _pnlBuscarFactura = new Panel
                 {
                     Name = "pnlBuscarFactura",
@@ -198,7 +203,6 @@ namespace TheGoodTaste.UI
                     Font = new Font("Segoe UI", 9f)
                 };
 
-                // Filtro en tiempo real por coincidencia al escribir
                 _cmbFacturas.TextUpdate += (s, e) =>
                 {
                     string busqueda = _cmbFacturas.Text;
@@ -251,7 +255,7 @@ namespace TheGoodTaste.UI
                     _cmbFacturas.DisplayMember = "Descripcion";
                     _cmbFacturas.ValueMember = "NroFactura";
                     _cmbFacturas.SelectedIndex = -1;
-                    _cmbFacturas.Text = string.Empty; // Inicia vacía sin factura predeterminada
+                    _cmbFacturas.Text = string.Empty;
                 }
             }
             catch
@@ -266,13 +270,11 @@ namespace TheGoodTaste.UI
 
             try
             {
-                // 1. Si seleccionó un ítem válido de la lista
                 if (_cmbFacturas.SelectedIndex != -1 && _cmbFacturas.SelectedValue != null)
                 {
                     int.TryParse(_cmbFacturas.SelectedValue.ToString(), out idFactura);
                 }
 
-                // 2. Extraer el primer número que aparezca en el cuadro si escribió manualmente
                 if (idFactura <= 0 && !string.IsNullOrWhiteSpace(_cmbFacturas.Text))
                 {
                     Match m = Regex.Match(_cmbFacturas.Text, @"\d+");

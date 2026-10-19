@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Data;
 using System.Data.SqlClient;
 using The_Good_Taste.Entidades;
 
@@ -6,12 +8,43 @@ namespace The_Good_Taste.Datos
 {
     public class VentaDatos
     {
+        // Obtiene únicamente productos activos (DeleteAt IS NULL)
+        public static List<Producto> ObtenerProductosActivos()
+        {
+            List<Producto> lista = new List<Producto>();
+            using (SqlConnection con = Conexion.ObtenerConexion())
+            {
+                con.Open();
+                string query = @"SELECT Codigo, Nombre, Descripcion, Precio, Stock, StockMinimo 
+                                 FROM Productos 
+                                 WHERE DeleteAt IS NULL";
+
+                SqlCommand cmd = new SqlCommand(query, con);
+                using (SqlDataReader dr = cmd.ExecuteReader())
+                {
+                    while (dr.Read())
+                    {
+                        lista.Add(new Producto
+                        {
+                            Codigo = dr["Codigo"].ToString(),
+                            Nombre = dr["Nombre"].ToString(),
+                            Descripcion = dr["Descripcion"] != DBNull.Value ? dr["Descripcion"].ToString() : "",
+                            Precio = Convert.ToDecimal(dr["Precio"]),
+                            Stock = Convert.ToInt32(dr["Stock"]),
+                            StockMinimo = dr["StockMinimo"] != DBNull.Value ? Convert.ToInt32(dr["StockMinimo"]) : 0
+                        });
+                    }
+                }
+            }
+            return lista;
+        }
+
         public static int ObtenerStockActual(string codigo)
         {
             using (SqlConnection con = Conexion.ObtenerConexion())
             {
                 con.Open();
-                string query = "SELECT Stock FROM Productos WHERE Codigo = @Codigo";
+                string query = "SELECT Stock FROM Productos WHERE Codigo = @Codigo AND DeleteAt IS NULL";
                 SqlCommand cmd = new SqlCommand(query, con);
                 cmd.Parameters.AddWithValue("@Codigo", codigo);
 
@@ -32,8 +65,8 @@ namespace The_Good_Taste.Datos
                 {
                     // 1. Insertar el encabezado de la Venta
                     string queryVenta = @"INSERT INTO Venta (fechaVenta, dniCliente, DNIUsuario, totalVenta) 
-                                  VALUES (@Fecha, @IdCliente, @DNIUsuario, @Total);
-                                  SELECT SCOPE_IDENTITY();";
+                                          VALUES (@Fecha, @IdCliente, @DNIUsuario, @Total);
+                                          SELECT SCOPE_IDENTITY();";
 
                     SqlCommand cmdVenta = new SqlCommand(queryVenta, con, transaccion);
                     cmdVenta.Parameters.AddWithValue("@Fecha", venta.FechaVenta);
@@ -46,10 +79,10 @@ namespace The_Good_Taste.Datos
                     // 2. Recorrer cada producto del carrito
                     foreach (var item in venta.Detalles)
                     {
-                        // Descontar stock con verificación atómica
+                        // Descontar stock con verificación atómica y filtro DeleteAt IS NULL
                         string queryStock = @"UPDATE Productos 
-                                      SET Stock = Stock - @Cantidad 
-                                      WHERE Codigo = @Codigo AND Stock >= @Cantidad;";
+                                              SET Stock = Stock - @Cantidad 
+                                              WHERE Codigo = @Codigo AND Stock >= @Cantidad AND DeleteAt IS NULL;";
 
                         SqlCommand cmdStock = new SqlCommand(queryStock, con, transaccion);
                         cmdStock.Parameters.AddWithValue("@Codigo", item.Codigo);
@@ -57,15 +90,14 @@ namespace The_Good_Taste.Datos
 
                         int filasAfectadas = cmdStock.ExecuteNonQuery();
 
-                        // Si filasAfectadas == 0 significa que en ese milisegundo otra caja se llevó el stock
                         if (filasAfectadas == 0)
                         {
-                            throw new Exception($"El producto '{item.Codigo}' ya no cuenta con suficiente stock debido a una venta simultánea.");
+                            throw new Exception($"El producto '{item.Codigo}' no cuenta con suficiente stock o no se encuentra activo.");
                         }
 
                         // Insertar el detalle de la venta
                         string queryDetalle = @"INSERT INTO VentaDetalle (idVenta, Codigo, cantidad, precioUnitario, idTipoPago) 
-                                        VALUES (@IdVenta, @Codigo, @Cantidad, @Precio, @IdTipoPago);";
+                                                VALUES (@IdVenta, @Codigo, @Cantidad, @Precio, @IdTipoPago);";
 
                         SqlCommand cmdDetalle = new SqlCommand(queryDetalle, con, transaccion);
                         cmdDetalle.Parameters.AddWithValue("@IdVenta", idVentaGenerado);
@@ -77,15 +109,13 @@ namespace The_Good_Taste.Datos
                         cmdDetalle.ExecuteNonQuery();
                     }
 
-                    // Si no hubo errores en ningún producto, confirmamos la transacción
                     transaccion.Commit();
                     return true;
                 }
                 catch (Exception ex)
                 {
-                    // Si algo falla o salta la excepción de stock, deshacemos todo
                     transaccion.Rollback();
-                    throw ex; // Re-lanzamos la excepción para que llegue a la UI y muestre el MessageBox
+                    throw ex;
                 }
             }
         }
