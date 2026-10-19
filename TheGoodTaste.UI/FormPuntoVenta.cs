@@ -321,11 +321,22 @@ namespace TheGoodTaste.UI
             int idPago = Convert.ToInt32(cboTipoPago.SelectedValue);
             string nombrePago = cboTipoPago.Text;
 
+            // Consultamos el stock actual del producto en tiempo real
             int stockReal = _ventaNegocio.ObtenerStockActual(codigoProd);
             _productoSeleccionado.Stock = stockReal;
 
+            // 1. RESTRICCIÓN BÁSICA: Si no hay stock absoluto (stock 0), no permite agregar
+            if (stockReal <= 0)
+            {
+                MessageBox.Show($"El producto '{nombreProd}' no cuenta con stock disponible en este momento (Stock: 0).",
+                                "Sin Stock", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            // Calculamos cuánto del mismo producto ya hay en el carrito de esta venta
             int cantidadExistenteEnGrilla = 0;
             DataGridViewRow filaExistente = null;
+
             foreach (DataGridViewRow row in dgvDetalles.Rows)
             {
                 if (row.Cells["ID"].Value?.ToString() == codigoProd && Convert.ToInt32(row.Cells["IdPago"].Value) == idPago)
@@ -345,20 +356,15 @@ namespace TheGoodTaste.UI
                 }
             }
 
-            int cantidadTotalAValidarStock = cantidadTotalMismoProductoEnGrilla + cantidad;
+            int cantidadAcumulada = cantidadTotalMismoProductoEnGrilla + cantidad;
 
-            if (cantidadTotalAValidarStock > _productoSeleccionado.Stock)
-            {
-                MessageBox.Show($"Stock insuficiente. Quedan {_productoSeleccionado.Stock} unidades disponibles en stock.",
-                                "Stock Insuficiente", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-
-            if (_productoNegocio.ValidarStockMinimo(_productoSeleccionado, cantidadTotalAValidarStock, out string mensajeAlerta))
+            // 2. ADVERTENCIA INFORMATIVA: Alerta de Stock Mínimo (no frena la carga, solo avisa)
+            if (_productoNegocio.ValidarStockMinimo(_productoSeleccionado, cantidadAcumulada, out string mensajeAlerta))
             {
                 MessageBox.Show(mensajeAlerta, "Alerta de Stock Mínimo", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
 
+            // Agregamos o actualizamos la fila en la grilla del carrito
             if (filaExistente != null)
             {
                 decimal nuevoSubtotal = (cantidadExistenteEnGrilla + cantidad) * precio;
@@ -488,7 +494,8 @@ namespace TheGoodTaste.UI
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, "Error al Procesar Venta", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                // Actualizado para reflejar claramente si hubo un conflicto de stock simultáneo
+                MessageBox.Show(ex.Message, "Conflicto de Stock / Venta Simultánea", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
 

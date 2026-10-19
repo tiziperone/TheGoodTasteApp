@@ -30,10 +30,10 @@ namespace The_Good_Taste.Datos
 
                 try
                 {
-                    // Se remueve idTipoPago de la tabla Venta general
+                    // 1. Insertar el encabezado de la Venta
                     string queryVenta = @"INSERT INTO Venta (fechaVenta, dniCliente, DNIUsuario, totalVenta) 
-                                          VALUES (@Fecha, @IdCliente, @DNIUsuario, @Total);
-                                          SELECT SCOPE_IDENTITY();";
+                                  VALUES (@Fecha, @IdCliente, @DNIUsuario, @Total);
+                                  SELECT SCOPE_IDENTITY();";
 
                     SqlCommand cmdVenta = new SqlCommand(queryVenta, con, transaccion);
                     cmdVenta.Parameters.AddWithValue("@Fecha", venta.FechaVenta);
@@ -43,11 +43,13 @@ namespace The_Good_Taste.Datos
 
                     int idVentaGenerado = Convert.ToInt32(cmdVenta.ExecuteScalar());
 
+                    // 2. Recorrer cada producto del carrito
                     foreach (var item in venta.Detalles)
                     {
+                        // Descontar stock con verificación atómica
                         string queryStock = @"UPDATE Productos 
-                                              SET Stock = Stock - @Cantidad 
-                                              WHERE Codigo = @Codigo AND Stock >= @Cantidad;";
+                                      SET Stock = Stock - @Cantidad 
+                                      WHERE Codigo = @Codigo AND Stock >= @Cantidad;";
 
                         SqlCommand cmdStock = new SqlCommand(queryStock, con, transaccion);
                         cmdStock.Parameters.AddWithValue("@Codigo", item.Codigo);
@@ -55,37 +57,35 @@ namespace The_Good_Taste.Datos
 
                         int filasAfectadas = cmdStock.ExecuteNonQuery();
 
+                        // Si filasAfectadas == 0 significa que en ese milisegundo otra caja se llevó el stock
                         if (filasAfectadas == 0)
                         {
-                            throw new Exception($"El producto con código '{item.Codigo}' ya no cuenta con suficiente stock debido a una venta simultánea.");
+                            throw new Exception($"El producto '{item.Codigo}' ya no cuenta con suficiente stock debido a una venta simultánea.");
                         }
 
-                        // Se agrega idTipoPago al detalle
+                        // Insertar el detalle de la venta
                         string queryDetalle = @"INSERT INTO VentaDetalle (idVenta, Codigo, cantidad, precioUnitario, idTipoPago) 
-                                                VALUES (@IdVenta, @Codigo, @Cantidad, @PrecioUnitario, @IdTipoPago);";
+                                        VALUES (@IdVenta, @Codigo, @Cantidad, @Precio, @IdTipoPago);";
 
                         SqlCommand cmdDetalle = new SqlCommand(queryDetalle, con, transaccion);
                         cmdDetalle.Parameters.AddWithValue("@IdVenta", idVentaGenerado);
                         cmdDetalle.Parameters.AddWithValue("@Codigo", item.Codigo);
                         cmdDetalle.Parameters.AddWithValue("@Cantidad", item.Cantidad);
-                        cmdDetalle.Parameters.AddWithValue("@PrecioUnitario", item.PrecioUnitario);
-
-                        // Se asigna el valor capturado de la grilla
+                        cmdDetalle.Parameters.AddWithValue("@Precio", item.PrecioUnitario);
                         cmdDetalle.Parameters.AddWithValue("@IdTipoPago", item.IdTipoPago);
 
                         cmdDetalle.ExecuteNonQuery();
                     }
 
+                    // Si no hubo errores en ningún producto, confirmamos la transacción
                     transaccion.Commit();
                     return true;
                 }
-                catch
+                catch (Exception ex)
                 {
-                    if (transaccion != null && transaccion.Connection != null)
-                    {
-                        transaccion.Rollback();
-                    }
-                    throw;
+                    // Si algo falla o salta la excepción de stock, deshacemos todo
+                    transaccion.Rollback();
+                    throw ex; // Re-lanzamos la excepción para que llegue a la UI y muestre el MessageBox
                 }
             }
         }
