@@ -57,6 +57,7 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.panelReportes.AutoSize = true;
+            this.panelReportes.Controls.Add(this.chart1);
             this.panelReportes.Controls.Add(this.panelVentasVendedor);
             this.panelReportes.Controls.Add(this.label1);
             this.panelReportes.Controls.Add(this.tituloDesde);
@@ -64,7 +65,7 @@
             this.panelReportes.Controls.Add(this.fechaDesde);
             this.panelReportes.Location = new System.Drawing.Point(23, 67);
             this.panelReportes.Name = "panelReportes";
-            this.panelReportes.Size = new System.Drawing.Size(827, 333);
+            this.panelReportes.Size = new System.Drawing.Size(1366, 743);
             this.panelReportes.TabIndex = 0;
             this.panelReportes.Paint += new System.Windows.Forms.PaintEventHandler(this.panelReportes_Paint);
             // 
@@ -152,9 +153,9 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.panelClientes.Controls.Add(this.button1);
             this.panelClientes.Controls.Add(this.listaClientes);
-            this.panelClientes.Location = new System.Drawing.Point(707, 73);
+            this.panelClientes.Location = new System.Drawing.Point(788, 73);
             this.panelClientes.Name = "panelClientes";
-            this.panelClientes.Size = new System.Drawing.Size(553, 558);
+            this.panelClientes.Size = new System.Drawing.Size(1011, 734);
             this.panelClientes.TabIndex = 1;
             // 
             // button1
@@ -181,7 +182,7 @@
             this.listaClientes.RowHeadersWidth = 51;
             this.listaClientes.RowTemplate.Height = 24;
             this.listaClientes.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.listaClientes.Size = new System.Drawing.Size(521, 442);
+            this.listaClientes.Size = new System.Drawing.Size(979, 618);
             this.listaClientes.TabIndex = 0;
             this.listaClientes.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.listaClientes_CellContentClick);
             // 
@@ -191,13 +192,13 @@
             this.chart1.ChartAreas.Add(chartArea1);
             legend1.Name = "Legend1";
             this.chart1.Legends.Add(legend1);
-            this.chart1.Location = new System.Drawing.Point(72, 431);
+            this.chart1.Location = new System.Drawing.Point(-11, 292);
             this.chart1.Name = "chart1";
             series1.ChartArea = "ChartArea1";
             series1.Legend = "Legend1";
             series1.Name = "Series1";
             this.chart1.Series.Add(series1);
-            this.chart1.Size = new System.Drawing.Size(543, 242);
+            this.chart1.Size = new System.Drawing.Size(770, 448);
             this.chart1.TabIndex = 3;
             this.chart1.Text = "chart1";
             this.chart1.Click += new System.EventHandler(this.chart1_Click);
@@ -206,8 +207,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1272, 719);
-            this.Controls.Add(this.chart1);
+            this.ClientSize = new System.Drawing.Size(1811, 895);
             this.Controls.Add(this.panelClientes);
             this.Controls.Add(this.panelReportes);
             this.Name = "FormReportes";

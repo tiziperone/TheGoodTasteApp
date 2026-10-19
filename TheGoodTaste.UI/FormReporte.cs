@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Data;
 using System.Drawing;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
-using System.Linq;
 using The_Good_Taste.Entidades;
 using TheGoodTaste.Negocio;
 
@@ -15,6 +15,11 @@ namespace TheGoodTaste.UI
         private Label _lblInfoUsuario;
         private ComboBox _cmbReportesGerencia;
         private Button _btnGenerarReporte;
+
+        // Panel de Búsqueda de Facturas (Sin solapamientos)
+        private Panel _pnlBuscarFactura;
+        private ComboBox _cmbFacturas;
+        private Button _btnBuscarFactura;
 
         public FormReportes()
         {
@@ -42,15 +47,29 @@ namespace TheGoodTaste.UI
 
             ConfigurarVistaInicialSegunRol();
             MostrarInfoUsuario();
+            AgrandarGraficoMaximo();
 
-            // Cargar automáticamente los datos al abrir si es VENDEDOR
             if (_usuarioActual != null && _usuarioActual.Rol == RolUsuario.Vendedor)
             {
                 CargarReporteVendedor();
             }
         }
 
-        // Método auxiliar para buscar controles dentro de Paneles o Contenedores anidados
+        private void AgrandarGraficoMaximo()
+        {
+            if (chart1 != null && chart1.ChartAreas.Count > 0)
+            {
+                var area = chart1.ChartAreas[0];
+                area.Position.Auto = false;
+                area.Position.X = 1;
+                area.Position.Y = 4;
+                area.Position.Width = 98;
+                area.Position.Height = 92;
+
+                area.InnerPlotPosition.Auto = true;
+            }
+        }
+
         private Control BuscarControlEnTodoElFormulario(string nombreControl)
         {
             Control[] controles = Controls.Find(nombreControl, true);
@@ -86,7 +105,7 @@ namespace TheGoodTaste.UI
                 {
                     Name = "lblInfoUsuarioDinamico",
                     AutoSize = true,
-                    Location = new Point(25, 20),
+                    Location = new Point(25, 12),
                     Font = new Font("Segoe UI", 10.5f, FontStyle.Bold),
                     ForeColor = Color.FromArgb(230, 160, 50),
                     BackColor = Color.Transparent
@@ -110,22 +129,21 @@ namespace TheGoodTaste.UI
             Control btnTopClientes = BuscarControlEnTodoElFormulario("button1");
             Control pnlClientes = BuscarControlEnTodoElFormulario("panelClientes");
 
-            // Inicializamos la barra/desplegable para AMBOS roles
+            if (pnlClientes != null) pnlClientes.Visible = true;
+            if (listaClientes != null) listaClientes.Visible = true;
+
             InicializarSelectorReportes();
+            InicializarListadoFacturasBuscador();
 
             if (_usuarioActual.Rol == RolUsuario.Vendedor)
             {
                 this.Text = $"Mis Reportes - Vendedor: {_usuarioActual.Username}";
 
-                // Ocultar botones laterales de Gerente
                 if (btnRecaudacion != null) btnRecaudacion.Visible = false;
                 if (btnProductoVendido != null) btnProductoVendido.Visible = false;
                 if (panelVendedorSearch != null) panelVendedorSearch.Visible = false;
                 if (btnTopClientes != null) btnTopClientes.Visible = false;
                 if (btnVentas != null) btnVentas.Visible = false;
-
-                if (pnlClientes != null) pnlClientes.Visible = true;
-                if (listaClientes != null) listaClientes.Visible = true;
 
                 if (lblTituloGrilla is Label l)
                 {
@@ -144,8 +162,170 @@ namespace TheGoodTaste.UI
 
                 if (lblTituloGrilla is Label l)
                 {
-                    l.Text = "Listado de Datos";
+                    l.Text = "Listado de Datos / Clientes";
                 }
+            }
+        }
+
+        private void InicializarListadoFacturasBuscador()
+        {
+            if (_pnlBuscarFactura == null)
+            {
+                // Ubicación en X=540, Y=12 para evitar solapamiento con los contenedores inferiores
+                _pnlBuscarFactura = new Panel
+                {
+                    Name = "pnlBuscarFactura",
+                    Location = new Point(540, 12),
+                    Size = new Size(380, 35),
+                    BackColor = Color.Transparent
+                };
+
+                Label lblFactura = new Label
+                {
+                    Text = "Buscar Factura:",
+                    Location = new Point(0, 6),
+                    AutoSize = true,
+                    ForeColor = Color.White,
+                    Font = new Font("Segoe UI", 9f, FontStyle.Bold)
+                };
+
+                _cmbFacturas = new ComboBox
+                {
+                    Name = "cmbFacturas",
+                    Location = new Point(100, 3),
+                    Width = 170,
+                    DropDownStyle = ComboBoxStyle.DropDown,
+                    Font = new Font("Segoe UI", 9f)
+                };
+
+                // Filtro en tiempo real por coincidencia al escribir
+                _cmbFacturas.TextUpdate += (s, e) =>
+                {
+                    string busqueda = _cmbFacturas.Text;
+                    if (busqueda.Length >= 1)
+                    {
+                        CargarListaFacturasDesplegable(busqueda);
+                        _cmbFacturas.Text = busqueda;
+                        _cmbFacturas.SelectionStart = busqueda.Length;
+                        _cmbFacturas.DroppedDown = true;
+                    }
+                };
+
+                _btnBuscarFactura = new Button
+                {
+                    Name = "btnBuscarFactura",
+                    Text = "🔍 Consultar",
+                    Location = new Point(275, 2),
+                    Width = 100,
+                    Height = 26,
+                    BackColor = Color.FromArgb(180, 130, 40),
+                    ForeColor = Color.Black,
+                    FlatStyle = FlatStyle.Flat,
+                    Font = new Font("Segoe UI", 8.5f, FontStyle.Bold),
+                    Cursor = Cursors.Hand
+                };
+                _btnBuscarFactura.FlatAppearance.BorderSize = 0;
+                _btnBuscarFactura.Click += BtnBuscarFactura_Click;
+
+                _pnlBuscarFactura.Controls.Add(lblFactura);
+                _pnlBuscarFactura.Controls.Add(_cmbFacturas);
+                _pnlBuscarFactura.Controls.Add(_btnBuscarFactura);
+
+                this.Controls.Add(_pnlBuscarFactura);
+                _pnlBuscarFactura.BringToFront();
+            }
+
+            CargarListaFacturasDesplegable();
+        }
+
+        private void CargarListaFacturasDesplegable(string filtro = "")
+        {
+            try
+            {
+                ReporteNegocio negocio = new ReporteNegocio();
+                DataTable dtFacturas = negocio.ObtenerHistorialFacturas(filtro);
+
+                if (dtFacturas != null && dtFacturas.Rows.Count > 0)
+                {
+                    _cmbFacturas.DataSource = dtFacturas;
+                    _cmbFacturas.DisplayMember = "Descripcion";
+                    _cmbFacturas.ValueMember = "NroFactura";
+                    _cmbFacturas.SelectedIndex = -1;
+                    _cmbFacturas.Text = string.Empty; // Inicia vacía sin factura predeterminada
+                }
+            }
+            catch
+            {
+                // Protección
+            }
+        }
+
+        private void BtnBuscarFactura_Click(object sender, EventArgs e)
+        {
+            int idFactura = 0;
+
+            try
+            {
+                // 1. Si seleccionó un ítem válido de la lista
+                if (_cmbFacturas.SelectedIndex != -1 && _cmbFacturas.SelectedValue != null)
+                {
+                    int.TryParse(_cmbFacturas.SelectedValue.ToString(), out idFactura);
+                }
+
+                // 2. Extraer el primer número que aparezca en el cuadro si escribió manualmente
+                if (idFactura <= 0 && !string.IsNullOrWhiteSpace(_cmbFacturas.Text))
+                {
+                    Match m = Regex.Match(_cmbFacturas.Text, @"\d+");
+                    if (m.Success)
+                    {
+                        int.TryParse(m.Value, out idFactura);
+                    }
+                }
+            }
+            catch
+            {
+                idFactura = 0;
+            }
+
+            if (idFactura <= 0)
+            {
+                MessageBox.Show("Seleccione o ingrese un número de factura válido.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            ReporteNegocio negocio = new ReporteNegocio();
+            DataTable dtFactura = negocio.BuscarFacturaPorId(idFactura);
+
+            if (dtFactura != null && dtFactura.Rows.Count > 0)
+            {
+                listaClientes.DataSource = dtFactura;
+                listaClientes.Visible = true;
+
+                if (listaClientes.Columns["Precio Unitario"] != null)
+                    listaClientes.Columns["Precio Unitario"].DefaultCellStyle.Format = "$#,##0.00";
+                if (listaClientes.Columns["Subtotal"] != null)
+                    listaClientes.Columns["Subtotal"].DefaultCellStyle.Format = "$#,##0.00";
+                if (listaClientes.Columns["Total Factura"] != null)
+                    listaClientes.Columns["Total Factura"].DefaultCellStyle.Format = "$#,##0.00";
+
+                chart1.Series[0].Points.Clear();
+                chart1.Series[0].Points.DataBindXY(dtFactura.DefaultView, "Producto", dtFactura.DefaultView, "Cantidad");
+                chart1.Series[0].ChartType = SeriesChartType.Column;
+                chart1.Series[0].IsValueShownAsLabel = true;
+                chart1.Series[0].LabelFormat = "#,##0 \"un.\"";
+
+                chart1.Titles.Clear();
+                chart1.Titles.Add($"Detalle de Productos - Factura N° {idFactura}").Font = new Font("Segoe UI", 11.5f, FontStyle.Bold);
+
+                Control lblTitulo = BuscarControlEnTodoElFormulario("label2");
+                if (lblTitulo is Label l)
+                {
+                    l.Text = $"Historial de Factura N° {idFactura}";
+                }
+            }
+            else
+            {
+                MessageBox.Show($"No se encontró la factura N° {idFactura} en la base de datos.", "Sin Resultados", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
 
@@ -167,14 +347,13 @@ namespace TheGoodTaste.UI
                 {
                     Name = "cmbReportesGerencia",
                     DropDownStyle = ComboBoxStyle.DropDownList,
-                    Location = new Point(25, 60),
+                    Location = new Point(25, 52),
                     Width = 320,
                     Font = new Font("Segoe UI", 9.5f)
                 };
 
                 if (_usuarioActual != null && _usuarioActual.Rol == RolUsuario.Vendedor)
                 {
-                    // Opciones disponibles para el VENDEDOR
                     _cmbReportesGerencia.Items.AddRange(new string[]
                     {
                         "Mis Ventas por Día",
@@ -183,19 +362,16 @@ namespace TheGoodTaste.UI
                 }
                 else
                 {
-                    // Opciones disponibles para GERENCIA
                     _cmbReportesGerencia.Items.AddRange(new string[]
                     {
                         "Ventas Globales",
                         "Recaudación Global",
-                        "Ventas por Vendedor",
                         "Ventas por Medio de Pago",
                         "Ticket Promedio Diario",
                         "Top 5 Productos Más Vendidos",
                         "Stock Crítico / Faltantes",
                         "Día de Mayor Venta por Producto",
-                        "Top 5 Clientes",
-                        "Clientes Fieles (Múltiples Compras)"
+                        "Top 5 Clientes"
                     });
                 }
 
@@ -205,7 +381,7 @@ namespace TheGoodTaste.UI
                 {
                     Name = "btnGenerarReporte",
                     Text = "Generar Reporte",
-                    Location = new Point(355, 58),
+                    Location = new Point(355, 50),
                     Height = 28,
                     Width = 120,
                     Font = new Font("Segoe UI", 9f, FontStyle.Bold)
@@ -231,15 +407,14 @@ namespace TheGoodTaste.UI
             {
                 switch (_cmbReportesGerencia.SelectedIndex)
                 {
-                    case 0: // Mis Ventas por Día
+                    case 0:
                         dt = negocio.GenerarMisVentas(_usuarioActual.DNI, desde, hasta);
                         RenderizarGrafico(dt, "Mis Ventas por Día", SeriesChartType.Column);
                         break;
-                    case 1: // Cierre de Caja / Formas de Pago del vendedor
+                    case 1:
                         dt = negocio.GenerarVentasPorMedioPago(desde, hasta);
                         RenderizarGrafico(dt, "Cierre de Caja - Formas de Pago", SeriesChartType.Doughnut);
                         break;
-
                 }
             }
             else
@@ -248,48 +423,72 @@ namespace TheGoodTaste.UI
                 {
                     case 0:
                         dt = negocio.GenerarVentasGenerales(desde, hasta);
-                        RenderizarGrafico(dt, "Ventas Globales", SeriesChartType.Line);
+                        RenderizarVentasGenerales(dt, "Ventas Globales");
                         break;
                     case 1:
                         dt = negocio.GenerarRecaudacionGlobal(desde, hasta);
                         RenderizarGrafico(dt, "Recaudación Global", SeriesChartType.Line);
                         break;
                     case 2:
-                        Control txtVendedor = BuscarControlEnTodoElFormulario("textBoxBuscarVendedor");
-                        string filtroVendedor = txtVendedor != null ? txtVendedor.Text.Trim() : "";
-                        dt = negocio.GenerarVentasPorVendedor(desde, hasta, filtroVendedor);
-                        RenderizarGrafico(dt, "Ventas por Vendedor", SeriesChartType.Doughnut);
-                        break;
-                    case 3:
                         dt = negocio.GenerarVentasPorMedioPago(desde, hasta);
                         RenderizarGrafico(dt, "Ventas por Medio de Pago", SeriesChartType.Doughnut);
                         break;
-                    case 4:
+                    case 3:
                         dt = negocio.GenerarTicketPromedio(desde, hasta);
                         RenderizarGrafico(dt, "Ticket Promedio Diario ($)", SeriesChartType.Line);
                         break;
-                    case 5:
+                    case 4:
                         dt = negocio.GenerarTopProductos(desde, hasta);
                         RenderizarGrafico(dt, "Top 5 Productos Más Vendidos", SeriesChartType.Bar);
                         break;
-                    case 6:
+                    case 5:
                         dt = negocio.GenerarStockCritico();
                         RenderizarGrafico(dt, "Productos con Stock Crítico", SeriesChartType.Column);
                         break;
-                    case 7:
+                    case 6:
                         dt = negocio.GenerarDiaMasVendidoPorProducto(desde, hasta);
-                        // Le pasamos el DataTable; RenderizarGrafico tomará la col 0 (Producto) y la col 2 (Cantidad) para las barras
                         RenderizarGraficoPersonalizado(dt, "Día de Mayor Venta por Producto", SeriesChartType.Column);
                         break;
-                    case 8:
+                    case 7:
                         dt = negocio.GenerarTopClientes(desde, hasta);
-                        RenderizarGrafico(dt, "Top 5 Clientes", SeriesChartType.Pie);
-                        break;
-                    case 9:
-                        dt = negocio.GenerarClientesFieles(desde, hasta);
-                        RenderizarGrafico(dt, "Clientes Fieles (Múltiples Compras)", SeriesChartType.Column);
+                        RenderizarTopClientes(dt, "Top 5 Clientes");
                         break;
                 }
+            }
+        }
+
+        private void RenderizarVentasGenerales(DataTable dt, string titulo)
+        {
+            listaClientes.DataSource = dt;
+            listaClientes.Visible = true;
+
+            if (dt != null && dt.Rows.Count > 0 && dt.Columns.Count >= 3)
+            {
+                if (listaClientes.Columns["CantidadVentas"] != null)
+                    listaClientes.Columns["CantidadVentas"].DefaultCellStyle.Format = "#,##0";
+                if (listaClientes.Columns["Total"] != null)
+                    listaClientes.Columns["Total"].DefaultCellStyle.Format = "$#,##0.00";
+
+                string colX = dt.Columns[0].ColumnName;
+                string colY = dt.Columns[1].ColumnName;
+
+                chart1.Series[0].Points.Clear();
+                chart1.Series[0].Points.DataBindXY(dt.DefaultView, colX, dt.DefaultView, colY);
+                chart1.Series[0].ChartType = SeriesChartType.Line;
+                chart1.Series[0].IsValueShownAsLabel = true;
+                chart1.Series[0].LabelFormat = "#,##0 \"ventas\"";
+
+                chart1.ChartAreas[0].AxisX.LabelStyle.Angle = -35;
+                chart1.ChartAreas[0].AxisX.Interval = 1;
+
+                chart1.Titles.Clear();
+                chart1.Titles.Add(titulo + " (Cantidad de Operaciones)").Font = new Font("Segoe UI", 11f, FontStyle.Bold);
+            }
+            else
+            {
+                chart1.Series[0].Points.Clear();
+                chart1.Titles.Clear();
+                MessageBox.Show("No se encontraron registros en el período seleccionado.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
 
@@ -298,10 +497,11 @@ namespace TheGoodTaste.UI
             if (dt != null && dt.Rows.Count > 0 && dt.Columns.Count >= 2)
             {
                 DataTable dtClon = new DataTable();
-                dtClon.Columns.Add("EjeX_Formateado", typeof(string));
+                string nombrePrimeraColumna = dt.Columns[0].ColumnName;
+
+                dtClon.Columns.Add(nombrePrimeraColumna, typeof(string));
                 dtClon.Columns.Add(dt.Columns[1].ColumnName, dt.Columns[1].DataType);
 
-                // Cultura en español para obtener los nombres de días en español
                 System.Globalization.CultureInfo culturaEs = new System.Globalization.CultureInfo("es-AR");
 
                 foreach (DataRow row in dt.Rows)
@@ -314,7 +514,6 @@ namespace TheGoodTaste.UI
                         DateTime fechaDetectada = default;
                         bool esFecha = false;
 
-                        // 1. Si viene como número serial OLE/Excel (ej: 46295)
                         if (double.TryParse(valorStr, out double numSerial) && numSerial > 30000 && numSerial < 60000)
                         {
                             try
@@ -324,7 +523,6 @@ namespace TheGoodTaste.UI
                             }
                             catch { esFecha = false; }
                         }
-                        // 2. Si viene como fecha normal
                         else if (DateTime.TryParse(valorStr, out fechaDetectada))
                         {
                             esFecha = true;
@@ -332,8 +530,6 @@ namespace TheGoodTaste.UI
 
                         if (esFecha)
                         {
-                            // Formato Ejecutivo: "Mié 07/10" (Día abreviado + día/mes)
-                            // Si prefieres "Miércoles 07/10", cambia "ddd" por "dddd"
                             string diaNombre = culturaEs.TextInfo.ToTitleCase(fechaDetectada.ToString("ddd", culturaEs));
                             etiquetaFinal = $"{diaNombre} {fechaDetectada:dd/MM}";
                         }
@@ -343,6 +539,7 @@ namespace TheGoodTaste.UI
                 }
 
                 listaClientes.DataSource = dtClon;
+                listaClientes.Visible = true;
 
                 string colX = dtClon.Columns[0].ColumnName;
                 string colY = dtClon.Columns[1].ColumnName;
@@ -352,14 +549,21 @@ namespace TheGoodTaste.UI
                 chart1.Series[0].ChartType = tipoGrafico;
                 chart1.Series[0].IsValueShownAsLabel = true;
 
-                // Formato para los valores sobre las barras/puntos: mostrar signo pesos si es dinero
-                if (titulo.Contains("$") || titulo.Contains("Recaudación") || titulo.Contains("Ventas") || titulo.Contains("Ticket"))
+                if (titulo.Contains("Recaudación") || titulo.Contains("Ticket") || titulo.Contains("Total") || titulo.Contains("$"))
                 {
-                    chart1.Series[0].LabelFormat = "$#,##0";
+                    chart1.Series[0].LabelFormat = "$#,##0.00";
+
+                    if (listaClientes.Columns.Count > 1)
+                    {
+                        listaClientes.Columns[1].DefaultCellStyle.Format = "$#,##0.00";
+                    }
+                }
+                else
+                {
+                    chart1.Series[0].LabelFormat = "#,##0";
                 }
 
-                // Estilo visual moderno del Eje X
-                chart1.ChartAreas[0].AxisX.LabelStyle.Angle = -35; // Inclinación suave y legible
+                chart1.ChartAreas[0].AxisX.LabelStyle.Angle = -35;
                 chart1.ChartAreas[0].AxisX.Interval = 1;
                 chart1.ChartAreas[0].AxisX.MajorGrid.LineColor = Color.LightGray;
                 chart1.ChartAreas[0].AxisY.MajorGrid.LineColor = Color.LightGray;
@@ -370,6 +574,7 @@ namespace TheGoodTaste.UI
             else
             {
                 listaClientes.DataSource = dt;
+                listaClientes.Visible = true;
                 chart1.Series[0].Points.Clear();
                 chart1.Titles.Clear();
 
@@ -380,20 +585,53 @@ namespace TheGoodTaste.UI
             }
         }
 
+        private void RenderizarTopClientes(DataTable dt, string titulo)
+        {
+            listaClientes.DataSource = dt;
+            listaClientes.Visible = true;
+
+            if (dt != null && dt.Rows.Count > 0 && dt.Columns.Count >= 4)
+            {
+                if (listaClientes.Columns["Total Gastado"] != null)
+                {
+                    listaClientes.Columns["Total Gastado"].DefaultCellStyle.Format = "$#,##0.00";
+                }
+
+                string colX = dt.Columns[0].ColumnName;
+                string colY = dt.Columns[3].ColumnName;
+
+                chart1.Series[0].Points.Clear();
+                chart1.Series[0].Points.DataBindXY(dt.DefaultView, colX, dt.DefaultView, colY);
+                chart1.Series[0].ChartType = SeriesChartType.Pie;
+                chart1.Series[0].IsValueShownAsLabel = true;
+                chart1.Series[0].LabelFormat = "$#,##0.00";
+
+                chart1.Titles.Clear();
+                chart1.Titles.Add(titulo).Font = new Font("Segoe UI", 11f, FontStyle.Bold);
+            }
+            else
+            {
+                chart1.Series[0].Points.Clear();
+                chart1.Titles.Clear();
+                MessageBox.Show("No se encontraron registros de clientes en el período seleccionado.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+        }
+
         private void RenderizarGraficoPersonalizado(DataTable dt, string titulo, SeriesChartType tipoGrafico, bool mostrarAlertaVacio = true)
         {
-            listaClientes.DataSource = dt; // La tabla muestra todo el detalle bonito con el día y la cantidad
+            listaClientes.DataSource = dt;
+            listaClientes.Visible = true;
 
             if (dt != null && dt.Rows.Count > 0 && dt.Columns.Count >= 3)
             {
-                string colX = dt.Columns[0].ColumnName; // Producto
-                string colY = dt.Columns[2].ColumnName; // Cantidad numérica
+                string colX = dt.Columns[0].ColumnName;
+                string colY = dt.Columns[2].ColumnName;
 
                 chart1.Series[0].Points.Clear();
                 chart1.Series[0].Points.DataBindXY(dt.DefaultView, colX, dt.DefaultView, colY);
                 chart1.Series[0].ChartType = tipoGrafico;
                 chart1.Series[0].IsValueShownAsLabel = true;
-                chart1.Series[0].LabelFormat = "#,##0 \"un.\""; // Muestra ej: "12 un."
+                chart1.Series[0].LabelFormat = "#,##0 \"un.\"";
 
                 chart1.ChartAreas[0].AxisX.LabelStyle.Angle = -35;
                 chart1.ChartAreas[0].AxisX.Interval = 1;
@@ -428,7 +666,7 @@ namespace TheGoodTaste.UI
             else
             {
                 DataTable dt = negocio.GenerarVentasGenerales(desde, hasta);
-                RenderizarGrafico(dt, "Ventas Globales", SeriesChartType.Line);
+                RenderizarVentasGenerales(dt, "Ventas Globales");
             }
         }
 
@@ -482,7 +720,7 @@ namespace TheGoodTaste.UI
             DateTime hasta = fechaHasta.Value.Date.AddDays(1).AddSeconds(-1);
 
             DataTable dt = negocio.GenerarTopClientes(desde, hasta);
-            RenderizarGrafico(dt, "Top 5 Clientes con más compras", SeriesChartType.Pie);
+            RenderizarTopClientes(dt, "Top 5 Clientes con más compras");
         }
 
         // Eventos del diseñador

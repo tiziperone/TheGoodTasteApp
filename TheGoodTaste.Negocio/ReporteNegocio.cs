@@ -22,9 +22,12 @@ namespace TheGoodTaste.Negocio
 
         // 3. FIDELIZACIÓN Y CLIENTES (GERENCIA)
         public DataTable GenerarTopClientes(DateTime desde, DateTime hasta) => _datos.ObtenerTopClientes(desde, hasta);
-        public DataTable GenerarClientesFieles(DateTime desde, DateTime hasta) => _datos.ObtenerClientesFieles(desde, hasta);
 
         // REPORTE EXCLUSIVO DEL VENDEDOR
         public DataTable GenerarMisVentas(int dniVendedor, DateTime desde, DateTime hasta) => _datos.ObtenerMisVentasPorPeriodo(dniVendedor, desde, hasta);
+
+        // BÚSQUEDA Y SUGERENCIAS DE FACTURAS
+        public DataTable ObtenerHistorialFacturas(string filtro = "") => _datos.ObtenerHistorialFacturas(filtro);
+        public DataTable BuscarFacturaPorId(int idFactura) => _datos.ObtenerFacturaPorId(idFactura);
     }
 }
