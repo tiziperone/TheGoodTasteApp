@@ -349,6 +349,7 @@ namespace TheGoodTaste.UI
             int idPago = Convert.ToInt32(cboTipoPago.SelectedValue);
             string nombrePago = cboTipoPago.Text;
 
+            // Consultar y actualizar la entidad con el stock actualizado en tiempo real
             int stockReal = _ventaNegocio.ObtenerStockActual(codigoProd);
             _productoSeleccionado.Stock = stockReal;
 
@@ -383,6 +384,7 @@ namespace TheGoodTaste.UI
 
             int cantidadAcumulada = cantidadTotalMismoProductoEnGrilla + cantidad;
 
+            // Validación de stock mínimo utilizando el stock real actualizado
             if (_productoNegocio.ValidarStockMinimo(_productoSeleccionado, cantidadAcumulada, out string mensajeAlerta))
             {
                 MessageBox.Show(mensajeAlerta, "Alerta de Stock Mínimo", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -440,7 +442,6 @@ namespace TheGoodTaste.UI
             try
             {
                 // 1. VERIFICACIÓN PREVIA DE STOCK EN TIEMPO REAL
-                // Agrupamos la cantidad solicitada en la grilla por código de producto
                 Dictionary<string, int> cantidadesSolicitadas = new Dictionary<string, int>();
                 foreach (DataGridViewRow row in dgvDetalles.Rows)
                 {
@@ -454,7 +455,6 @@ namespace TheGoodTaste.UI
                         cantidadesSolicitadas[cod] = cant;
                 }
 
-                // Verificamos el stock actual de la base de datos antes de solicitar el vuelto
                 foreach (var item in cantidadesSolicitadas)
                 {
                     int stockActualEnBD = _ventaNegocio.ObtenerStockActual(item.Key);
@@ -463,9 +463,9 @@ namespace TheGoodTaste.UI
                         var prodObj = _listaProductos.FirstOrDefault(p => p.Codigo == item.Key);
                         string nombreProd = prodObj != null ? prodObj.Nombre : item.Key;
 
-                        MessageBox.Show($"No hay suficiente stock disponible para el producto '{nombreProd}'.\n\nStock disponible en BD: {stockActualEnBD}\nCantidad requerida: {item.Value}",
+                        MessageBox.Show($"No hay suficiente stock disponible para el producto '{nombreProd}'.\n\nStock disponible: {stockActualEnBD}\nCantidad requerida: {item.Value}",
                                         "Sin Stock Suficiente", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                        return; // Corta aquí inmediatamente SIN abrir FormCobroEfectivo
+                        return; // Cancela el flujo antes de abrir el modal de vuelto
                     }
                 }
 
@@ -486,14 +486,14 @@ namespace TheGoodTaste.UI
                     }
                 }
 
-                // 3. SI HAY COBRO EN EFECTIVO, AHORA SÍ ES SEGURO ABRIR LA VENTANA DE VUELTO
+                // 3. PANTALLA DE VUELTO SI HUBIESE PAGO EN EFECTIVO
                 if (totalEfectivo > 0)
                 {
                     using (FormCobroEfectivo formCobro = new FormCobroEfectivo(totalEfectivo))
                     {
                         if (formCobro.ShowDialog() != DialogResult.OK || !formCobro.Confirmado)
                         {
-                            return; // El usuario canceló la pantalla de cobro
+                            return;
                         }
 
                         _huboPagoEfectivo = true;

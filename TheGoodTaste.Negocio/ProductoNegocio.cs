@@ -84,29 +84,26 @@ namespace TheGoodTaste.Negocio
                 throw new Exception("Ocurrió un error al intentar activar el producto en la base de datos.");
         }
 
-
         public bool ValidarStockMinimo(Producto producto, int cantidadAComprar, out string mensaje)
         {
             mensaje = string.Empty;
 
             if (producto == null) return false;
 
-            // Calculamos el stock remanente que resultaría tras la compra
+            // Calculamos el stock remanente que resultaría tras agregar este item
             int stockRestante = producto.Stock - cantidadAComprar;
 
             // Si el stock restante queda por debajo o es igual al mínimo permitido
             if (stockRestante <= producto.StockMinimo)
             {
-                // Nos aseguramos de que el número que se muestra no sea negativo para evitar confusiones visuales
                 int stockVisual = Math.Max(0, stockRestante);
 
-                mensaje = $"Atención: Al agregar este producto, el stock disponible ({stockVisual}) " +
+                mensaje = $"Atención: Al agregar este producto, el stock restante ({stockVisual}) " +
                           $"quedará por debajo o igual al stock mínimo permitido ({producto.StockMinimo}).";
                 return true;
             }
 
             return false;
         }
-
     }
 }
