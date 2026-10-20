@@ -65,6 +65,21 @@ namespace TheGoodTaste.UI
             dgvDetalles.Columns["IdPago"].Visible = false;
             dgvDetalles.Columns.Add("TipoPago", "Forma de Pago");
 
+            // Botón de Edición
+            DataGridViewButtonColumn colEditar = new DataGridViewButtonColumn
+            {
+                Name = "colEditar",
+                HeaderText = "Editar",
+                Text = "✏️ Editar",
+                UseColumnTextForButtonValue = true,
+                Width = 85,
+                FlatStyle = FlatStyle.Flat
+            };
+            colEditar.DefaultCellStyle.BackColor = Color.FromArgb(50, 130, 190);
+            colEditar.DefaultCellStyle.ForeColor = Color.White;
+            colEditar.DefaultCellStyle.Font = new Font("Segoe UI", 8.5f, FontStyle.Bold);
+
+            // Botón de Eliminación
             DataGridViewButtonColumn colEliminar = new DataGridViewButtonColumn
             {
                 Name = "colQuitar",
@@ -78,6 +93,7 @@ namespace TheGoodTaste.UI
             colEliminar.DefaultCellStyle.ForeColor = Color.White;
             colEliminar.DefaultCellStyle.Font = new Font("Segoe UI", 8.5f, FontStyle.Bold);
 
+            dgvDetalles.Columns.Add(colEditar);
             dgvDetalles.Columns.Add(colEliminar);
 
             dgvDetalles.AllowUserToAddRows = false;
@@ -90,11 +106,89 @@ namespace TheGoodTaste.UI
 
         private void DgvDetalles_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
-            if (e.RowIndex >= 0 && dgvDetalles.Columns[e.ColumnIndex].Name == "colQuitar")
+            if (e.RowIndex < 0) return;
+
+            string nombreColumna = dgvDetalles.Columns[e.ColumnIndex].Name;
+
+            if (nombreColumna == "colQuitar")
             {
                 dgvDetalles.Rows.RemoveAt(e.RowIndex);
                 CalcularTotalVenta();
                 ActualizarEstadoBotones();
+            }
+            else if (nombreColumna == "colEditar")
+            {
+                EditarCantidadFila(e.RowIndex);
+            }
+        }
+
+        private void EditarCantidadFila(int rowIndex)
+        {
+            DataGridViewRow fila = dgvDetalles.Rows[rowIndex];
+            string codigoProd = fila.Cells["ID"].Value.ToString();
+            string nombreProd = fila.Cells["Producto"].Value.ToString();
+            int cantidadActual = Convert.ToInt32(fila.Cells["Cantidad"].Value);
+            decimal precioUnit = ConvertirADecimal(fila.Cells["Precio"].Value.ToString());
+
+            // Modal simple para modificar la cantidad
+            using (Form formDialog = new Form())
+            {
+                formDialog.Width = 320;
+                formDialog.Height = 180;
+                formDialog.FormBorderStyle = FormBorderStyle.FixedDialog;
+                formDialog.Text = "Editar Cantidad";
+                formDialog.StartPosition = FormStartPosition.CenterParent;
+                formDialog.MaximizeBox = false;
+                formDialog.MinimizeBox = false;
+
+                Label lblPrompt = new Label() { Left = 20, Top = 15, Width = 260, Text = $"Modificar cantidad para:\n{nombreProd}" };
+                NumericUpDown nudNuevaCantidad = new NumericUpDown() { Left = 20, Top = 55, Width = 260, Minimum = 1, Maximum = 9999, Value = cantidadActual };
+                Button btnAceptar = new Button() { Text = "Guardar", Left = 110, Width = 80, Top = 95, DialogResult = DialogResult.OK };
+                Button btnCancelar = new Button() { Text = "Cancelar", Left = 200, Width = 80, Top = 95, DialogResult = DialogResult.Cancel };
+
+                btnAceptar.Click += (sender, e) => { formDialog.Close(); };
+                btnCancelar.Click += (sender, e) => { formDialog.Close(); };
+
+                formDialog.Controls.Add(lblPrompt);
+                formDialog.Controls.Add(nudNuevaCantidad);
+                formDialog.Controls.Add(btnAceptar);
+                formDialog.Controls.Add(btnCancelar);
+                formDialog.AcceptButton = btnAceptar;
+                formDialog.CancelButton = btnCancelar;
+
+                if (formDialog.ShowDialog() == DialogResult.OK)
+                {
+                    int nuevaCantidad = (int)nudNuevaCantidad.Value;
+
+                    if (nuevaCantidad == cantidadActual) return;
+
+                    // Verificar stock en tiempo real
+                    int stockRealBD = _ventaNegocio.ObtenerStockActual(codigoProd);
+
+                    // Calculamos qué cantidad total de este mismo producto habría sumando las demás filas (por si está con otro medio de pago)
+                    int cantidadOtrasFilas = 0;
+                    foreach (DataGridViewRow r in dgvDetalles.Rows)
+                    {
+                        if (r.Index != rowIndex && r.Cells["ID"].Value?.ToString() == codigoProd)
+                        {
+                            cantidadOtrasFilas += Convert.ToInt32(r.Cells["Cantidad"].Value);
+                        }
+                    }
+
+                    if ((cantidadOtrasFilas + nuevaCantidad) > stockRealBD)
+                    {
+                        MessageBox.Show($"No hay suficiente stock disponible para el producto '{nombreProd}'.\n\nStock disponible: {stockRealBD}\nCantidad requerida total: {cantidadOtrasFilas + nuevaCantidad}",
+                                        "Sin Stock Suficiente", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        return;
+                    }
+
+                    // Actualizar fila
+                    fila.Cells["Cantidad"].Value = nuevaCantidad;
+                    fila.Cells["Subtotal"].Value = (nuevaCantidad * precioUnit).ToString("N2");
+
+                    CalcularTotalVenta();
+                    ActualizarEstadoBotones();
+                }
             }
         }
 
@@ -349,7 +443,6 @@ namespace TheGoodTaste.UI
             int idPago = Convert.ToInt32(cboTipoPago.SelectedValue);
             string nombrePago = cboTipoPago.Text;
 
-            // Consultar y actualizar la entidad con el stock actualizado en tiempo real
             int stockReal = _ventaNegocio.ObtenerStockActual(codigoProd);
             _productoSeleccionado.Stock = stockReal;
 
@@ -384,7 +477,6 @@ namespace TheGoodTaste.UI
 
             int cantidadAcumulada = cantidadTotalMismoProductoEnGrilla + cantidad;
 
-            // Validación de stock mínimo utilizando el stock real actualizado
             if (_productoNegocio.ValidarStockMinimo(_productoSeleccionado, cantidadAcumulada, out string mensajeAlerta))
             {
                 MessageBox.Show(mensajeAlerta, "Alerta de Stock Mínimo", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -465,7 +557,7 @@ namespace TheGoodTaste.UI
 
                         MessageBox.Show($"No hay suficiente stock disponible para el producto '{nombreProd}'.\n\nStock disponible: {stockActualEnBD}\nCantidad requerida: {item.Value}",
                                         "Sin Stock Suficiente", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                        return; // Cancela el flujo antes de abrir el modal de vuelto
+                        return;
                     }
                 }
 
