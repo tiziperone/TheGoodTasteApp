@@ -91,7 +91,7 @@ namespace The_Good_Taste.Datos
         {
             string query = @"SELECT Nombre AS Producto, Stock, StockMinimo AS [Stock Mínimo], (StockMinimo - Stock) AS [Faltante]
                              FROM Productos
-                             WHERE Stock <= StockMinimo
+                             WHERE Stock <= StockMinimo AND DeleteAt IS NULL
                              ORDER BY (StockMinimo - Stock) DESC";
             return EjecutarConsultaLibre(query);
         }
@@ -109,7 +109,7 @@ namespace The_Good_Taste.Datos
                 FROM VentaDetalle vd
                 INNER JOIN Venta v ON vd.idVenta = v.idVenta
                 INNER JOIN Productos p ON vd.Codigo = p.Codigo
-                WHERE v.fechaVenta BETWEEN @Desde AND @Hasta
+                WHERE v.fechaVenta BETWEEN @Desde AND @Hasta AND p.DeleteAt IS NULL
                 GROUP BY p.Nombre, DATENAME(dw, v.fechaVenta), CAST(v.fechaVenta AS DATE)
              )
              SELECT 
@@ -161,7 +161,6 @@ namespace The_Good_Taste.Datos
 
             if (!string.IsNullOrWhiteSpace(filtro))
             {
-                // Limpiamos texto para prevenir que 'Factura N°' rompa la consulta
                 string filtroLimpio = filtro.Replace("Factura", "").Replace("N°", "").Replace("N° ", "").Trim();
 
                 query += @" WHERE CAST(v.idVenta AS VARCHAR) LIKE '%' + @Filtro + '%' 
