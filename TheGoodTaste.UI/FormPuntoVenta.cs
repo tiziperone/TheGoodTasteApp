@@ -65,7 +65,6 @@ namespace TheGoodTaste.UI
             dgvDetalles.Columns["IdPago"].Visible = false;
             dgvDetalles.Columns.Add("TipoPago", "Forma de Pago");
 
-            // Columna de botón para quitar cada producto individualmente de la grilla
             DataGridViewButtonColumn colEliminar = new DataGridViewButtonColumn
             {
                 Name = "colQuitar",
@@ -85,14 +84,12 @@ namespace TheGoodTaste.UI
             dgvDetalles.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             dgvDetalles.MultiSelect = false;
 
-            // Evento al hacer clic en el botón de la fila
             dgvDetalles.CellContentClick -= DgvDetalles_CellContentClick;
             dgvDetalles.CellContentClick += DgvDetalles_CellContentClick;
         }
 
         private void DgvDetalles_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
-            // Verifica si hizo clic en el botón "❌ Quitar" de la columna
             if (e.RowIndex >= 0 && dgvDetalles.Columns[e.ColumnIndex].Name == "colQuitar")
             {
                 dgvDetalles.Rows.RemoveAt(e.RowIndex);
@@ -126,8 +123,6 @@ namespace TheGoodTaste.UI
             try
             {
                 _tablaClientes = _clienteNegocio.ObtenerClientes(true) ?? new DataTable();
-
-                // Filtra productos donde DeleteAt IS NULL
                 _listaProductos = _ventaNegocio.ObtenerProductosActivos() ?? new List<Producto>();
 
                 List<TipoPago> tipos = _tipoPagoNegocio.ObtenerTiposPago();
@@ -403,7 +398,6 @@ namespace TheGoodTaste.UI
             else
             {
                 decimal subtotal = precio * cantidad;
-                // Se agrega la fila con sus celdas de datos (el botón de la última columna toma su texto por defecto)
                 dgvDetalles.Rows.Add(codigoProd, nombreProd, precio.ToString("N2"), cantidad, subtotal.ToString("N2"), idPago, nombrePago);
             }
 
@@ -445,6 +439,37 @@ namespace TheGoodTaste.UI
 
             try
             {
+                // 1. VERIFICACIÓN PREVIA DE STOCK EN TIEMPO REAL
+                // Agrupamos la cantidad solicitada en la grilla por código de producto
+                Dictionary<string, int> cantidadesSolicitadas = new Dictionary<string, int>();
+                foreach (DataGridViewRow row in dgvDetalles.Rows)
+                {
+                    if (row.IsNewRow) continue;
+                    string cod = row.Cells["ID"].Value.ToString();
+                    int cant = Convert.ToInt32(row.Cells["Cantidad"].Value);
+
+                    if (cantidadesSolicitadas.ContainsKey(cod))
+                        cantidadesSolicitadas[cod] += cant;
+                    else
+                        cantidadesSolicitadas[cod] = cant;
+                }
+
+                // Verificamos el stock actual de la base de datos antes de solicitar el vuelto
+                foreach (var item in cantidadesSolicitadas)
+                {
+                    int stockActualEnBD = _ventaNegocio.ObtenerStockActual(item.Key);
+                    if (stockActualEnBD < item.Value)
+                    {
+                        var prodObj = _listaProductos.FirstOrDefault(p => p.Codigo == item.Key);
+                        string nombreProd = prodObj != null ? prodObj.Nombre : item.Key;
+
+                        MessageBox.Show($"No hay suficiente stock disponible para el producto '{nombreProd}'.\n\nStock disponible en BD: {stockActualEnBD}\nCantidad requerida: {item.Value}",
+                                        "Sin Stock Suficiente", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        return; // Corta aquí inmediatamente SIN abrir FormCobroEfectivo
+                    }
+                }
+
+                // 2. PREPARACIÓN DE ENTIDAD VENTA
                 _huboPagoEfectivo = false;
                 _efectivoRecibidoTicket = 0;
                 _vueltoTicket = 0;
@@ -461,13 +486,14 @@ namespace TheGoodTaste.UI
                     }
                 }
 
+                // 3. SI HAY COBRO EN EFECTIVO, AHORA SÍ ES SEGURO ABRIR LA VENTANA DE VUELTO
                 if (totalEfectivo > 0)
                 {
                     using (FormCobroEfectivo formCobro = new FormCobroEfectivo(totalEfectivo))
                     {
                         if (formCobro.ShowDialog() != DialogResult.OK || !formCobro.Confirmado)
                         {
-                            return;
+                            return; // El usuario canceló la pantalla de cobro
                         }
 
                         _huboPagoEfectivo = true;
@@ -502,8 +528,10 @@ namespace TheGoodTaste.UI
                     });
                 }
 
+                // 4. REGISTRAR EN LA BASE DE DATOS
                 _ventaNegocio.RegistrarVenta(nuevaVenta);
 
+                // 5. GENERAR IMPRESIÓN Y FINALIZAR
                 string rutaTicket = GenerarTicketPDF(nuevaVenta);
 
                 MessageBox.Show("Venta registrada con éxito.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
