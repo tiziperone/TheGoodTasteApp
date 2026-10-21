@@ -88,7 +88,10 @@ namespace TheGoodTaste.UI
                 ? $"{_usuarioActual.Nombre} {_usuarioActual.Apellido}".Trim()
                 : _usuarioActual.Username;
 
-            string texto = $"Vendedor: {nombreAMostrar} (DNI: {_usuarioActual.DNI})";
+            // Determina dinámicamente si es Gerente o Vendedor
+            string etiquetaRol = _usuarioActual.Rol == RolUsuario.Gerente ? "Gerente" : "Vendedor";
+
+            string texto = $"{etiquetaRol}: {nombreAMostrar} (DNI: {_usuarioActual.DNI})";
 
             Control lbl = BuscarControlEnTodoElFormulario("lblVendedor");
             if (lbl is Label lblCast)
