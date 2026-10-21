@@ -91,7 +91,6 @@ namespace TheGoodTaste.Negocio
                 if (_repo.ExisteUsuario(username)) throw new Exception("El nombre de usuario autogenerado ya está en uso.");
                 if (_repo.ExisteEmail(email)) throw new Exception("El correo electrónico ya se encuentra registrado.");
                 if (_repo.ExisteTelefono(telefono)) throw new Exception("El número de teléfono ya está asociado a otro usuario.");
-
                 if (!_repo.RegistrarUsuario(dni, username, dni.ToString(), idRol, nombre, apellido, direccion, idLocalidad, fechaNacimiento, telefono, email, sexo))
                     throw new Exception("No se pudo registrar el usuario en la base de datos.");
             }
