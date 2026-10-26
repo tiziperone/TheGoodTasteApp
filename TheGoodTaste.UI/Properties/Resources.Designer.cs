@@ -93,6 +93,16 @@ namespace TheGoodTaste.UI.Properties {
         /// <summary>
         ///   Busca un recurso adaptado de tipo System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap Gemini_Generated_Image_9xxsry9xxsry9xxs {
+            get {
+                object obj = ResourceManager.GetObject("Gemini_Generated_Image_9xxsry9xxsry9xxs", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Busca un recurso adaptado de tipo System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap LogoOscuro {
             get {
                 object obj = ResourceManager.GetObject("LogoOscuro", resourceCulture);

@@ -224,7 +224,7 @@
             // 
             this.buttonCerrarSesion.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.buttonCerrarSesion.BackColor = System.Drawing.Color.Transparent;
-            this.buttonCerrarSesion.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("buttonCerrarSesion.BackgroundImage")));
+            this.buttonCerrarSesion.BackgroundImage = global::TheGoodTaste.UI.Properties.Resources.Gemini_Generated_Image_9xxsry9xxsry9xxs;
             this.buttonCerrarSesion.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
             this.buttonCerrarSesion.FlatAppearance.BorderSize = 0;
             this.buttonCerrarSesion.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(130)))), ((int)(((byte)(40)))));

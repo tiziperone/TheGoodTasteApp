@@ -194,5 +194,8 @@
   <ItemGroup>
     <None Include="Resources\agregar-producto2.png" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Gemini_Generated_Image_9xxsry9xxsry9xxs.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
