@@ -20,7 +20,7 @@ namespace TheGoodTaste.Negocio
             return VentaDatos.ObtenerStockActual(codigo);
         }
 
-        public void RegistrarVenta(Venta nuevaVenta)
+        public int RegistrarVenta(Venta nuevaVenta)
         {
             if (nuevaVenta == null)
                 throw new Exception("La venta no contiene información.");
@@ -42,8 +42,11 @@ namespace TheGoodTaste.Negocio
 
             try
             {
-                if (!VentaDatos.RegistrarVenta(nuevaVenta))
+                int idGenerado = VentaDatos.RegistrarVenta(nuevaVenta);
+                if (idGenerado <= 0)
                     throw new Exception("No se pudo registrar la venta en la base de datos.");
+
+                return idGenerado;
             }
             catch (SqlException sqlEx)
             {

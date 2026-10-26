@@ -54,7 +54,7 @@ namespace The_Good_Taste.Datos
             }
         }
 
-        public static bool RegistrarVenta(Venta venta)
+        public static int RegistrarVenta(Venta venta)
         {
             using (SqlConnection con = Conexion.ObtenerConexion())
             {
@@ -63,7 +63,7 @@ namespace The_Good_Taste.Datos
 
                 try
                 {
-                    // 1. Insertar el encabezado de la Venta
+                    // 1. Insertar el encabezado de la Venta y obtener el ID generado
                     string queryVenta = @"INSERT INTO Venta (fechaVenta, dniCliente, DNIUsuario, totalVenta) 
                                           VALUES (@Fecha, @IdCliente, @DNIUsuario, @Total);
                                           SELECT SCOPE_IDENTITY();";
@@ -79,7 +79,6 @@ namespace The_Good_Taste.Datos
                     // 2. Recorrer cada producto del carrito
                     foreach (var item in venta.Detalles)
                     {
-                        // Descontar stock con verificación atómica y filtro DeleteAt IS NULL
                         string queryStock = @"UPDATE Productos 
                                               SET Stock = Stock - @Cantidad 
                                               WHERE Codigo = @Codigo AND Stock >= @Cantidad AND DeleteAt IS NULL;";
@@ -95,7 +94,6 @@ namespace The_Good_Taste.Datos
                             throw new Exception($"El producto '{item.Codigo}' no cuenta con suficiente stock o no se encuentra activo.");
                         }
 
-                        // Insertar el detalle de la venta
                         string queryDetalle = @"INSERT INTO VentaDetalle (idVenta, Codigo, cantidad, precioUnitario, idTipoPago) 
                                                 VALUES (@IdVenta, @Codigo, @Cantidad, @Precio, @IdTipoPago);";
 
@@ -110,7 +108,7 @@ namespace The_Good_Taste.Datos
                     }
 
                     transaccion.Commit();
-                    return true;
+                    return idVentaGenerado; // Retornamos el número de factura/venta
                 }
                 catch (Exception ex)
                 {

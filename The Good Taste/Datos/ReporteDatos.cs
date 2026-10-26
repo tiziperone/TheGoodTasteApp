@@ -14,10 +14,8 @@ namespace The_Good_Taste.Datos
             {
                 SqlCommand cmd = new SqlCommand("sp_ObtenerRecaudacionGlobal", con);
                 cmd.CommandType = CommandType.StoredProcedure;
-
                 cmd.Parameters.AddWithValue("@Desde", desde);
                 cmd.Parameters.AddWithValue("@Hasta", hasta);
-
                 SqlDataAdapter da = new SqlDataAdapter(cmd);
                 da.Fill(dt);
             }
@@ -99,7 +97,7 @@ namespace The_Good_Taste.Datos
         public DataTable ObtenerDiaMasVendidoPorProducto(DateTime desde, DateTime hasta)
         {
             string query = @"SET LANGUAGE Spanish;
-             WITH VentasPorDia AS (
+              WITH VentasPorDia AS (
                 SELECT 
                     p.Nombre AS Producto,
                     DATENAME(dw, v.fechaVenta) AS DiaSemana,
@@ -111,14 +109,14 @@ namespace The_Good_Taste.Datos
                 INNER JOIN Productos p ON vd.Codigo = p.Codigo
                 WHERE v.fechaVenta BETWEEN @Desde AND @Hasta AND p.DeleteAt IS NULL
                 GROUP BY p.Nombre, DATENAME(dw, v.fechaVenta), CAST(v.fechaVenta AS DATE)
-             )
-             SELECT 
+              )
+              SELECT 
                 Producto, 
                 UPPER(LEFT(DiaSemana, 1)) + LOWER(SUBSTRING(DiaSemana, 2, LEN(DiaSemana))) + ' ' + CAST(FechaPico AS VARCHAR) AS [Día Pico],
                 CantidadVendida AS [Cantidad]
-             FROM VentasPorDia
-             WHERE Ranking = 1
-             ORDER BY CantidadVendida DESC";
+              FROM VentasPorDia
+              WHERE Ranking = 1
+              ORDER BY CantidadVendida DESC";
             return EjecutarConsulta(query, desde, hasta);
         }
 
@@ -135,7 +133,6 @@ namespace The_Good_Taste.Datos
                              WHERE v.fechaVenta BETWEEN @Desde AND @Hasta
                              GROUP BY c.nombreCliente, c.apellidoCliente 
                              ORDER BY [Total Gastado] DESC";
-
             return EjecutarConsulta(query, desde, hasta);
         }
 
@@ -150,29 +147,32 @@ namespace The_Good_Taste.Datos
             return EjecutarConsulta(query, desde, hasta, dniVendedor);
         }
 
-        // BÚSQUEDA FLEXIBLE DE HISTORIAL DE FACTURAS
         public DataTable ObtenerHistorialFacturas(string filtro = "")
         {
+            string filtroLimpio = string.IsNullOrWhiteSpace(filtro)
+                ? ""
+                : filtro.Replace("Factura", "").Replace("N°", "").Trim();
+
             string query = @"SELECT TOP 100
                                 v.idVenta AS [NroFactura],
-                                'Factura N° ' + CAST(v.idVenta AS VARCHAR) + ' - ' + ISNULL(c.nombreCliente + ' ' + c.apellidoCliente, 'Consumidor Final') + ' ($' + CAST(CAST(v.totalVenta AS DECIMAL(10,2)) AS VARCHAR) + ')' AS [Descripcion]
+                                'Factura N° ' + CAST(v.idVenta AS VARCHAR(20))
+                                + ' - DNI: ' + ISNULL(CAST(v.dniCliente AS VARCHAR(20)), 'S/D')
+                                + ' - ' + ISNULL(c.nombreCliente + ' ' + c.apellidoCliente, 'Consumidor Final')
+                                + ' ($' + CAST(CAST(v.totalVenta AS DECIMAL(10,2)) AS VARCHAR(20)) + ')' AS [Descripcion]
                              FROM Venta v
-                             LEFT JOIN Cliente c ON v.dniCliente = c.dniCliente ";
+                             LEFT JOIN Cliente c ON v.dniCliente = c.dniCliente
+                             WHERE 1 = 1 ";
 
-            if (!string.IsNullOrWhiteSpace(filtro))
+            if (filtroLimpio != "")
             {
-                string filtroLimpio = filtro.Replace("Factura", "").Replace("N°", "").Replace("N° ", "").Trim();
-
-                query += @" WHERE CAST(v.idVenta AS VARCHAR) LIKE '%' + @Filtro + '%' 
-                             OR ISNULL(c.nombreCliente, '') LIKE '%' + @Filtro + '%' 
-                             OR ISNULL(c.apellidoCliente, '') LIKE '%' + @Filtro + '%'
-                             OR (ISNULL(c.nombreCliente, '') + ' ' + ISNULL(c.apellidoCliente, '')) LIKE '%' + @Filtro + '%'
-                             OR (@Filtro = 'Consumidor Final' AND c.dniCliente IS NULL) ";
-
-                if (Regex.IsMatch(filtroLimpio, @"^\d+$"))
-                {
-                    query += " OR v.idVenta = " + filtroLimpio + " ";
-                }
+                query += @" AND (
+                                CAST(v.idVenta AS VARCHAR(20)) LIKE '%' + @Filtro + '%'
+                                OR CAST(v.dniCliente AS VARCHAR(20)) LIKE '%' + @Filtro + '%'
+                                OR ISNULL(c.nombreCliente, '') LIKE '%' + @Filtro + '%'
+                                OR ISNULL(c.apellidoCliente, '') LIKE '%' + @Filtro + '%'
+                                OR (ISNULL(c.nombreCliente, '') + ' ' + ISNULL(c.apellidoCliente, '')) LIKE '%' + @Filtro + '%'
+                                OR (c.dniCliente IS NULL AND 'Consumidor Final' LIKE '%' + @Filtro + '%')
+                            ) ";
             }
 
             query += " ORDER BY v.idVenta DESC";
@@ -181,10 +181,9 @@ namespace The_Good_Taste.Datos
             using (SqlConnection con = Conexion.ObtenerConexion())
             {
                 SqlCommand cmd = new SqlCommand(query, con);
-                if (!string.IsNullOrWhiteSpace(filtro))
-                {
-                    cmd.Parameters.AddWithValue("@Filtro", filtro.Trim());
-                }
+                if (filtroLimpio != "")
+                    cmd.Parameters.AddWithValue("@Filtro", filtroLimpio);
+
                 SqlDataAdapter da = new SqlDataAdapter(cmd);
                 da.Fill(dt);
             }
@@ -197,6 +196,7 @@ namespace The_Good_Taste.Datos
                                 v.idVenta AS [Nro Factura],
                                 v.fechaVenta AS [Fecha y Hora],
                                 ISNULL(c.nombreCliente + ' ' + c.apellidoCliente, 'Consumidor Final') AS [Cliente],
+                                v.dniCliente AS [DNI Cliente],
                                 ISNULL(u.Nombre + ' ' + u.Apellido, CAST(v.DNIUsuario AS VARCHAR)) AS [Vendedor],
                                 p.Nombre AS [Producto],
                                 vd.cantidad AS [Cantidad],

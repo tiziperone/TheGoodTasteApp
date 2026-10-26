@@ -130,7 +130,6 @@ namespace TheGoodTaste.UI
             int cantidadActual = Convert.ToInt32(fila.Cells["Cantidad"].Value);
             decimal precioUnit = ConvertirADecimal(fila.Cells["Precio"].Value.ToString());
 
-            // Modal simple para modificar la cantidad
             using (Form formDialog = new Form())
             {
                 formDialog.Width = 320;
@@ -162,10 +161,8 @@ namespace TheGoodTaste.UI
 
                     if (nuevaCantidad == cantidadActual) return;
 
-                    // Verificar stock en tiempo real
                     int stockRealBD = _ventaNegocio.ObtenerStockActual(codigoProd);
 
-                    // Calculamos qué cantidad total de este mismo producto habría sumando las demás filas (por si está con otro medio de pago)
                     int cantidadOtrasFilas = 0;
                     foreach (DataGridViewRow r in dgvDetalles.Rows)
                     {
@@ -182,7 +179,6 @@ namespace TheGoodTaste.UI
                         return;
                     }
 
-                    // Actualizar fila
                     fila.Cells["Cantidad"].Value = nuevaCantidad;
                     fila.Cells["Subtotal"].Value = (nuevaCantidad * precioUnit).ToString("N2");
 
@@ -620,13 +616,14 @@ namespace TheGoodTaste.UI
                     });
                 }
 
-                // 4. REGISTRAR EN LA BASE DE DATOS
-                _ventaNegocio.RegistrarVenta(nuevaVenta);
+                // 4. REGISTRAR EN LA BASE DE DATOS Y OBTENER EL ID GENERADO
+                int idVentaGenerado = _ventaNegocio.RegistrarVenta(nuevaVenta);
+                nuevaVenta.IdVenta = idVentaGenerado; // Asignamos el ID obtenido
 
                 // 5. GENERAR IMPRESIÓN Y FINALIZAR
                 string rutaTicket = GenerarTicketPDF(nuevaVenta);
 
-                MessageBox.Show("Venta registrada con éxito.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show($"Venta registrada con éxito. N° de Factura / Ticket: {idVentaGenerado}", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
                 if (!string.IsNullOrEmpty(rutaTicket) && File.Exists(rutaTicket))
                 {
@@ -659,14 +656,15 @@ namespace TheGoodTaste.UI
                     Directory.CreateDirectory(carpetaTickets);
                 }
 
-                string nombreArchivo = $"Ticket_Venta_{DateTime.Now:yyyyMMdd_HHmmss}.txt";
+                string nombreArchivo = $"Ticket_Venta_{venta.IdVenta}_{DateTime.Now:yyyyMMdd_HHmmss}.txt";
                 string rutaCompleta = Path.Combine(carpetaTickets, nombreArchivo);
 
                 using (StreamWriter writer = new StreamWriter(rutaCompleta))
                 {
                     writer.WriteLine("==================================================");
-                    writer.WriteLine("                THE GOOD TASTE POS                ");
+                    writer.WriteLine("            THE GOOD TASTE POS                    ");
                     writer.WriteLine("==================================================");
+                    writer.WriteLine($"Nro. de Factura / Venta: {venta.IdVenta}"); // <--- AQUÍ SE MUESTRA EL NÚMERO
                     writer.WriteLine($"Fecha: {venta.FechaVenta:dd/MM/yyyy HH:mm:ss}");
                     writer.WriteLine($"Cliente ID/DNI: {venta.DniCliente}");
                     writer.WriteLine($"Vendedor DNI: {venta.DNIUsuario}");
@@ -696,11 +694,11 @@ namespace TheGoodTaste.UI
                     if (_huboPagoEfectivo)
                     {
                         writer.WriteLine($"Efectivo Recibido: ${_efectivoRecibidoTicket:N2}");
-                        writer.WriteLine($"Vuelto: ${_vueltoTicket:N2}");
+                    _vuelto: writer.WriteLine($"Vuelto: ${_vueltoTicket:N2}");
                     }
 
                     writer.WriteLine("==================================================");
-                    writer.WriteLine("              ¡Gracias por su compra!              ");
+                    writer.WriteLine("            ¡Gracias por su compra!               ");
                 }
 
                 return rutaCompleta;
