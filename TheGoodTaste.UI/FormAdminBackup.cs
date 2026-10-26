@@ -147,33 +147,42 @@ namespace TheGoodTaste.UI
 
         private void BtnRestaurarBackup_Click(object sender, EventArgs e)
         {
-            if (_usuarioActual == null)
+            // 1. Solicitar usuario y contraseña del gerente para la doble autorización
+            var credencialesGerente = SolicitarCredencialesGerente();
+            if (string.IsNullOrEmpty(credencialesGerente.username) || string.IsNullOrEmpty(credencialesGerente.password))
             {
-                MessageBox.Show("No se encuentra la información de la sesión actual.",
-                                "Acceso denegado", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-
-            // Solicitar la contraseña mediante un diálogo modal
-            string claveIngresada = SolicitarContraseniaGerente();
-            if (string.IsNullOrEmpty(claveIngresada))
-            {
-                return; // El usuario canceló o dejó el campo vacío
+                return; // El usuario canceló o dejó campos vacíos
             }
 
             try
             {
-                // Reutilizamos el método Autenticar de UsuarioNegocio con el usuario activo en sesión
-                _usuarioNegocio.Autenticar(_usuarioActual.Username, claveIngresada);
+                // 2. Validar las credenciales del gerente en la base de datos
+                var usuarioGerente = _usuarioNegocio.Autenticar(credencialesGerente.username, credencialesGerente.password);
+
+                if (usuarioGerente == null)
+                {
+                    MessageBox.Show("El usuario o la contraseña del gerente son incorrectos.",
+                                    "Validación Fallida", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                // Opcional: Si deseas validar estrictamente que el rol sea Gerente (descomenta si corresponde):
+                /*
+                if (usuarioGerente.IdRol != 1) // Asumiendo que 1 es Gerente
+                {
+                    MessageBox.Show("El usuario ingresado no cuenta con privilegios de Gerente.", "Acceso Denegado", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+                */
             }
             catch (Exception)
             {
-                MessageBox.Show("Contraseña incorrecta. No se puede proceder con la restauración de la base de datos.",
+                MessageBox.Show("Credenciales de gerente inválidas. No se puede proceder con la restauración.",
                                 "Validación Fallida", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
-            // Si la autenticación no lanzó excepción, procedemos a seleccionar el archivo de backup
+            // 3. Si la autenticación es exitosa, procedemos a seleccionar el archivo de backup
             using (OpenFileDialog ofd = new OpenFileDialog())
             {
                 ofd.Filter = "Archivos de Respaldo (*.bak)|*.bak";
@@ -182,7 +191,7 @@ namespace TheGoodTaste.UI
                 if (ofd.ShowDialog() == DialogResult.OK)
                 {
                     DialogResult confirmacion = MessageBox.Show(
-                        "¿Está seguro de que desea restaurar la base de datos?\n\nSe perderán los cambios o registros posteriores a la fecha del backup seleccionado.",
+                        $"Restauración autorizada por el gerente: [{credencialesGerente.username}]\n\n¿Está seguro de que desea restaurar la base de datos?\nSe perderán los cambios o registros posteriores a la fecha del backup seleccionado.",
                         "Confirmar Restauración", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
 
                     if (confirmacion == DialogResult.Yes)
@@ -206,27 +215,45 @@ namespace TheGoodTaste.UI
         }
 
         /// <summary>
-        /// Muestra un cuadro de diálogo para solicitar la contraseña del gerente con opción de visibilidad.
+        /// Muestra un cuadro de diálogo para solicitar tanto el usuario como la contraseña del gerente con opción de visibilidad.
         /// </summary>
-        private string SolicitarContraseniaGerente()
+        private (string username, string password) SolicitarCredencialesGerente()
         {
             using (Form formPassword = new Form())
             {
                 formPassword.Width = 380;
-                formPassword.Height = 220;
+                formPassword.Height = 270;
                 formPassword.FormBorderStyle = FormBorderStyle.FixedDialog;
-                formPassword.Text = "Confirmación de Seguridad";
+                formPassword.Text = "Autorización de Gerencia";
                 formPassword.StartPosition = FormStartPosition.CenterParent;
                 formPassword.MaximizeBox = false;
                 formPassword.MinimizeBox = false;
                 formPassword.BackColor = Color.FromArgb(35, 25, 20);
 
-                Label lblMensaje = new Label()
+                Label lblUser = new Label()
                 {
                     Left = 20,
-                    Top = 20,
+                    Top = 15,
                     Width = 320,
-                    Text = "Ingrese la contraseña del usuario Gerente:",
+                    Text = "Usuario del Gerente:",
+                    ForeColor = Color.White,
+                    Font = new Font("Segoe UI", 9.5f)
+                };
+
+                TextBox txtUser = new TextBox()
+                {
+                    Left = 20,
+                    Top = 40,
+                    Width = 320,
+                    Font = new Font("Segoe UI", 10f)
+                };
+
+                Label lblPassword = new Label()
+                {
+                    Left = 20,
+                    Top = 75,
+                    Width = 320,
+                    Text = "Contraseña:",
                     ForeColor = Color.White,
                     Font = new Font("Segoe UI", 9.5f)
                 };
@@ -234,7 +261,7 @@ namespace TheGoodTaste.UI
                 TextBox txtPassword = new TextBox()
                 {
                     Left = 20,
-                    Top = 50,
+                    Top = 100,
                     Width = 320,
                     UseSystemPasswordChar = true,
                     Font = new Font("Segoe UI", 10f)
@@ -244,7 +271,7 @@ namespace TheGoodTaste.UI
                 CheckBox chkMostrarOcultar = new CheckBox()
                 {
                     Left = 20,
-                    Top = 85,
+                    Top = 135,
                     Width = 200,
                     Text = "Mostrar contraseña",
                     ForeColor = Color.White,
@@ -262,7 +289,7 @@ namespace TheGoodTaste.UI
                     Text = "Aceptar",
                     Left = 140,
                     Width = 90,
-                    Top = 125,
+                    Top = 175,
                     DialogResult = DialogResult.OK,
                     BackColor = Color.FromArgb(180, 130, 40),
                     ForeColor = Color.Black,
@@ -276,7 +303,7 @@ namespace TheGoodTaste.UI
                     Text = "Cancelar",
                     Left = 250,
                     Width = 90,
-                    Top = 125,
+                    Top = 175,
                     DialogResult = DialogResult.Cancel,
                     BackColor = Color.FromArgb(60, 45, 38),
                     ForeColor = Color.White,
@@ -285,7 +312,9 @@ namespace TheGoodTaste.UI
                 };
                 btnCancelar.FlatAppearance.BorderSize = 0;
 
-                formPassword.Controls.Add(lblMensaje);
+                formPassword.Controls.Add(lblUser);
+                formPassword.Controls.Add(txtUser);
+                formPassword.Controls.Add(lblPassword);
                 formPassword.Controls.Add(txtPassword);
                 formPassword.Controls.Add(chkMostrarOcultar);
                 formPassword.Controls.Add(btnAceptar);
@@ -294,7 +323,12 @@ namespace TheGoodTaste.UI
                 formPassword.AcceptButton = btnAceptar;
                 formPassword.CancelButton = btnCancelar;
 
-                return formPassword.ShowDialog(this) == DialogResult.OK ? txtPassword.Text : string.Empty;
+                if (formPassword.ShowDialog(this) == DialogResult.OK)
+                {
+                    return (txtUser.Text.Trim(), txtPassword.Text);
+                }
+
+                return (string.Empty, string.Empty);
             }
         }
     }
