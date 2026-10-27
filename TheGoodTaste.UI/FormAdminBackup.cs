@@ -151,7 +151,8 @@ namespace TheGoodTaste.UI
             var credencialesGerente = SolicitarCredencialesGerente();
             if (string.IsNullOrEmpty(credencialesGerente.username) || string.IsNullOrEmpty(credencialesGerente.password))
             {
-                return; // El usuario canceló o dejó campos vacíos
+                // Solo llegará aquí si el usuario canceló o cerró la ventana
+                return;
             }
 
             try
@@ -290,7 +291,6 @@ namespace TheGoodTaste.UI
                     Left = 140,
                     Width = 90,
                     Top = 175,
-                    DialogResult = DialogResult.OK,
                     BackColor = Color.FromArgb(180, 130, 40),
                     ForeColor = Color.Black,
                     FlatStyle = FlatStyle.Flat,
@@ -311,6 +311,28 @@ namespace TheGoodTaste.UI
                     Cursor = Cursors.Hand
                 };
                 btnCancelar.FlatAppearance.BorderSize = 0;
+
+                // Validación antes de cerrar: solo se cierra con OK si los campos están completos
+                btnAceptar.Click += (s, e) =>
+                {
+                    if (string.IsNullOrWhiteSpace(txtUser.Text))
+                    {
+                        MessageBox.Show("Debe ingresar el usuario del gerente.",
+                                        "Campo requerido", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        txtUser.Focus();
+                        return;
+                    }
+
+                    if (string.IsNullOrEmpty(txtPassword.Text))
+                    {
+                        MessageBox.Show("Debe ingresar la contraseña del gerente.",
+                                        "Campo requerido", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        txtPassword.Focus();
+                        return;
+                    }
+
+                    formPassword.DialogResult = DialogResult.OK;
+                };
 
                 formPassword.Controls.Add(lblUser);
                 formPassword.Controls.Add(txtUser);
