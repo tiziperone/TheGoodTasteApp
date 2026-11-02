@@ -151,9 +151,6 @@ namespace TheGoodTaste.UI
                 string email = txtEmail.Text.Trim();
                 string telefono = txtTelefono.Text.Trim();
                 string pais = textPais?.Text.Trim() ?? "Argentina";
-                
-
-                // --- FORMATEAR LOCALIDAD CON MAYÚSCULA INICIAL ---
                 string provincia = FormatearTextoTipoTitulo(txtProvincia?.Text);
                 string localidad = FormatearTextoTipoTitulo(textLocalidad?.Text);
 
@@ -401,8 +398,6 @@ namespace TheGoodTaste.UI
             if (txtApellido != null) txtApellido.Clear();
             if (txtEmail != null) txtEmail.Clear();
             if (txtTelefono != null) txtTelefono.Clear();
-
-            // --- PAÍS POR DEFECTO EDITABLE ---
             if (textPais != null)
             {
                 textPais.Text = "Argentina"; // Se carga Argentina por defecto pero queda editable
@@ -453,7 +448,6 @@ namespace TheGoodTaste.UI
         {
             if (dgvClientes.DataSource is DataTable dt)
             {
-                // --- AUTOCOMPLETADO LOCALIDAD ---
                 if (textLocalidad != null && dt.Columns.Contains("localidadCliente"))
                 {
                     textLocalidad.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
@@ -472,8 +466,6 @@ namespace TheGoodTaste.UI
 
                     textLocalidad.AutoCompleteCustomSource = listaLocalidades;
                 }
-
-                // --- AUTOCOMPLETADO PROVINCIA ---
                 if (txtProvincia != null && dt.Columns.Contains("provinciaCliente"))
                 {
                     txtProvincia.AutoCompleteMode = AutoCompleteMode.SuggestAppend;

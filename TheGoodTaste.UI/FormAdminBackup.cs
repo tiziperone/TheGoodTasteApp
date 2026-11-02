@@ -167,14 +167,6 @@ namespace TheGoodTaste.UI
                     return;
                 }
 
-                // Opcional: Si deseas validar estrictamente que el rol sea Gerente (descomenta si corresponde):
-                /*
-                if (usuarioGerente.IdRol != 1) // Asumiendo que 1 es Gerente
-                {
-                    MessageBox.Show("El usuario ingresado no cuenta con privilegios de Gerente.", "Acceso Denegado", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    return;
-                }
-                */
             }
             catch (Exception)
             {

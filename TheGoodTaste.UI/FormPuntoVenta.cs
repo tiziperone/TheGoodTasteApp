@@ -529,7 +529,7 @@ namespace TheGoodTaste.UI
 
             try
             {
-                // 1. VERIFICACIÓN PREVIA DE STOCK EN TIEMPO REAL
+                //1VERIFICACIÓN PREVIA DE STOCK EN TIEMPO REAL
                 Dictionary<string, int> cantidadesSolicitadas = new Dictionary<string, int>();
                 foreach (DataGridViewRow row in dgvDetalles.Rows)
                 {

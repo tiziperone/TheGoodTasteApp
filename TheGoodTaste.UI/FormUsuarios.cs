@@ -325,7 +325,7 @@ namespace TheGoodTaste.UI
             !string.IsNullOrWhiteSpace(textBoxDir.Text) ||
             !string.IsNullOrWhiteSpace(textBoxNroTel.Text) ||
             comboBox1.SelectedIndex != -1 ||
-            !string.IsNullOrWhiteSpace(comboBoxLocalidad.Text) || // MODIFICADO: Verifica el texto escrito, no solo el índice
+            !string.IsNullOrWhiteSpace(comboBoxLocalidad.Text) ||
             radioButtonHom.Checked ||
             radioButtonMuj.Checked ||
             dateTimePickerFechNac.Value.Date != DateTime.Today.AddYears(-18).Date;
@@ -336,7 +336,7 @@ namespace TheGoodTaste.UI
             !string.IsNullOrWhiteSpace(textBoxEmail.Text) &&
             !string.IsNullOrWhiteSpace(textBoxDNI.Text) &&
             comboBox1.SelectedIndex != -1 &&
-            !string.IsNullOrWhiteSpace(comboBoxLocalidad.Text) && // MODIFICADO: Obligatorio que tenga texto
+            !string.IsNullOrWhiteSpace(comboBoxLocalidad.Text) &&
             (radioButtonHom.Checked || radioButtonMuj.Checked);
 
             buttonDel.Enabled = algunCampoConDato || _idUsuarioSeleccionado.HasValue;
@@ -472,7 +472,7 @@ namespace TheGoodTaste.UI
                         CargarGrillaUsuarios(true);
                     }
                 }
-                else //Modificación de usuario existente
+                else 
                 {
                     if (username != _datosOriginales["Username"].ToString() && negocio.ExisteUsuario(username))
                     {

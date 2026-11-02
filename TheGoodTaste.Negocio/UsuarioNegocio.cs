@@ -31,7 +31,7 @@ namespace TheGoodTaste.Negocio
         public bool ExisteEmail(string email) => _repo.ExisteEmail(email);
         public bool ExisteTelefono(string telefono) => _repo.ExisteTelefono(telefono);
 
-        // NUEVO MÉTODO: Validación y llamada para registrar nueva localidad separando la provincia
+        //Validación y llamada para registrar nueva localidad separando la provincia
         public int RegistrarYObtenerIdLocalidad(string textoIngresado)
         {
             if (string.IsNullOrWhiteSpace(textoIngresado))

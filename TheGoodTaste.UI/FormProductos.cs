@@ -17,7 +17,6 @@ namespace TheGoodTaste.UI
 
         private Producto _productoOriginalEdicion = null;
 
-        // Caché en memoria para filtrar sin ir a la base de datos constantemente
         private List<Producto> _productosActuales = new List<Producto>();
 
         public FormProductos()
@@ -108,7 +107,7 @@ namespace TheGoodTaste.UI
 
             string f = filtro.ToLower();
 
-            // LINQ para filtrar la lista en memoria (Código, Nombre o Descripción)
+            //iltrar la lista en memoria (Código, Nombre o Descripción)
             var listaFiltrada = _productosActuales.Where(p =>
                 (p.Codigo != null && p.Codigo.ToLower().Contains(f)) ||
                 (p.Nombre != null && p.Nombre.ToLower().Contains(f)) ||
@@ -196,7 +195,7 @@ namespace TheGoodTaste.UI
                         {
                             _negocio.EliminarProducto(prod);
                             LimpiarCampos();
-                            CargarGrillaProductos(); // Refresca y aplica el filtro si quedó escrito
+                            CargarGrillaProductos();
                         }
                         catch (Exception ex)
                         {
