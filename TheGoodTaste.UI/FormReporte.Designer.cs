@@ -32,6 +32,7 @@
             System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
             System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
             this.panelReportes = new System.Windows.Forms.Panel();
+            this.chart1 = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.panelVentasVendedor = new System.Windows.Forms.Panel();
             this.textBoxBuscarVendedor = new System.Windows.Forms.TextBox();
             this.botonVentasVendedor = new System.Windows.Forms.Button();
@@ -43,12 +44,11 @@
             this.panelClientes = new System.Windows.Forms.Panel();
             this.button1 = new System.Windows.Forms.Button();
             this.listaClientes = new System.Windows.Forms.DataGridView();
-            this.chart1 = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.panelReportes.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.chart1)).BeginInit();
             this.panelVentasVendedor.SuspendLayout();
             this.panelClientes.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.listaClientes)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.chart1)).BeginInit();
             this.SuspendLayout();
             // 
             // panelReportes
@@ -65,18 +65,35 @@
             this.panelReportes.Controls.Add(this.fechaDesde);
             this.panelReportes.Location = new System.Drawing.Point(23, 67);
             this.panelReportes.Name = "panelReportes";
-            this.panelReportes.Size = new System.Drawing.Size(1366, 743);
+            this.panelReportes.Size = new System.Drawing.Size(1508, 923);
             this.panelReportes.TabIndex = 0;
             this.panelReportes.Paint += new System.Windows.Forms.PaintEventHandler(this.panelReportes_Paint);
+            // 
+            // chart1
+            // 
+            chartArea1.Name = "ChartArea1";
+            this.chart1.ChartAreas.Add(chartArea1);
+            legend1.Name = "Legend1";
+            this.chart1.Legends.Add(legend1);
+            this.chart1.Location = new System.Drawing.Point(22, 247);
+            this.chart1.Name = "chart1";
+            series1.ChartArea = "ChartArea1";
+            series1.Legend = "Legend1";
+            series1.Name = "Series1";
+            this.chart1.Series.Add(series1);
+            this.chart1.Size = new System.Drawing.Size(1031, 456);
+            this.chart1.TabIndex = 3;
+            this.chart1.Text = "chart1";
+            this.chart1.Click += new System.EventHandler(this.chart1_Click);
             // 
             // panelVentasVendedor
             // 
             this.panelVentasVendedor.Controls.Add(this.textBoxBuscarVendedor);
             this.panelVentasVendedor.Controls.Add(this.botonVentasVendedor);
             this.panelVentasVendedor.Controls.Add(this.tituloVendedor);
-            this.panelVentasVendedor.Location = new System.Drawing.Point(49, 161);
+            this.panelVentasVendedor.Location = new System.Drawing.Point(22, 161);
             this.panelVentasVendedor.Name = "panelVentasVendedor";
-            this.panelVentasVendedor.Size = new System.Drawing.Size(563, 91);
+            this.panelVentasVendedor.Size = new System.Drawing.Size(590, 91);
             this.panelVentasVendedor.TabIndex = 3;
             this.panelVentasVendedor.Paint += new System.Windows.Forms.PaintEventHandler(this.panelVentasVendedor_Paint);
             // 
@@ -153,9 +170,9 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.panelClientes.Controls.Add(this.button1);
             this.panelClientes.Controls.Add(this.listaClientes);
-            this.panelClientes.Location = new System.Drawing.Point(788, 73);
+            this.panelClientes.Location = new System.Drawing.Point(1155, 73);
             this.panelClientes.Name = "panelClientes";
-            this.panelClientes.Size = new System.Drawing.Size(1011, 734);
+            this.panelClientes.Size = new System.Drawing.Size(786, 914);
             this.panelClientes.TabIndex = 1;
             // 
             // button1
@@ -176,38 +193,21 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.listaClientes.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
             this.listaClientes.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.listaClientes.Location = new System.Drawing.Point(18, 67);
+            this.listaClientes.Location = new System.Drawing.Point(18, 53);
             this.listaClientes.Name = "listaClientes";
             this.listaClientes.ReadOnly = true;
             this.listaClientes.RowHeadersWidth = 51;
             this.listaClientes.RowTemplate.Height = 24;
             this.listaClientes.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.listaClientes.Size = new System.Drawing.Size(979, 618);
+            this.listaClientes.Size = new System.Drawing.Size(714, 807);
             this.listaClientes.TabIndex = 0;
             this.listaClientes.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.listaClientes_CellContentClick);
-            // 
-            // chart1
-            // 
-            chartArea1.Name = "ChartArea1";
-            this.chart1.ChartAreas.Add(chartArea1);
-            legend1.Name = "Legend1";
-            this.chart1.Legends.Add(legend1);
-            this.chart1.Location = new System.Drawing.Point(-11, 292);
-            this.chart1.Name = "chart1";
-            series1.ChartArea = "ChartArea1";
-            series1.Legend = "Legend1";
-            series1.Name = "Series1";
-            this.chart1.Series.Add(series1);
-            this.chart1.Size = new System.Drawing.Size(770, 448);
-            this.chart1.TabIndex = 3;
-            this.chart1.Text = "chart1";
-            this.chart1.Click += new System.EventHandler(this.chart1_Click);
             // 
             // FormReportes
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1811, 895);
+            this.ClientSize = new System.Drawing.Size(1953, 1075);
             this.Controls.Add(this.panelClientes);
             this.Controls.Add(this.panelReportes);
             this.Name = "FormReportes";
@@ -215,11 +215,11 @@
             this.Load += new System.EventHandler(this.FormReporte_Load);
             this.panelReportes.ResumeLayout(false);
             this.panelReportes.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.chart1)).EndInit();
             this.panelVentasVendedor.ResumeLayout(false);
             this.panelVentasVendedor.PerformLayout();
             this.panelClientes.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.listaClientes)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.chart1)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
